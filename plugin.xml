@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="padacore.editor.AdaEditor"
+            default="true"
+            extensions="ads,adb"
+            id="padacore.editor.AdaEditor"
+            name="Ada Editor">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.core.filebuffers.documentSetup">
+      <participant
+            class="padacore.editor.AdaDocumentSetupParticipant"
+            extensions="ads,adb">
+      </participant>
+   </extension>
+
+</plugin>
