@@ -6,14 +6,15 @@ import java.util.List;
 
 public class GprProject {
 
-	private String name;
-	private List<String> sourcesDir;
-	private String objectDir;
-	private String execDir;
+	private String       name;
+	private List<String> sourcesDir = new ArrayList<String>();
+	private String       objectDir  = "obj";
+	private String       execDir    = "exe";
 	
 	public GprProject (String name) {
+		assert !name.isEmpty();
+		
 		this.name = name;
-		this.sourcesDir = new ArrayList<String>();
 		this.addSourceDir (".");
 	}
 
