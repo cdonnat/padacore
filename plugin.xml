@@ -18,5 +18,19 @@
             extensions="ads,adb">
       </participant>
    </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            id="padacore.wizards.ada"
+            name="Ada">
+      </category>
+      <wizard
+            category="padacore.wizards.ada"
+            class="padacore.wizards.NewAdaProjectWizard"
+            id="padacore.wizards.NewGnatProjectWizard"
+            name="Ada Project"
+            project="true">
+      </wizard>
+   </extension>
 
 </plugin>
