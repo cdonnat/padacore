@@ -1,4 +1,4 @@
-package padacore.editor;
+package org.padacore.editor;
 
 import org.eclipse.ui.editors.text.TextEditor;
 

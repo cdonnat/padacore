@@ -1,11 +1,11 @@
-package padacore;
+package org.padacore;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
-import padacore.editor.scanners.AdaCodeScanner;
-import padacore.editor.scanners.AdaCommentScanner;
-import padacore.editor.scanners.AdaPartitionScanner;
+import org.padacore.editor.scanners.AdaCodeScanner;
+import org.padacore.editor.scanners.AdaCommentScanner;
+import org.padacore.editor.scanners.AdaPartitionScanner;
 
 /**
  * The activator class controls the plug-in life cycle

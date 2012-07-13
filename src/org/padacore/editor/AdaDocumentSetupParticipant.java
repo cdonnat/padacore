@@ -1,4 +1,4 @@
-package padacore.editor;
+package org.padacore.editor;
 
 import org.eclipse.core.filebuffers.IDocumentSetupParticipant;
 import org.eclipse.jface.text.IDocument;
@@ -6,8 +6,8 @@ import org.eclipse.jface.text.IDocumentExtension3;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.rules.FastPartitioner;
 
-import padacore.Activator;
-import padacore.editor.scanners.AdaPartitionScanner;
+import org.padacore.Activator;
+import org.padacore.editor.scanners.AdaPartitionScanner;
 
 public class AdaDocumentSetupParticipant implements IDocumentSetupParticipant {
 

@@ -9,7 +9,7 @@
  *     AdaCore - Initial API and implementation
  *****************************************************************************/
 
-package padacore.editor.rules;
+package org.padacore.editor.rules;
 
 public class SyntaxUtils {
 

@@ -1,4 +1,4 @@
-package padacore.editor.scanners;
+package org.padacore.editor.scanners;
 
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.EndOfLineRule;

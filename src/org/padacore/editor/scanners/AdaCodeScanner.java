@@ -1,4 +1,4 @@
-package padacore.editor.scanners;
+package org.padacore.editor.scanners;
 
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.rules.IRule;
@@ -11,11 +11,11 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 
-import padacore.editor.rules.AdaCharacterRule;
-import padacore.editor.rules.AdaKeywordRule;
-import padacore.editor.rules.AdaNumberRule;
-import padacore.editor.rules.AdaStringRule;
-import padacore.editor.rules.AdaWordDetector;
+import org.padacore.editor.rules.AdaCharacterRule;
+import org.padacore.editor.rules.AdaKeywordRule;
+import org.padacore.editor.rules.AdaNumberRule;
+import org.padacore.editor.rules.AdaStringRule;
+import org.padacore.editor.rules.AdaWordDetector;
 
 public class AdaCodeScanner extends RuleBasedScanner {
 

@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Padacore
 Bundle-SymbolicName: padacore;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: padacore.Activator
+Bundle-Activator: org.padacore.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.ui.editors;bundle-version="3.7.0",

@@ -9,20 +9,15 @@
  *     AdaCore - Initial API and implementation
  *******************************************************************************/
 
-package padacore.editor.rules;
+package org.padacore.editor.rules;
 
 import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
 
-import padacore.editor.rules.SyntaxUtils;
+import org.padacore.editor.rules.SyntaxUtils;
 
-/**
- * Dectects a keyword, whatever casing it has.
- * 
- * @author ochem
- */
 public class AdaKeywordRule implements IPredicateRule {
 
 	private IToken fToken;

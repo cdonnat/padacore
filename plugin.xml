@@ -4,30 +4,30 @@
    <extension
          point="org.eclipse.ui.editors">
       <editor
-            class="padacore.editor.AdaEditor"
+            class="org.padacore.editor.AdaEditor"
             default="true"
             extensions="ads,adb"
-            id="padacore.editor.AdaEditor"
+            id="org.padacore.editor.AdaEditor"
             name="Ada Editor">
       </editor>
    </extension>
    <extension
          point="org.eclipse.core.filebuffers.documentSetup">
       <participant
-            class="padacore.editor.AdaDocumentSetupParticipant"
+            class="org.padacore.editor.AdaDocumentSetupParticipant"
             extensions="ads,adb">
       </participant>
    </extension>
    <extension
          point="org.eclipse.ui.newWizards">
       <category
-            id="padacore.wizards.ada"
+            id="org.padacore.wizards.ada"
             name="Ada">
       </category>
       <wizard
-            category="padacore.wizards.ada"
-            class="padacore.wizards.NewAdaProjectWizard"
-            id="padacore.wizards.NewGnatProjectWizard"
+            category="org.padacore.wizards.ada"
+            class="org.padacore.wizards.NewAdaProjectWizard"
+            id="org.padacore.wizards.NewGnatProjectWizard"
             name="Ada Project"
             project="true">
       </wizard>

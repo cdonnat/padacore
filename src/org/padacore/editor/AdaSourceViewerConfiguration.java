@@ -1,4 +1,4 @@
-package padacore.editor;
+package org.padacore.editor;
 
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
@@ -7,8 +7,8 @@ import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 
-import padacore.Activator;
-import padacore.editor.scanners.AdaPartitionScanner;
+import org.padacore.Activator;
+import org.padacore.editor.scanners.AdaPartitionScanner;
 
 public class AdaSourceViewerConfiguration extends SourceViewerConfiguration {
 

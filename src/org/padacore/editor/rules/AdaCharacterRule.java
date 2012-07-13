@@ -1,5 +1,5 @@
 
-package padacore.editor.rules;
+package org.padacore.editor.rules;
 
 import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IPredicateRule;
