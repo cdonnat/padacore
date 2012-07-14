@@ -9,16 +9,19 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.ide.IDE;
+import org.padacore.IAdaSourceFile;
 
-public class NewAdaSpecWizard extends Wizard implements INewWizard {
+public class NewAdaSourceFileWizard extends Wizard implements INewWizard {
 	
 	private IStructuredSelection selection;
-	private FileGeneralInfoPage fileCreationPage;
+	private AdaSourceFileCreationPage fileCreationPage;
 	private IWorkbench workbench;
+	private IAdaSourceFile sourceFileType;
 	
-	public NewAdaSpecWizard() {
+	public NewAdaSourceFileWizard(IAdaSourceFile sourceFileType) {
 		super();
-		super.setWindowTitle("New Ada specification");
+		this.sourceFileType = sourceFileType;
+		super.setWindowTitle(sourceFileType.getFileTypeDescription());
 	}
 	
 
@@ -44,16 +47,12 @@ public class NewAdaSpecWizard extends Wizard implements INewWizard {
 			}
 		} 
 		
-		
-		
-		
-		
 		return performFinish;
 	}
 	
 	@Override
 	public void addPages() {
-		this.fileCreationPage = new FileGeneralInfoPage("General information", selection); 
+		this.fileCreationPage = new AdaSourceFileCreationPage("General information", selection, this.sourceFileType); 
 		super.addPage(this.fileCreationPage);
 	}
 

@@ -33,9 +33,16 @@
       </wizard>
       <wizard
             category="org.padacore.wizards.ada"
-            class="org.padacore.wizards.NewAdaSpecWizard"
-            id="org.padacore.wizards.NewAdaSpecWizard"
+            class="org.padacore.wizards.NewAdaSpecificationWizard"
+            id="org.padacore.wizards.NewAdaSpecificationWizard"
             name="Ada Specification"
+            project="false">
+      </wizard>
+      <wizard
+            category="org.padacore.wizards.ada"
+            class="org.padacore.wizards.NewAdaImplementationWizard"
+            id="org.padacore.wizards.NewAdaImplementationWizard"
+            name="Ada Implementation"
             project="false">
       </wizard>
    </extension>
