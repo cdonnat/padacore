@@ -1,6 +1,5 @@
 package org.padacore.wizards;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
