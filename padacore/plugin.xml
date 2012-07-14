@@ -31,6 +31,13 @@
             name="Ada Project"
             project="true">
       </wizard>
+      <wizard
+            category="org.padacore.wizards.ada"
+            class="org.padacore.wizards.NewAdaSpecWizard"
+            id="org.padacore.wizards.NewAdaSpecWizard"
+            name="Ada Specification"
+            project="false">
+      </wizard>
    </extension>
 
 </plugin>
