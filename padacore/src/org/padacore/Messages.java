@@ -5,6 +5,8 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "org.padacore.messages"; //$NON-NLS-1$
 	public static String AdaImplementationFile_Description;
+	public static String AdaPreferences_Description;
+	public static String AdaPreferences_Title;
 	public static String AdaSpecificationFile_Description;
 	public static String NewAdaProjectWizard_Description;
 	public static String NewAdaProjectWizard_PageName;
