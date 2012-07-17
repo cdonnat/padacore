@@ -3,7 +3,7 @@ package org.padacore;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-public class AdaSpecificationFile implements IAdaSourceFile {
+public class AdaSpecificationFile extends AdaSourceFile {
 
 	@Override
 	public String getExtension() {

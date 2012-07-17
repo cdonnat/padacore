@@ -8,7 +8,7 @@ import org.padacore.AdaImplementationFile;
 public class AdaImplementationFileTest {
 
 	@Test
-	public void ExtensionTest() {
+	public void extensionTest() {
 		AdaImplementationFile sut = new AdaImplementationFile();
 
 		assertEquals("Extension of Ada implementation shall be set to ",
