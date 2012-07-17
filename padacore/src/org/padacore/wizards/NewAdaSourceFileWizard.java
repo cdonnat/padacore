@@ -22,7 +22,7 @@ public class NewAdaSourceFileWizard extends Wizard implements INewWizard {
 		this.sourceFileType = sourceFileType;
 		super.setWindowTitle(sourceFileType.getFileTypeDescription());
 	}
-	
+
 	@Override
 	public boolean performFinish() {
 		IFile createdFile = this.fileCreationPage.createNewFile();

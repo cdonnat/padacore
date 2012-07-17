@@ -1,5 +1,8 @@
 package org.padacore;
 
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,5 +47,28 @@ public class GprProject {
 
 	public String name() {
 		return name;
+	}
+	
+	public void save(OutputStream out) {
+		DataOutputStream data = new DataOutputStream(out);
+
+		try {
+			data.writeBytes("project " + name() + " is\n");
+			data.writeBytes("\tfor Source_Dirs use (");
+
+			for (int i = 0; i < sourcesDir().size() - 1; i++) {
+				data.writeBytes("\"" + sourcesDir().get(i) + "\",\n");
+			}
+			data.writeBytes("\""
+					+ sourcesDir().get(sourcesDir().size() - 1)
+					+ "\");\n");
+
+			data.writeBytes("\tfor Object_Dir use \"" + objectDir() + "\";\n");
+			data.writeBytes("\tfor Exec_Dir use \"" + execDir() + "\";\n");
+			data.writeBytes("end " + name() + ";");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }
