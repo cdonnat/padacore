@@ -46,5 +46,14 @@
             project="false">
       </wizard>
    </extension>
+   <extension
+         id="id1"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="org.padacore.AdaProjectNature">
+         </run>
+      </runtime>
+   </extension>
 
 </plugin>
