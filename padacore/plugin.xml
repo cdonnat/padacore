@@ -47,7 +47,7 @@
       </wizard>
    </extension>
    <extension
-         id="id1"
+         id="org.padacore.nature"
          point="org.eclipse.core.resources.natures">
       <runtime>
          <run
@@ -62,6 +62,14 @@
             id="org.padacore.preferences.AdaPreferences"
             name="Ada">
       </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.ide.projectNatureImages">
+      <image
+            icon="icons/ada_ovr.gif"
+            id="padacore.adaProjectNatureImg"
+            natureId="org.padacore.projectNature">
+      </image>
    </extension>
 
 </plugin>
