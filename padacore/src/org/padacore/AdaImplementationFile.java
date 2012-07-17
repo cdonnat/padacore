@@ -7,18 +7,18 @@ public class AdaImplementationFile implements IAdaSourceFile {
 
 	@Override
 	public String getExtension() {
-		return "adb";
+		return "adb"; //$NON-NLS-1$
 	}
 
 	@Override
 	public String getFileTypeDescription() {
-		return "Ada Implementation file";
+		return Messages.AdaImplementationFile_Description;
 	}
 
 	@Override
 	public InputStream getTemplate() {
 		//TODO get template from file
-		return new ByteArrayInputStream("-- Adb template".getBytes());
+		return new ByteArrayInputStream("-- Adb template".getBytes()); //$NON-NLS-1$
 	}
 
 }

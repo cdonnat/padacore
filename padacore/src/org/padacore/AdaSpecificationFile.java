@@ -7,18 +7,18 @@ public class AdaSpecificationFile implements IAdaSourceFile {
 
 	@Override
 	public String getExtension() {
-		return "ads";
+		return "ads"; //$NON-NLS-1$
 	}
 
 	@Override
 	public String getFileTypeDescription() {
-		return "Ada Specification file";
+		return Messages.AdaSpecificationFile_Description;
 	}
 
 	@Override
 	public InputStream getTemplate() {
 		//TODO get template from preferences
-		return new ByteArrayInputStream("-- Ads template".getBytes());
+		return new ByteArrayInputStream("-- Ads template".getBytes()); //$NON-NLS-1$
 	}
 
 }

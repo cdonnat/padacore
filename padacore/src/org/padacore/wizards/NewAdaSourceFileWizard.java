@@ -12,54 +12,54 @@ import org.eclipse.ui.ide.IDE;
 import org.padacore.IAdaSourceFile;
 
 public class NewAdaSourceFileWizard extends Wizard implements INewWizard {
-	
+
 	private IStructuredSelection selection;
 	private AdaSourceFileCreationPage fileCreationPage;
 	private IWorkbench workbench;
 	private IAdaSourceFile sourceFileType;
-	
+
 	public NewAdaSourceFileWizard(IAdaSourceFile sourceFileType) {
 		super();
 		this.sourceFileType = sourceFileType;
 		super.setWindowTitle(sourceFileType.getFileTypeDescription());
 	}
-	
 
 	@Override
 	public boolean performFinish() {
 		IFile createdFile = this.fileCreationPage.createNewFile();
-		IWorkbenchPage activePage = this.workbench.getActiveWorkbenchWindow().getActivePage();
+		IWorkbenchPage activePage = this.workbench.getActiveWorkbenchWindow()
+				.getActivePage();
 		boolean performFinish = false;
-		
+
 		if (createdFile != null) {
-			
+
 			try {
-				
-			IDE.openEditor(activePage, createdFile);
+
+				IDE.openEditor(activePage, createdFile);
 			}
-			
+
 			catch (PartInitException e) {
 				// simply don't open editor
 			}
-			
+
 			finally {
-			performFinish = true;
+				performFinish = true;
 			}
-		} 
-		
+		}
+
 		return performFinish;
 	}
-	
+
 	@Override
 	public void addPages() {
-		this.fileCreationPage = new AdaSourceFileCreationPage("General information", selection, this.sourceFileType); 
+		this.fileCreationPage = new AdaSourceFileCreationPage(
+				"General information", selection, this.sourceFileType);
 		super.addPage(this.fileCreationPage);
 	}
 
-
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
-				this.selection = selection;
-				this.workbench = workbench;
+		this.selection = selection;
+		this.workbench = workbench;
 	}
 }
