@@ -11,6 +11,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.padacore.Messages;
 
 public class AdaPreferences implements IWorkbenchPreferencePage {
 
@@ -59,7 +60,7 @@ public class AdaPreferences implements IWorkbenchPreferencePage {
 		Label adaInfo = new Label(adaPreferences, SWT.NONE);
 		
 		adaPreferences.setLayout(layout);
-		adaInfo.setText("Groups preferences related to Ada language in padacore plugin.");
+		adaInfo.setText(Messages.AdaPreferences_Description);
 		
 		this.control = adaPreferences;
 	}
@@ -91,7 +92,7 @@ public class AdaPreferences implements IWorkbenchPreferencePage {
 
 	@Override
 	public String getMessage() {
-		return "Ada";
+		return Messages.AdaPreferences_Title;
 	}
 
 	@Override
