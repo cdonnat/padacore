@@ -4,14 +4,12 @@ import java.net.URI;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.padacore.AdaProjectNature;
 
 public class NewAdaProject {
 
 	private IProject            project;
-	private URI                 location;
 	private IProjectDescription description;
 	
 	private static final String[] NATURES = {AdaProjectNature.NATURE_ID}; 
@@ -26,12 +24,11 @@ public class NewAdaProject {
 	 */
 	public NewAdaProject (IProject project, URI location) {
 		
-		this.location    = location;
 		this.project     = project;
 		this.description = project.getWorkspace().newProjectDescription(project.getName());
 		
 		this.description.setNatureIds(NATURES);
-		//this.description.setLocationURI(location);		
+		this.description.setLocationURI(location);		 
 	}
 	
 	/**
