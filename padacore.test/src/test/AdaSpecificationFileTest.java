@@ -7,7 +7,7 @@ import org.padacore.AdaSpecificationFile;
 public class AdaSpecificationFileTest {
 
 	@Test
-	public void ExtensionTest() {
+	public void extensionTest() {
 		AdaSpecificationFile sut = new AdaSpecificationFile();
 
 		assertEquals("Extension of Ada specification shall be set to ",

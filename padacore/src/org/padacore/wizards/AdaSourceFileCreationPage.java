@@ -5,11 +5,11 @@ import java.io.InputStream;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
-import org.padacore.IAdaSourceFile;
+import org.padacore.AdaSourceFile;
 
 public class AdaSourceFileCreationPage extends WizardNewFileCreationPage {
 
-	private IAdaSourceFile sourceFileType;
+	private AdaSourceFile sourceFileType;
 
 	/**
 	 * Creates a new wizard page for Ada source file creation.
@@ -18,7 +18,7 @@ public class AdaSourceFileCreationPage extends WizardNewFileCreationPage {
 	 * @param sourceFileType the type of Ada source file to create
 	 */
 	public AdaSourceFileCreationPage(String pageName,
-			IStructuredSelection selection, IAdaSourceFile sourceFileType) {
+			IStructuredSelection selection, AdaSourceFile sourceFileType) {
 		super(pageName, selection);
 		this.sourceFileType = sourceFileType;
 		super.setFileExtension(sourceFileType.getExtension());
@@ -34,45 +34,36 @@ public class AdaSourceFileCreationPage extends WizardNewFileCreationPage {
 	@Override
 	protected InputStream getInitialContents() {
 		return this.sourceFileType.getTemplate();
-
+	}
+	
+	@Override
+	public void setFileName(String value) {
+		super.setFileName(value);
 	}
 	
 	/**
 	 * Displays an error message if the input file name is considered as incorrect.
 	 */
 	private void displayErrorMsgForIncorrectFileName() {
-		String errorMsgIfDotInFileName = "Filename cannot contain any dot.";
+		String errorMsgIfInvalidFileName = "Filename is invalid (it shall contain only letters, digits, underscores and dashes and shall shart with a letter or digit.";
 
-			if (this.getErrorMessage() == null) {
-				this.setErrorMessage(errorMsgIfDotInFileName);
-			} else {
-				this.setErrorMessage(this.getErrorMessage()
-						+ "\n" + errorMsgIfDotInFileName);
-			}
+		this.setErrorMessage(errorMsgIfInvalidFileName);
 	}
 	
-	/**
-	 * Checks if the input file name is correct.
-	 * @return True if the file name is correct, False otherwise.
-	 */
-	private boolean isFileNameCorrect() {
-		boolean fileNameIsEmpty = this.getFileName() == null || this.getFileName().length() == 0;
-		boolean fileNameContainsNoDot = fileNameIsEmpty
-				|| (this.getFileName().indexOf(".") == this.getFileName()
-						.length() - this.getFileExtension().length() - 1);
-		
-		return fileNameIsEmpty || fileNameContainsNoDot;
-	}
-
 	@Override
 	protected boolean validatePage() {
 		boolean pageIsValid = super.validatePage();
+		boolean fileNameIsValid = false;
 		
-		if (!isFileNameCorrect()) {
-			displayErrorMsgForIncorrectFileName();
+		if (pageIsValid) {
+			fileNameIsValid = this.sourceFileType.isFileNameValid(this.getFileName()); 
+			
+			if (!fileNameIsValid){
+				displayErrorMsgForIncorrectFileName();
+			}
 		}
-
-		pageIsValid = pageIsValid && isFileNameCorrect();
+		
+		pageIsValid = pageIsValid && fileNameIsValid;
 
 		return pageIsValid;
 	}

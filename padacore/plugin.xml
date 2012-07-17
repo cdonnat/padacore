@@ -46,5 +46,13 @@
             project="false">
       </wizard>
    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="org.padacore.preferences.AdaPreferences"
+            id="org.padacore.preferences.AdaPreferences"
+            name="Ada">
+      </page>
+   </extension>
 
 </plugin>
