@@ -4,6 +4,7 @@ import java.net.URI;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.padacore.AdaProjectNature;
 
@@ -22,13 +23,15 @@ public class NewAdaProject {
 	 * @param location
 	 *            Project location.
 	 */
-	public NewAdaProject (IProject project, URI location) {
+	public NewAdaProject (String projectName, boolean useDefaultLocation, URI location) {
 		
-		this.project     = project;
+		this.project     = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 		this.description = project.getWorkspace().newProjectDescription(project.getName());
 		
 		this.description.setNatureIds(NATURES);
-		this.description.setLocationURI(location);		 
+		
+		URI projectLocation = useDefaultLocation ? null : location;
+		this.description.setLocationURI(projectLocation);		 
 	}
 	
 	/**
