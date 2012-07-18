@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Padacore
-Bundle-SymbolicName: padacore;singleton:=true
+Bundle-SymbolicName: org.padacore;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.padacore.Activator
 Require-Bundle: org.eclipse.ui,

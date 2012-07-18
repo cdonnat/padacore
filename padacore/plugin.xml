@@ -7,6 +7,7 @@
             class="org.padacore.editor.AdaEditor"
             default="true"
             extensions="ads,adb"
+            icon="icons/adafile_obj.gif"
             id="org.padacore.editor.AdaEditor"
             name="Ada Editor">
       </editor>
@@ -27,6 +28,7 @@
       <wizard
             category="org.padacore.wizards.ada"
             class="org.padacore.wizards.NewAdaProjectWizard"
+            icon="icons/newadaprj_wiz.gif"
             id="org.padacore.wizards.NewGnatProjectWizard"
             name="Ada Project"
             project="true">
@@ -47,7 +49,7 @@
       </wizard>
    </extension>
    <extension
-         id="org.padacore.nature"
+         id="adaProjectNature"
          point="org.eclipse.core.resources.natures">
       <runtime>
          <run
@@ -68,7 +70,7 @@
       <image
             icon="icons/ada_ovr.gif"
             id="padacore.adaProjectNatureImg"
-            natureId="org.padacore.projectNature">
+            natureId="org.padacore.adaProjectNature">
       </image>
    </extension>
 

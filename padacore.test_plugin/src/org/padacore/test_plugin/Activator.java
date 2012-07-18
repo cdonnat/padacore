@@ -1,4 +1,4 @@
-package padacore.test_plugin;
+package org.padacore.test_plugin;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;

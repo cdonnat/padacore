@@ -1,4 +1,4 @@
-package padacore.test_plugin;
+package org.padacore.test_plugin;
 
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
