@@ -6,7 +6,7 @@ import org.eclipse.core.runtime.CoreException;
 
 public class AdaProjectNature implements IProjectNature {
 
-	public static final String NATURE_ID = "org.padacore.projectNature";
+	public static final String NATURE_ID = "org.padacore.adaProjectNature";
 	
 	@Override
 	public void configure() throws CoreException {

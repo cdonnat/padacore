@@ -11,7 +11,6 @@ import org.padacore.AdaProjectNature;
 public class NewAdaProject {
 
 	private IProject            project;
-	private URI                 location;
 	private IProjectDescription description;
 	
 	private static final String[] NATURES = {AdaProjectNature.NATURE_ID}; 
@@ -24,14 +23,15 @@ public class NewAdaProject {
 	 * @param location
 	 *            Project location.
 	 */
-	public NewAdaProject (IProject project, URI location) {
+	public NewAdaProject (String projectName, boolean useDefaultLocation, URI location) {
 		
-		this.location    = location;
-		this.project     = project;
+		this.project     = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 		this.description = project.getWorkspace().newProjectDescription(project.getName());
 		
 		this.description.setNatureIds(NATURES);
-		//this.description.setLocationURI(location);		
+		
+		URI projectLocation = useDefaultLocation ? null : location;
+		this.description.setLocationURI(projectLocation);		 
 	}
 	
 	/**

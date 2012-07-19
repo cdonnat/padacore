@@ -1,17 +1,18 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Padacore
-Bundle-SymbolicName: padacore;singleton:=true
+Bundle-SymbolicName: org.padacore;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.padacore.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.ui.editors;bundle-version="3.7.0",
  org.eclipse.ui.workbench.texteditor;bundle-version="3.7.0",
- org.eclipse.jface.text;bundle-version="3.7.2"
+ org.eclipse.jface.text;bundle-version="3.7.2",
+ org.eclipse.core.resources;bundle-version="3.7.101"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: org.eclipse.core.resources,
- org.eclipse.ui.dialogs,
+Import-Package: org.eclipse.ui.dialogs,
  org.eclipse.ui.ide
-Export-Package: org.padacore
+Export-Package: org.padacore,
+ org.padacore.wizards

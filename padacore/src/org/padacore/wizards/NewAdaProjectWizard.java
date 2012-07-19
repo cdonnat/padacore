@@ -27,8 +27,9 @@ public class NewAdaProjectWizard extends Wizard implements INewWizard {
 
 	@Override
 	public boolean performFinish() {
-		NewAdaProject project = new NewAdaProject(
-				projectCreationPage.getProjectHandle(),
+		NewAdaProject project = new NewAdaProject(projectCreationPage
+				.getProjectHandle().getName(),
+				projectCreationPage.useDefaults(),
 				projectCreationPage.getLocationURI());
 		project.Create();
 
