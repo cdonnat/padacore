@@ -59,7 +59,7 @@
          point="org.eclipse.ui.preferencePages">
       <page
             class="org.padacore.preferences.AdaPreferences"
-            id="org.padacore.preferences.AdaPreferences"
+            id="org.padacore.preferences"
             name="Ada">
       </page>
    </extension>
