@@ -31,7 +31,7 @@ public class NewAdaProject {
 		this.description.setNatureIds(NATURES);
 		
 		URI projectLocation = useDefaultLocation ? null : location;
-		this.description.setLocationURI(projectLocation);		 
+		this.description.setLocationURI(projectLocation);	
 	}
 	
 	/**
@@ -42,8 +42,9 @@ public class NewAdaProject {
 
 		if (!project.exists()) {
 			try {
-				project.create(description, null);
+				project.create(null);
 				project.open(null);
+				project.setDescription(description, null);
 			} catch (CoreException e) {
 				e.printStackTrace();
 			}

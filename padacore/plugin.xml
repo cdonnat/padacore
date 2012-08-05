@@ -56,6 +56,9 @@
                class="org.padacore.AdaProjectNature">
          </run>
       </runtime>
+      <builder
+            id="org.padacore.builder.AdaProjectBuilder">
+      </builder>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
@@ -72,6 +75,20 @@
             id="padacore.adaProjectNatureImg"
             natureId="org.padacore.adaProjectNature">
       </image>
+   </extension>
+   <extension
+         id="org.padacore.builder.AdaProjectBuilder"
+         name="Ada project builder"
+         point="org.eclipse.core.resources.builders">
+      <builder
+            callOnEmptyDelta="false"
+            hasNature="true"
+            isConfigurable="false"
+            supportsConfigurations="false">
+         <run
+               class="org.padacore.builder.AdaProjectBuilder">
+         </run>
+      </builder>
    </extension>
 
 </plugin>
