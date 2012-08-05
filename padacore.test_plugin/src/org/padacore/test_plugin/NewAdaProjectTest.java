@@ -4,8 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
-
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -36,7 +34,7 @@ public class NewAdaProjectTest {
 
 			assertEquals("Project location shall be in workspace", ResourcesPlugin.getWorkspace()
 					.getRoot().getLocationURI().getPath()
-					+ File.separator + "TestProject", createdProject.getLocationURI().getPath());
+					+ "/" + "TestProject", createdProject.getLocationURI().getPath());
 
 		} catch (CoreException e) {
 			// TODO Auto-generated catch block
