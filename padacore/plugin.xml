@@ -36,6 +36,7 @@
       <wizard
             category="org.padacore.wizards.ada"
             class="org.padacore.wizards.NewAdaSpecificationWizard"
+            icon="icons/ada_new_spec_wiz.gif"
             id="org.padacore.wizards.NewAdaSpecificationWizard"
             name="Ada Specification"
             project="false">
@@ -43,6 +44,7 @@
       <wizard
             category="org.padacore.wizards.ada"
             class="org.padacore.wizards.NewAdaImplementationWizard"
+            icon="icons/ada_new_body_wiz.gif"
             id="org.padacore.wizards.NewAdaImplementationWizard"
             name="Ada Implementation"
             project="false">
