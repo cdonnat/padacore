@@ -2,8 +2,6 @@ package src.test;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.ByteArrayOutputStream;
-
 import org.junit.Test;
 import org.padacore.GprProject;
 
@@ -18,7 +16,7 @@ public class GprProjectTest {
 		assertEquals("One Source dir shall be set", sut.sourcesDir().size(), 1);
 		assertEquals("Source dir shall be set to .", sut.sourcesDir().get(0), ".");
 		assertEquals("Obj dir shall be set to obj", sut.objectDir(), "obj");
-		assertEquals("Exe dir shall be set to exe", sut.execDir(), "exe");
+		assertEquals("Exe dir shall be set to exe", sut.executableDir(), "exe");
 	}
 
 	
@@ -28,13 +26,10 @@ public class GprProjectTest {
 
 		final String expectedDefaultProject = "project Test is\n"
 				+ "\tfor Source_Dirs use (\".\");\n"
-				+ "\tfor Object_Dir use \"obj\";\n" + "\tfor Exec_Dir use \"exe\";\n"
-				+ "end Test;";
-		ByteArrayOutputStream output = new ByteArrayOutputStream();
+				+ "\tfor Object_Dir use \"obj\";\n"
+				+ "end Test;";		
 
-		sut.save(output);
-
-		assertEquals("Gpr project content", expectedDefaultProject, output.toString());
+		assertEquals("Gpr project content", expectedDefaultProject,sut.toString());
 	}
 }
  

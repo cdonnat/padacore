@@ -12,6 +12,7 @@ public class Messages extends NLS {
 	public static String NewAdaProjectWizard_PageName;
 	public static String NewAdaProjectWizard_Title;
 	public static String NewAdaProjectWizard_WizardName;
+	public static String AdaProjectCreationPage_AddMainProcedure;
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

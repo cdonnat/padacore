@@ -17,7 +17,7 @@ public class AdaProjectNatureTest {
 	@Before
 	public void createAdaProject() {
 		NewAdaProject adaProject = new NewAdaProject("TestProject", true, null);
-		this.adaProject = adaProject.Create();
+		this.adaProject = adaProject.create(false);
 	}
 
 	@Test

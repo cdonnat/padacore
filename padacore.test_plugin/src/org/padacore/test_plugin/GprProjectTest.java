@@ -2,8 +2,6 @@ package org.padacore.test_plugin;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.ByteArrayOutputStream;
-
 import org.junit.Test;
 import org.padacore.GprProject;
 
@@ -18,23 +16,29 @@ public class GprProjectTest {
 		assertEquals("One Source dir shall be set", sut.sourcesDir().size(), 1);
 		assertEquals("Source dir shall be set to .", sut.sourcesDir().get(0), ".");
 		assertEquals("Obj dir shall be set to obj", sut.objectDir(), "obj");
-		assertEquals("Exe dir shall be set to exe", sut.execDir(), "exe");
+		assertEquals("Exe dir shall be set to exe", sut.executableDir(), "exe");
 	}
 
 	
 	@Test
 	public void saveTest() {
 		GprProject sut = new GprProject("Test");
-
-		final String expectedDefaultProject = "project Test is\n"
+		sut.setExecutable(true);
+		final String expectedExecutableDefaultProject = "project Test is\n"
 				+ "\tfor Source_Dirs use (\".\");\n"
 				+ "\tfor Object_Dir use \"obj\";\n" + "\tfor Exec_Dir use \"exe\";\n"
+				+ "\tfor Main use (\"main.adb\");\n"
 				+ "end Test;";
-		ByteArrayOutputStream output = new ByteArrayOutputStream();
 
-		sut.save(output);
+		assertEquals("Gpr executable project content", expectedExecutableDefaultProject, sut.toString());
+		
+		sut.setExecutable(false);
+		final String expectedDefaultProject = "project Test is\n"
+				+ "\tfor Source_Dirs use (\".\");\n"
+				+ "\tfor Object_Dir use \"obj\";\n"
+				+ "end Test;";
 
-		assertEquals("Gpr project content", expectedDefaultProject, output.toString());
+		assertEquals("Gpr project content", expectedDefaultProject, sut.toString());
 	}
 }
  

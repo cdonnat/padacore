@@ -25,15 +25,14 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 		for (IResource iResource : resources) {
 			if (iResource.getType() == IResource.FILE) {
 
-				if (iResource.getFileExtension().equals("adb")) {
+				if (iResource.getFileExtension().equals("gpr")) {
 
 					Runtime rt = Runtime.getRuntime();
 					try {
 
-						Process pr = rt.exec("gnatmake -D "
-								+ this.getProject().getLocation() + " -o "
-								+ this.getProject().getLocation()
-								+ "\\main.exe " + iResource.getLocation());
+						Process pr = rt.exec("gprbuild -p -P "
+								+ this.getProject().getLocation() + "/" 
+								+ this.getProject().getName() + ".gpr");
 
 						BufferedReader error = new BufferedReader(
 								new InputStreamReader(pr.getErrorStream()));

@@ -6,7 +6,7 @@
       <editor
             class="org.padacore.editor.AdaEditor"
             default="true"
-            extensions="ads,adb"
+            extensions="ads,adb,gpr"
             icon="icons/adafile_obj.gif"
             id="org.padacore.editor.AdaEditor"
             name="Ada Editor">
@@ -16,7 +16,7 @@
          point="org.eclipse.core.filebuffers.documentSetup">
       <participant
             class="org.padacore.editor.AdaDocumentSetupParticipant"
-            extensions="ads,adb">
+            extensions="ads,adb,gpr">
       </participant>
    </extension>
    <extension

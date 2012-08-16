@@ -4,7 +4,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 import org.padacore.Messages;
 
 public class NewAdaProjectWizard extends Wizard implements INewWizard {
@@ -14,7 +13,7 @@ public class NewAdaProjectWizard extends Wizard implements INewWizard {
 	private static final String TITLE = Messages.NewAdaProjectWizard_Title;
 	private static final String NEW_PROJECT_DESCRIPTION = Messages.NewAdaProjectWizard_Description;
 
-	private WizardNewProjectCreationPage projectCreationPage;
+	private AdaProjectCreationPage projectCreationPage;
 
 	public NewAdaProjectWizard() {
 		setWindowTitle(WIZARD_NAME);
@@ -32,14 +31,14 @@ public class NewAdaProjectWizard extends Wizard implements INewWizard {
 				.getProjectHandle().getName(),
 				projectCreationPage.useDefaults(),
 				projectCreationPage.getLocationURI());
-		project.Create();
+		project.create(projectCreationPage.addMainProcedure());
 		
 		return true;
 	}
 
 	@Override
 	public void addPages() {
-		projectCreationPage = new WizardNewProjectCreationPage(PAGE_NAME);
+		projectCreationPage = new AdaProjectCreationPage(PAGE_NAME);
 		projectCreationPage.setTitle(TITLE);
 		projectCreationPage.setDescription(NEW_PROJECT_DESCRIPTION);
 		addPage(projectCreationPage);

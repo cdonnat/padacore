@@ -1,10 +1,10 @@
-Padacore is an Eclipse plugin providing Ada support in Eclipse.
+Padacore is an Eclipse plugin providing Ada support for Eclipse.
 
 ### How to import Padacore into eclipse
 
 Requirements :
 * git
-* eclipse
+* eclipse (3.7.2 or above)
 
 [1] Clone Padacore repository 
 * git clone https://github.com/cdonnat/padacore.git
