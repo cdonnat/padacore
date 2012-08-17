@@ -85,7 +85,7 @@
       <builder
             callOnEmptyDelta="false"
             hasNature="true"
-            isConfigurable="false"
+            isConfigurable="true"
             supportsConfigurations="false">
          <run
                class="org.padacore.builder.AdaProjectBuilder">

@@ -17,50 +17,68 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 
 	}
 
-	@Override
-	protected IProject[] build(int kind, Map<String, String> args,
-			IProgressMonitor monitor) throws CoreException {
+	private String getGprFullPath() {
+		return this.getProject().getLocation() + "/" + this.getProject().getName() + ".gpr";
+	}
 
+	private boolean isAGprFile(IResource resource) {
+		return (resource.getType() == IResource.FILE) && resource.getFileExtension().equals("gpr");
+	}
+
+	private void displayErrors(Process process) throws IOException {
+		BufferedReader error = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+		String errorLine;
+
+		while ((errorLine = error.readLine()) != null) {
+			System.err.println(errorLine);
+		}
+	}
+
+	private void displayWarnings(Process process) throws IOException {
+		BufferedReader output = new BufferedReader(new InputStreamReader(process.getInputStream()));
+		String outputLine;
+
+		while ((outputLine = output.readLine()) != null) {
+			System.out.println(outputLine);
+		}
+	}
+
+	private String[] buildCommand(int kind) {
+		if (kind == FULL_BUILD || kind == INCREMENTAL_BUILD) {
+			return new String[] { "gprbuild", "-p", "-P", getGprFullPath() };
+		} else {
+			return new String[] { "gprclean", "-P", getGprFullPath() };
+		}
+	}
+
+	private void build (int kind) throws CoreException {
 		IResource[] resources = this.getProject().members();
 		for (IResource iResource : resources) {
-			if (iResource.getType() == IResource.FILE) {
+			if (isAGprFile(iResource)) {
 
-				if (iResource.getFileExtension().equals("gpr")) {
-
-					Runtime rt = Runtime.getRuntime();
-					try {
-
-						Process pr = rt.exec("gprbuild -p -P "
-								+ this.getProject().getLocation() + "/" 
-								+ this.getProject().getName() + ".gpr");
-
-						BufferedReader error = new BufferedReader(
-								new InputStreamReader(pr.getErrorStream()));
-						String errorLine;
-
-						while ((errorLine = error.readLine()) != null) {
-							System.err.println(errorLine);
-						}
-
-						BufferedReader output = new BufferedReader(
-								new InputStreamReader(pr.getInputStream()));
-						String outputLine;
-
-						while ((outputLine = output.readLine()) != null) {
-							System.out.println(outputLine);
-						}
-
-					} catch (IOException e) {
-						System.err.println("gnatmake execution failed on "
-								+ iResource.getName());
-						e.printStackTrace();
-					}
-					System.out.println("Found a file " + iResource.getName());
-				} else {
-					System.out.println("Found something different from a file");
+				Runtime rt = Runtime.getRuntime();
+				try {
+					Process process = rt.exec(buildCommand(kind));
+					displayErrors(process);
+					displayWarnings(process);
+				} catch (IOException e) {
+					System.err.println("gnatmake execution failed on " + iResource.getName());
+					e.printStackTrace();
 				}
 			}
 		}
+	}
+	
+	@Override
+	protected IProject[] build(int kind, Map<String, String> args, IProgressMonitor monitor)
+			throws CoreException {
+
+		build (kind);
+
 		return null;
+	}
+	
+	protected void clean(IProgressMonitor monitor) throws CoreException {
+		build (CLEAN_BUILD);
 	}
 }
