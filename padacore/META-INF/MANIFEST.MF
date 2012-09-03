@@ -9,7 +9,9 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.editors;bundle-version="3.7.0",
  org.eclipse.ui.workbench.texteditor;bundle-version="3.7.0",
  org.eclipse.jface.text;bundle-version="3.7.2",
- org.eclipse.core.resources;bundle-version="3.7.101"
+ org.eclipse.core.resources;bundle-version="3.7.101",
+ org.eclipse.debug.core;bundle-version="3.7.1",
+ org.eclipse.debug.ui;bundle-version="3.7.102"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: org.eclipse.ui.dialogs,

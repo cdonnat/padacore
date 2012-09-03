@@ -92,5 +92,44 @@
          </run>
       </builder>
    </extension>
+   <extension
+         point="org.eclipse.debug.core.launchConfigurationTypes">
+      <launchConfigurationType
+            delegate="org.padacore.launch.AdaLaunchConfigurationDelegate"
+            id="org.padacore.launch.AdaLaunchConfiguration"
+            modes="run"
+            name="AdaLaunchConfiguration">
+      </launchConfigurationType>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+      <launchConfigurationTabGroup
+            class="org.padacore.launch.ui.AdaLaunchConfigurationTabGroup"
+            description="Ada Application"
+            id="org.padacore.launch.AdaLaunchConfigurationTabGroup"
+            type="org.padacore.launch.AdaLaunchConfiguration">
+      </launchConfigurationTabGroup>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTypeImages">
+      <launchConfigurationTypeImage
+            configTypeID="org.padacore.launch.AdaLaunchConfiguration"
+            icon="icons/adafile_obj.gif"
+            id="org.padacore.launch.AdaLaunchConfigurationTypeImage">
+      </launchConfigurationTypeImage>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchShortcuts">
+      <shortcut
+            class="org.padacore.launch.ui.AdaLaunchConfigurationShortcut"
+            id="org.padacore.launch.ui.AdaLaunchConfigurationShortcut"
+            label="Ada Application"
+            modes="run">
+            <contextualLaunch>
+           <enablement>             
+           </enablement>
+         </contextualLaunch>
+      </shortcut>
+   </extension>
 
 </plugin>
