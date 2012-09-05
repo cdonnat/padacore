@@ -16,41 +16,68 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 
 	}
 
+	/**
+	 * Returns the path of GPR (GNAT Project) file.
+	 * 
+	 * @return the absolute path of GPR file.
+	 */
 	private String getGprFullPath() {
-		return this.getProject().getLocation() + "/" + this.getProject().getName() + ".gpr";
+		return this.getProject().getLocation() + "/"
+				+ this.getProject().getName() + ".gpr";
 	}
 
+	/**
+	 * Checks if the given resource is a GPR file.
+	 * 
+	 * @param resource
+	 *            the resource to check.
+	 * @return true if the given resource is a file with gpr extension, false
+	 *         otherwise.
+	 */
 	private boolean isAGprFile(IResource resource) {
-		return (resource.getType() == IResource.FILE) && resource.getFileExtension().equals("gpr");
+		return (resource.getType() == IResource.FILE)
+				&& resource.getFileExtension().equals("gpr");
 	}
 
-	
-
-	private String[] buildCommand(int kind) {
-		switch (kind) {
-		case FULL_BUILD:
-		case INCREMENTAL_BUILD:
-		case AUTO_BUILD:
-			return new String[] { "gprbuild", "-p", "-P", getGprFullPath() };
-		case CLEAN_BUILD:
-			return new String[] { "gprclean", "-P", getGprFullPath() };
-		default:
-			return new String[] {};
-		}
+	/**
+	 * Returns the build command to use with its arguments.
+	 * 
+	 * @return the build command with its arguments as an array of String
+	 *         (command followed by arguments).
+	 */
+	private String[] buildCommand() {
+		return new String[] { "gprbuild", "-p", "-P", getGprFullPath() };
 	}
 
+	/**
+	 * Performs the build according to the kind of build requested.
+	 * 
+	 * @param kind
+	 *            the type of build requested (valid values are FULL_BUILD,
+	 *            INCREMENTAL_BUILD or AUTO_BUILD).
+	 * @throws CoreException
+	 *             if the resources of the project cannot be retrieved.
+	 */
 	private void build(int kind) throws CoreException {
+		assert (kind == FULL_BUILD || kind == INCREMENTAL_BUILD || kind == AUTO_BUILD);
+
+		// FIXME a-t-on vraiment besoin de boucler sur toutes les ressources du
+		// projet ? (on peut pas simplement appeler gprbuild avec getGprFullPath
+		// puisqu'on suppose qu'un projet a TOUJOURS un GPR associé ?
 		IResource[] resources = this.getProject().members();
 		for (IResource iResource : resources) {
 			if (isAGprFile(iResource)) {
 
-				Runtime rt = Runtime.getRuntime();
+				ProcessBuilder buildProcessBuilder = new ProcessBuilder(
+						buildCommand());
+
 				try {
-					Process process = rt.exec(buildCommand(kind));
-					ProcessDisplay.DisplayErrors(process);
-					ProcessDisplay.DisplayWarnings(process);
+					Process buildProcess = buildProcessBuilder.start();
+					ProcessDisplay.DisplayErrors(buildProcess);
+					ProcessDisplay.DisplayWarnings(buildProcess);
 				} catch (IOException e) {
-					System.err.println("gnatmake execution failed on " + iResource.getName());
+					System.err.println("gprbuild execution failed on "
+							+ iResource.getName());
 					e.printStackTrace();
 				}
 			}
@@ -58,14 +85,29 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 	}
 
 	@Override
-	protected IProject[] build(int kind, Map<String, String> args, IProgressMonitor monitor)
-			throws CoreException {
+	protected IProject[] build(int kind, Map<String, String> args,
+			IProgressMonitor monitor) throws CoreException {
 
 		build(kind);
 		return null;
 	}
 
+	@Override
 	protected void clean(IProgressMonitor monitor) throws CoreException {
-		build(CLEAN_BUILD);
+		String[] cleanCmdWithArgs = new String[] { "gprclean", "-P",
+				getGprFullPath() };
+
+		ProcessBuilder cleanProcessBuilder = new ProcessBuilder(
+				cleanCmdWithArgs);
+
+		try {
+			Process cleanProcess = cleanProcessBuilder.start();
+			ProcessDisplay.DisplayErrors(cleanProcess);
+			ProcessDisplay.DisplayWarnings(cleanProcess);
+		} catch (IOException e) {
+			System.err.println("gprclean execution failed on "
+					+ getGprFullPath());
+			e.printStackTrace();
+		}
 	}
 }
