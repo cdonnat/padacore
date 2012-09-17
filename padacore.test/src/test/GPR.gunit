@@ -1,0 +1,118 @@
+gunit GPR;
+@header{package org.padacore.gnat.project;}
+
+IDENTIFIER:
+"i" OK
+"identifier" OK
+"identi_f_1er" OK
+"identi_f_1er" OK
+
+"identif*er" FAIL // contains unauthorized characters
+"1dentifier" FAIL // starts with a digit
+"_dentifier" FAIL // starts with an underscore
+"identif__er" FAIL // 2 underscores next to each other
+"identifier_" FAIL // ends with an underscore
+
+STRING_ELEMENT : 
+"\"\"" OK
+"n" OK
+"*" OK
+
+"\n" FAIL // end of line character not allowed
+"\r" FAIL // end of line character not allowed
+
+STRING_LITERAL: 
+<<"Message of the day">> OK
+<<"">> OK                  
+<<" ">> OK
+<<"$tr@ng3|Ch*ra%ter$">> OK
+  
+
+name:
+"simple_identifier" OK
+"one_level.identifier" OK
+"two.levels.identifier" OK
+"two__nextToEachOther" FAIL
+
+simple_project_declaration:
+"project Empty is    \n\r  end Empty;" OK
+
+"project Missing_Semicolon is end Missing_Semicolon" FAIL 
+"project Missing_End is Missing_End;" FAIL
+
+empty_declaration :
+"null;" OK
+"null" FAIL // missing semicolon
+
+expression :
+<<"simple_string">> OK
+<<"string" & "string">> OK
+
+variable_declaration :
+<<variable := "value";>> OK
+<<variable = "missing_colon";>> FAIL
+<<variable = "missing_semicolon">> FAIL
+
+
+comment:
+"--Ada comment" OK
+"//Java comment" FAIL
+
+external_value :
+<<external "no_default_value">> OK
+<<external "platform","default_value">> OK
+<<"missing_external">> FAIL
+
+
+ALL:
+"all" OK
+
+AT  :  
+"at" OK
+
+CASE :
+"case" OK
+
+END   :
+"end" OK
+
+FOR   :  
+"for" OK
+
+IS  :
+"is" OK
+
+LIMITED : 
+"limited" OK
+NULL  :  
+"null" OK
+
+OTHERS  :  
+"others" OK
+
+PACKAGE :
+"package" OK
+
+RENAMES :  
+"renames" OK
+
+TYPE  :  
+"type" OK
+
+USE   :
+"use" OK
+
+WHEN  :  
+"when" OK
+
+WITH  :  
+"with" OK
+
+EXTENDS :  
+"extends" OK
+
+EXTERNAL : 
+"external" OK
+
+PROJECT : 
+"project" OK
