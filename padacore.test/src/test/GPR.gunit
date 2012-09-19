@@ -27,43 +27,6 @@ STRING_LITERAL:
 <<" ">> OK
 <<"$tr@ng3|Ch*ra%ter$">> OK
   
-
-name:
-"simple_identifier" OK
-"one_level.identifier" OK
-"two.levels.identifier" OK
-"two__nextToEachOther" FAIL
-
-simple_project_declaration:
-"project Empty is    \n\r  end Empty;" OK
-
-"project Missing_Semicolon is end Missing_Semicolon" FAIL 
-"project Missing_End is Missing_End;" FAIL
-
-empty_declaration :
-"null;" OK
-"null" FAIL // missing semicolon
-
-expression :
-<<"simple_string">> OK
-<<"string" & "string">> OK
-
-variable_declaration :
-<<variable := "value";>> OK
-<<variable = "missing_colon";>> FAIL
-<<variable = "missing_semicolon">> FAIL
-
-
-comment:
-"--Ada comment" OK
-"//Java comment" FAIL
-
-external_value :
-<<external "no_default_value">> OK
-<<external "platform","default_value">> OK
-<<"missing_external">> FAIL
-
-
 ALL:
 "all" OK
 
@@ -116,3 +79,65 @@ EXTERNAL :
 
 PROJECT : 
 "project" OK
+
+name:
+<<simple_identifier>> OK
+"one_level.identifier" OK
+"two.levels.identifier" OK
+"two__nextToEachOther" FAIL
+
+simple_project_declaration:
+"project Empty is    \n\r  end Empty;" OK
+
+"project Missing_Semicolon is end Missing_Semicolon" FAIL 
+"project Missing_End is Missing_End;" FAIL
+
+empty_declaration :
+"null;" OK
+"null" FAIL // missing semicolon
+
+expression :
+<<"simple_string">> OK
+<<"string" & "string">> OK
+<<"string" & ("first", "second")>> OK
+
+variable_declaration :
+<<That_OS := "GNU/Linux";>> OK
+<<Name      := "readme.txt";>> OK
+<<Save_Name := "name" & ".saved";>> OK
+
+<<variable = "missing_colon";>> FAIL
+<<variable = "missing_semicolon">> FAIL
+<<typed_variable : type := "GNU/Linux";>> FAIL
+
+typed_variable_declaration :
+<<That_OS : OS := "GNU/Linux";>> OK
+
+<<Untyped_variable := "GNU/Linux";>> FAIL
+//<<This_OS : OS := external ("OS");>> OK
+
+string_list :
+<<("One_Element")>> OK
+<<("First", "Second")>> OK
+
+<<("First" "Second")>> FAIL
+
+comment:
+"--Ada comment" OK
+"//Java comment" FAIL
+
+attribute_declaration :
+// simple attributes
+<<for Object_Dir use "objects";>> OK
+<<for Source_Dirs use ("units", "test/drivers");>> OK
+
+// indexed attributes
+<<for Body ("main") use "Main.ada";>> OK
+<<for Switches ("main.ada") use ("-v", "-gnatv");>> OK
+
+external_value : 
+<<external ("Variable")>> OK
+<<external ("Variable", "Default_Value")>> OK
+
+simple_project_declaration :
+sample_project.gpr OK

@@ -108,7 +108,7 @@ PROJECT
   :
   'project'
   ;
-
+  
 END_OF_LINE
   :
   '\n' ('\r')?
@@ -155,7 +155,7 @@ name
 empty_declaration
   :
   NULL ';'
-  ;
+  ; 
 
 fragment
   STRING_ELEMENT:
@@ -168,18 +168,35 @@ STRING_LITERAL
  
 variable_declaration : simple_name ':=' expression ';';
 
-string_expression : STRING_LITERAL;
+typed_variable_declaration : simple_name ':' name ':=' string_expression; 
+//TODO check if rule is correct in GPRbuild user manual (should be expression ?)
 
-term : string_expression;
+string_expression : STRING_LITERAL | name | external_value; // TODO complete rule
+
+string_list : '(' string_expression (',' string_expression)* ')'; //TODO complete rule
+
+term : string_expression | string_list;
 
 expression : term ('&' term)*;
 
-simple_declarative_item
+simple_declarative_item 
   :
-  empty_declaration
+  attribute_declaration | empty_declaration | typed_variable_declaration 
   ; // TODO complete rule
   
-  external_value : EXTERNAL (STRING_LITERAL (',' STRING_LITERAL)?);
+  attribute_declaration :
+  indexed_attribute_declaration | simple_attribute_declaration;
+  
+  indexed_attribute_declaration :
+  FOR simple_name '(' STRING_LITERAL ')' USE expression ';';
+  
+simple_attribute_declaration : FOR simple_name USE expression ';' ; // rule slightly adapted
+
+attribute_designator : simple_name | simple_name '(' STRING_LITERAL ')' ;
+
+external_value : EXTERNAL '(' STRING_LITERAL (',' STRING_LITERAL)* ')' | ; 
+
+//TODO add external_as_list
 
 declarative_item
   :
