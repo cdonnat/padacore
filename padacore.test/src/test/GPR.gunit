@@ -86,7 +86,7 @@ name:
 "two.levels.identifier" OK
 "two__nextToEachOther" FAIL
 
-simple_project_declaration:
+project_declaration:
 "project Empty is    \n\r  end Empty;" OK
 
 "project Missing_Semicolon is end Missing_Semicolon" FAIL 
