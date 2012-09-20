@@ -1,15 +1,22 @@
 package org.padacore.builder;
 
 import java.util.Map;
+import java.util.Observer;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.padacore.utils.ProcessManagement;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
+import org.padacore.utils.ExternalProcess;
 
 public class AdaProjectBuilder extends IncrementalProjectBuilder {
 
+	private static final String RUNNING_GPRBUILD = "Running GPRbuild...";
+	private static final String RUNNING_GPRCLEAN = "Running GPRclean...";
+	
 	public AdaProjectBuilder() {
 
 	}
@@ -20,8 +27,7 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 	 * @return the absolute path of GPR file.
 	 */
 	private String getGprFullPath() {
-		return this.getProject().getLocation() + "/"
-				+ this.getProject().getName() + ".gpr";
+		return this.getProject().getLocation() + "/" + this.getProject().getName() + ".gpr";
 	}
 
 	/**
@@ -31,7 +37,7 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 	 *         (command followed by arguments).
 	 */
 	private String[] buildCommand() {
-		return new String[] { "gprbuild", "-p", "-P", getGprFullPath() };
+		return new String[] { "gprbuild", "-d", "-p", "-P", getGprFullPath() };
 	}
 
 	/**
@@ -56,21 +62,47 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 	private void build(int kind) throws CoreException {
 		assert (kind == FULL_BUILD || kind == INCREMENTAL_BUILD || kind == AUTO_BUILD);
 
-		ProcessManagement.executeExternalCommandWithArgs(buildCommand());
+		Job job = new Job(RUNNING_GPRBUILD) {
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+
+				ExternalProcess process = new ExternalProcess(
+						new Observer[] { new GprbuildObserver(monitor) }, new Observer[] {});
+
+				process.run(buildCommand(), monitor);
+
+				return Status.OK_STATUS;
+			}
+		};
+		job.schedule();
+		
 	}
 
 	@Override
-	protected IProject[] build(int kind, Map<String, String> args,
-			IProgressMonitor monitor) throws CoreException {
+	protected IProject[] build(int kind, Map<String, String> args, IProgressMonitor monitor)
+			throws CoreException {
 
 		this.build(kind);
-		
+
 		return null;
 	}
 
 	@Override
 	protected void clean(IProgressMonitor monitor) throws CoreException {
-		ProcessManagement.executeExternalCommandWithArgs(cleanCommand());
+
+		Job job = new Job(RUNNING_GPRCLEAN) {
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+
+				ExternalProcess process = new ExternalProcess(
+						new Observer[] {}, new Observer[] {});
+
+				process.run(cleanCommand(), monitor);
+
+				return Status.OK_STATUS;
+			}
+		};
+		job.schedule();
 	}
-	
+
 }

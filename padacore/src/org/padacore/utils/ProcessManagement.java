@@ -2,33 +2,34 @@ package org.padacore.utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 
 public class ProcessManagement {
-	
-	private static final class ReaderThread implements Runnable {
-		private BufferedReader reader;
-		private PrintStream currentOutputStream;
 
-		public ReaderThread(BufferedReader reader, PrintStream currentOutputStream) {
-			this.reader = reader;
-			this.currentOutputStream = currentOutputStream;
+	private static final class ReaderThread extends Thread {
+		private BufferedReader input;
+		private PrintStream output;
+
+		public ReaderThread(InputStream input, PrintStream output) {
+			this.output = output;
+			this.input = new BufferedReader(new InputStreamReader(input));
 		}
-		
+
 		@Override
 		public void run() {
-			String errorLine;
+			String line;
 
 			try {
-				while ((errorLine = this.reader.readLine()) != null) {
-					this.currentOutputStream.println(errorLine);
+				while ((line = this.input.readLine()) != null) {
+					this.output.println(line);
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			} finally {
 				try {
-					this.reader.close();
+					this.input.close();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -37,32 +38,30 @@ public class ProcessManagement {
 	}
 
 	/**
-	 * Redirects the error output stream of the given process to the current error output stream. 
+	 * Redirects the error output stream of the given process to the current
+	 * error output stream.
 	 * 
-	 * @param process the process for which the error output stream is redirected.
+	 * @param process
+	 *            the process for which the error output stream is redirected.
 	 */
 	public static void displayErrors(Process process) {
-
-		final BufferedReader error = new BufferedReader(new InputStreamReader(
-				process.getErrorStream()));
-
-		Thread errorReader = new Thread(new ReaderThread(error, System.err));		
+		Thread errorReader = new ReaderThread(process.getErrorStream(), System.err);
 		errorReader.start();
 	}
 
 	/**
-	 * Redirects the standard output stream of the given process to the current standard output stream. 
+	 * Redirects the standard output stream of the given process to the current
+	 * standard output stream.
 	 * 
-	 * @param process the process for which the standard output stream is redirected.
+	 * @param process
+	 *            the process for which the standard output stream is
+	 *            redirected.
 	 */
 	public static void displayWarnings(Process process) throws IOException {
-		BufferedReader output = new BufferedReader(new InputStreamReader(
-				process.getInputStream()));
-
-		Thread standardOutputReader = new Thread(new ReaderThread(output, System.out));		
+		Thread standardOutputReader = new ReaderThread(process.getInputStream(), System.out);
 		standardOutputReader.start();
 	}
-	
+
 	/**
 	 * Executes an external command and displays its standard / error output
 	 * streams in current standard / output streams.
@@ -75,13 +74,12 @@ public class ProcessManagement {
 
 		try {
 			Process process = processBuilder.start();
-			
+
 			for (int arg = 0; arg < cmdWithArgs.length; arg++) {
 				System.out.print(cmdWithArgs[arg] + " ");
 			}
 			System.out.println();
-			
-			
+
 			ProcessManagement.displayErrors(process);
 			ProcessManagement.displayWarnings(process);
 		} catch (IOException e) {
@@ -89,15 +87,16 @@ public class ProcessManagement {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Executes an external command and displays its standard / error output
 	 * streams in current standard / output streams.
 	 * 
-	 * @param cmdName the command to execute.
+	 * @param cmdName
+	 *            the command to execute.
 	 */
 	public static void executeExternalCommand(String cmdName) {
-		String[] cmdWithNoArgs = new String[]{ cmdName };
+		String[] cmdWithNoArgs = new String[] { cmdName };
 
 		ProcessManagement.executeExternalCommandWithArgs(cmdWithNoArgs);
 	}

@@ -9,20 +9,20 @@ package org.padacore.gnat.project;
 }
 
 // Fragment rules
-fragment UPPER_CASE_LETTER :
+fragment UPPER_CASE_LETTER : 
 'A'..'Z';
 
 fragment LOWER_CASE_LETTER :
-'a'..'z';
+'a'..'z'; 
 
 fragment DIGIT :
 '0'..'9';
 
 // Reserved keywords
-ALL
-  :
+ALL 
+  :  
   'all'
-  ;
+  ;  
 
 AT
   :
