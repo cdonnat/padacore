@@ -4,7 +4,7 @@ grammar GPR;
 private GprProject project;
 
 GprProject getGprProject() {
-	return this.project;
+  return this.project;
 }
 }
 
@@ -18,22 +18,12 @@ package org.padacore.gnat.project;
 }
 
 // Fragment rules
-<<<<<<< HEAD
-fragment UPPER_CASE_LETTER : 
-'A'..'Z';
-=======
->>>>>>> branch 'master' of https://github.com/cdonnat/padacore.git
 
-<<<<<<< HEAD
-fragment LOWER_CASE_LETTER :
-'a'..'z'; 
-=======
 fragment
 UPPER_CASE_LETTER
   :
   'A'..'Z'
   ;
->>>>>>> branch 'master' of https://github.com/cdonnat/padacore.git
 
 fragment
 LOWER_CASE_LETTER
@@ -48,16 +38,11 @@ DIGIT
   ;
 
 // Reserved keywords
-<<<<<<< HEAD
-ALL 
-  :  
-=======
 
 ALL
   :
->>>>>>> branch 'master' of https://github.com/cdonnat/padacore.git
   'all'
-  ;  
+  ;
 
 AT
   :
@@ -277,7 +262,7 @@ simple_attribute_declaration
   FOR att_name=simple_name USE att_value=expression ';' // rule slightly adapted
   {
                                                          System.out.println("found attribute " + $att_name.text + " with value "
-                                                         		+ $att_value.text);
+                                                            + $att_value.text);
                                                         }
   ;
 
