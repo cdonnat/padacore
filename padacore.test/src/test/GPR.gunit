@@ -139,5 +139,7 @@ external_value :
 <<external ("Variable")>> OK
 <<external ("Variable", "Default_Value")>> OK
 
-simple_project_declaration :
+project_declaration :
 sample_project.gpr OK
+<<project First_Name is 
+end Second_Name;>> FAIL

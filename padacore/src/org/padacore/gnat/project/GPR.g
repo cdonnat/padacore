@@ -1,20 +1,24 @@
 grammar GPR;
 
-@parser::members {
-private GprProject project;
-
-GprProject getGprProject() {
-  return this.project;
-}
-}
-
 @header {
 package org.padacore.gnat.project;
 import org.padacore.*;
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Map;
 }
 
 @lexer::header {
 package org.padacore.gnat.project;
+}
+
+@parser::members {
+private GprProject project;
+private Map<String, ArrayList<String>> vars = new HashMap<String, ArrayList<String>>();
+
+GprProject getGprProject() {
+  return this.project;
+}
 }
 
 // Fragment rules
@@ -207,7 +211,10 @@ STRING_LITERAL
 
 variable_declaration
   :
-  simple_name ':=' expression ';'
+  var_name=simple_name ':=' var_value=expression ';'
+  {ArrayList<String> var = new ArrayList(1);
+   var.add($var_value.text);
+   this.vars.put($var_name.text, var);}
   ;
 
 typed_variable_declaration
@@ -287,16 +294,18 @@ declarative_item
 
 simple_project_declaration returns [GprProject simpleProject]
   :
-  PROJECT project_name=name IS declarative_item* END name ';' EOF 
+  PROJECT begin_project_name=name IS declarative_item* END end_project_name=name ';' EOF
+  {$begin_project_name.text.equals($end_project_name.text)}?  
                                                                   {
-                                                                   simpleProject = new GprProject($project_name.text);
+                                                                   simpleProject = new GprProject($begin_project_name.text);
                                                                   }
   ;
 
 project_declaration
   :
+
   simple_project_declaration 
                              {
-                              project = $simple_project_declaration.simpleProject;
+                              this.project = $simple_project_declaration.simpleProject;
                              }
   ;
