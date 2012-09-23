@@ -5,7 +5,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.ILaunchConfigurationDelegate;
-import org.padacore.utils.ProcessManagement;
+import org.padacore.utils.ExternalProcessJob;
 
 public class AdaLaunchConfigurationDelegate implements ILaunchConfigurationDelegate {
 
@@ -14,8 +14,8 @@ public class AdaLaunchConfigurationDelegate implements ILaunchConfigurationDeleg
 			IProgressMonitor monitor) throws CoreException {
 
 		String cmd = configuration.getAttribute(AdaLaunchConstants.ExecutablePath, "");
-		
-		ProcessManagement.executeExternalCommand(cmd);
+
+		ExternalProcessJob.runWithDefaultOutput(cmd, cmd);
 	}
 
 }
