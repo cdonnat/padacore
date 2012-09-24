@@ -2,6 +2,7 @@ grammar GPR;
 
 @header {
 package org.padacore.gnat.project;
+
 import org.padacore.*;
 import java.util.HashMap;
 import java.util.ArrayList;
@@ -18,6 +19,11 @@ private Map<String, ArrayList<String>> vars = new HashMap<String, ArrayList<Stri
 
 GprProject getGprProject() {
   return this.project;
+}
+
+
+boolean isVariableDefined(String variableName) {
+return false;
 }
 }
 
@@ -219,7 +225,7 @@ variable_declaration
 
 typed_variable_declaration
   :
-  simple_name ':' name ':=' string_expression
+ simple_name ':' name ':=' string_expression ';'
   ;
 //TODO check if rule is correct in GPRbuild user manual (should be expression ?)
 
@@ -245,13 +251,13 @@ expression
   :
   term ('&' term)*
   ;
-
 simple_declarative_item
   :
-  attribute_declaration
-  | empty_declaration
+  variable_declaration 
   | typed_variable_declaration
-  ; // TODO complete rule
+  | attribute_declaration
+  | empty_declaration
+  ; // TODO complete rule with case construction
 
 attribute_declaration
   :

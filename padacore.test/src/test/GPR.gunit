@@ -112,6 +112,7 @@ variable_declaration :
 
 typed_variable_declaration :
 <<That_OS : OS := "GNU/Linux";>> OK
+<<That_OS : OS := "Missing_Semicolon">> FAIL
 
 <<Untyped_variable := "GNU/Linux";>> FAIL
 //<<This_OS : OS := external ("OS");>> OK
