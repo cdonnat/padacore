@@ -11,12 +11,14 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.padacore.utils.ExternalProcess;
+import org.padacore.utils.ExternalProcessJob;
+import org.padacore.utils.ExternalProcessOutput;
 
 public class AdaProjectBuilder extends IncrementalProjectBuilder {
 
 	private static final String RUNNING_GPRBUILD = "Running GPRbuild...";
 	private static final String RUNNING_GPRCLEAN = "Running GPRclean...";
-	
+
 	public AdaProjectBuilder() {
 
 	}
@@ -66,8 +68,9 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 
-				ExternalProcess process = new ExternalProcess(
-						new Observer[] { new GprbuildObserver(monitor) }, new Observer[] {});
+				ExternalProcess process = new ExternalProcess(new Observer[] {
+						new ExternalProcessOutput(), new GprbuildObserver(monitor) },
+						new Observer[] { new ExternalProcessOutput() });
 
 				process.run(buildCommand(), monitor);
 
@@ -75,7 +78,7 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 			}
 		};
 		job.schedule();
-		
+
 	}
 
 	@Override
@@ -89,20 +92,7 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 
 	@Override
 	protected void clean(IProgressMonitor monitor) throws CoreException {
-
-		Job job = new Job(RUNNING_GPRCLEAN) {
-			@Override
-			protected IStatus run(IProgressMonitor monitor) {
-
-				ExternalProcess process = new ExternalProcess(
-						new Observer[] {}, new Observer[] {});
-
-				process.run(cleanCommand(), monitor);
-
-				return Status.OK_STATUS;
-			}
-		};
-		job.schedule();
+		ExternalProcessJob.runWithDefaultOutput(RUNNING_GPRCLEAN, cleanCommand());
 	}
 
 }
