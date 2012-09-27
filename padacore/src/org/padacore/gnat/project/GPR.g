@@ -14,16 +14,90 @@ package org.padacore.gnat.project;
 }
 
 @parser::members {
+private final static String EXECUTABLE_DIRECTORY_ATTRIBUTE = "Exec_Dir";
+private final static String OBJECT_DIRECTORY_ATTRIBUTE = "Object_Dir";
+private final static String MAIN_ATTRIBUTE = "Main";
+private final static String SOURCE_DIRECTORIES_ATTRIBUTE = "Source_Dirs";
+
 private GprProject project;
 private Map<String, ArrayList<String>> vars = new HashMap<String, ArrayList<String>>();
+private Map<String, ArrayList<String>> simpleAttributes = new HashMap<String, ArrayList<String>>();
 
-GprProject getGprProject() {
-  return this.project;
+public GprProject getGprProject() {
+	return this.project;
 }
 
+/**
+ * Return True if variable whose name is given as a parameter is already defined.
+ *
+ */
+private boolean isVariableDefined(String variableName) {
+	return this.vars.containsKey(variableName);
+}
 
-boolean isVariableDefined(String variableName) {
-return false;
+/**
+ * Adds the given String variable with its value in the symbols table.
+ *
+ */
+private void addNewStringVariable(String variableName, String value) {
+	ArrayList<String> values = new ArrayList(1);
+	values.add(value);
+	this.vars.put(variableName, values);
+}
+
+/**
+ *
+ * Adds the given simple attribute to the list of found attributes.
+ */
+void addNewSimpleAttribute(String attributeName,
+		ArrayList<String> attributeValue) {
+	this.simpleAttributes.put(attributeName, attributeValue);
+}
+
+/**
+ * Returns True if the simple attribute whose name is given as a parameter is defined, False otherwise.
+ *
+ */
+boolean isSimpleAttributeDefined(String attributeName) {
+	return this.simpleAttributes.containsKey(attributeName);
+}
+
+/**
+ * Updates the GPR project according to the simple attributes read in GPR file.
+ *
+ */
+void processSimpleAttributes() {
+	if (this.simpleAttributes.containsKey(EXECUTABLE_DIRECTORY_ATTRIBUTE)) {
+
+		List<String> execDirectories = this.simpleAttributes
+				.get(EXECUTABLE_DIRECTORY_ATTRIBUTE);
+		assert (execDirectories.size() == 1);
+
+		this.project.setExecutableDir(execDirectories.get(0));
+	}
+
+	if (this.simpleAttributes.containsKey(OBJECT_DIRECTORY_ATTRIBUTE)) {
+		List<String> objectDirectories = this.simpleAttributes
+				.get(OBJECT_DIRECTORY_ATTRIBUTE);
+		assert (objectDirectories.size() == 1);
+		this.project.setObjectDir(objectDirectories.get(0));
+	}
+
+	if (this.simpleAttributes.containsKey(MAIN_ATTRIBUTE)) {
+		List<String> executables = this.simpleAttributes.get(MAIN_ATTRIBUTE);
+		this.project.setExecutable(true);
+		for (String executable : executables) {
+			this.project.addExecutableName(executable);
+		}
+	}
+	
+	if(this.simpleAttributes.containsKey(SOURCE_DIRECTORIES_ATTRIBUTE)) {
+	  List<String> sourceDirs = this.simpleAttributes.get(SOURCE_DIRECTORIES_ATTRIBUTE);
+	  
+	  for(String sourceDir : sourceDirs) {
+	    this.project.addSourceDir(sourceDir);
+	  }
+	}
 }
 }
 
@@ -199,15 +273,22 @@ empty_declaration
   ;
 
 fragment
-STRING_ELEMENT
+STRING_ELEMENT returns [String element]
+@init {
+element = new String();
+}
   :
-  '"' '"'
-  |
+  '"' '"' // no need to concatenate with empty string
+  | character=
   ~(
     '"'
     | '\n'
     | '\r'
    )
+  
+   {
+    element = new Integer(character).toString();
+   }
   ;
 
 STRING_LITERAL
@@ -217,43 +298,71 @@ STRING_LITERAL
 
 variable_declaration
   :
-  var_name=simple_name ':=' var_value=expression ';'
-  {ArrayList<String> var = new ArrayList(1);
-   var.add($var_value.text);
-   this.vars.put($var_name.text, var);}
+  var_name=simple_name ':=' var_value=expression ';' 
+                                                     {
+                                                      this.addNewStringVariable($var_name.text, $var_value.text);
+                                                     }
   ;
 
 typed_variable_declaration
   :
- simple_name ':' name ':=' string_expression ';'
+  var_name=simple_name ':' type=name ':=' var_value=string_expression ';' {!this.isVariableDefined($var_name.text)}? 
+                                                                                                                     {
+                                                                                                                      this.addNewStringVariable($var_name.text, $var_value.text);
+                                                                                                                     }
   ;
 //TODO check if rule is correct in GPRbuild user manual (should be expression ?)
 
-string_expression
+string_expression returns [String result]
   :
-  STRING_LITERAL
+  STRING_LITERAL 
+                 {
+                  retval.result = $STRING_LITERAL.text.replaceAll("\"", "");
+                 } //FIXME why is retval needed?
   | name
   | external_value
   ; // TODO complete rule
 
-string_list
+string_list returns [ArrayList < String > result]
+@init {
+result = new ArrayList<String>();
+}
   :
-  '(' string_expression (',' string_expression)* ')'
+  '(' expr1=string_expression 
+                              {
+                               result.add($expr1.result);
+                              }
+  (',' expr2=string_expression 
+                               {
+                                result.add($expr2.result);
+                               })* ')'
   ; //TODO complete rule
 
-term
+term returns [ArrayList < String > result]
   :
-  string_expression
-  | string_list
+  string_expression 
+                    {
+                     result = new ArrayList<String>(1);
+                     result.add($string_expression.result);
+                    }
+  | string_list 
+                {
+                 result = $string_list.result;
+                }
   ;
 
-expression
+expression returns [ArrayList < String > result]
   :
-  term ('&' term)*
+  //term ('&' term)* //TODO add concatenation to expression
+  term 
+       {
+        retval.result = $term.result;
+       }
   ;
+
 simple_declarative_item
   :
-  variable_declaration 
+  variable_declaration
   | typed_variable_declaration
   | attribute_declaration
   | empty_declaration
@@ -273,10 +382,10 @@ indexed_attribute_declaration
 simple_attribute_declaration
   :
   FOR att_name=simple_name USE att_value=expression ';' // rule slightly adapted
-  {
-                                                         System.out.println("found attribute " + $att_name.text + " with value "
-                                                            + $att_value.text);
-                                                        }
+  {!this.isSimpleAttributeDefined($att_name.text)}? 
+                                                                                                          {
+                                                                                                           this.addNewSimpleAttribute($att_name.text, $att_value.result);
+                                                                                                          }
   ;
 
 attribute_designator
@@ -300,18 +409,17 @@ declarative_item
 
 simple_project_declaration returns [GprProject simpleProject]
   :
-  PROJECT begin_project_name=name IS declarative_item* END end_project_name=name ';' EOF
-  {$begin_project_name.text.equals($end_project_name.text)}?  
-                                                                  {
-                                                                   simpleProject = new GprProject($begin_project_name.text);
-                                                                  }
+  PROJECT begin_project_name=name IS declarative_item* END end_project_name=name ';' EOF {$begin_project_name.text.equals($end_project_name.text)}? 
+                                                                                                                                                    {
+                                                                                                                                                     return new GprProject($begin_project_name.text);
+                                                                                                                                                    }
   ;
 
 project_declaration
   :
-
   simple_project_declaration 
                              {
                               this.project = $simple_project_declaration.simpleProject;
+                              this.processSimpleAttributes();
                              }
   ;
