@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 public class GprbuildOutput {
 
-	private static final String patternString = "completed [0-9]+ out of ([0-9]+)";
+	private static final String patternString = "completed ([0-9]+) out of ([0-9]+)";
 
 	private Pattern pattern;
 	private Matcher matcher;
@@ -39,10 +39,10 @@ public class GprbuildOutput {
 
 	/**
 	 * Precondition : lastEntryIndicatesProgress()
-	 * Provides the total number of to process. 
-	 * @return Total number of file to process is returned.
+	 * Provides the remaining percentage to process. 
+	 * @return Remaining percentage of file to process is returned.
 	 */
-	public int total() {
-		return Integer.parseInt(matcher.group(1));
+	public int remainingFileToProcess() {
+		return Integer.parseInt(matcher.group(2)) - Integer.parseInt(matcher.group(1));
 	}
 }
