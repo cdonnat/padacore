@@ -74,7 +74,7 @@ public class NewAdaProject {
 
 		if (addMainProcedure) {
 			gprProject.setExecutable(true);
-			gprProject.setExecutableName("main");
+			gprProject.addExecutableName("main.adb");
 			IFile mainHandle = project.getFile("main.adb");
 			mainHandle.create(defaultMainContent(), false, null);
 		}

@@ -23,13 +23,20 @@ public class GprProjectTest {
 	@Test
 	public void saveTest() {
 		GprProject sut = new GprProject("Test");
+		sut.setExecutable(true);
+		sut.setObjectDir("object");
+		sut.setExecutableDir("exec");
+		sut.addExecutableName("main1.adb");
+		sut.addExecutableName("main2.ads");
 
-		final String expectedDefaultProject = "project Test is\n"
+		final String expectedSavedProject = "project Test is\n"
 				+ "\tfor Source_Dirs use (\".\");\n"
-				+ "\tfor Object_Dir use \"obj\";\n"
+				+ "\tfor Object_Dir use \"object\";\n"
+				+ "\tfor Exec_Dir use \"exec\";\n"
+				+ "\tfor Main use (\"main.adb\", \"main1.adb\", \"main2.ads\");\n"
 				+ "end Test;";		
 
-		assertEquals("Gpr project content", expectedDefaultProject,sut.toString());
+		assertEquals("Gpr project content", expectedSavedProject,sut.toString());
 	}
 }
  
