@@ -68,8 +68,8 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 
-				ExternalProcess process = new ExternalProcess(new Observer[] {
-						new ExternalProcessOutput(), new GprbuildObserver(monitor) },
+				ExternalProcess process = new ExternalProcess(
+						new Observer[] { new GprbuildObserver(monitor) },
 						new Observer[] { new ExternalProcessOutput() });
 
 				process.run(buildCommand(), monitor);
