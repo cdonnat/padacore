@@ -136,7 +136,6 @@ external_value :
 
 project_declaration :
 "project Empty is    \n\r  end Empty;" OK
-sample_project.gpr OK
 
 "project Missing_Semicolon is end Missing_Semicolon" FAIL 
 "project Missing_End is Missing_End;" FAIL
@@ -146,3 +145,20 @@ end Second_Name;>> FAIL
 my_var : my_type := "Value";
 my_var : my_type := "New_Value";
 end My_Proj;>> FAIL // multiple definitions for typed variable
+
+with_clause :
+<<with "../../my_project.gpr";>> OK
+<<with "..\..\my_project_windows.gpr", "../my_project_linux.gpr";>> OK
+
+<<with "../../missing_semicolon.gpr">> FAIL
+
+context_clause :
+"" OK
+<<with "../../my_project.gpr";
+with "..\..\my_project_windows.gpr";>> OK
+
+project :
+<<with "../../included.gpr";
+project My_Project is
+end My_Project;>> OK
+sample_project.gpr OK

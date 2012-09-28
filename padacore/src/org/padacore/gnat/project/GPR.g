@@ -22,6 +22,7 @@ private final static String SOURCE_DIRECTORIES_ATTRIBUTE = "Source_Dirs";
 private GprProject project;
 private Map<String, ArrayList<String>> vars = new HashMap<String, ArrayList<String>>();
 private Map<String, ArrayList<String>> simpleAttributes = new HashMap<String, ArrayList<String>>();
+private ArrayList<String> withedProjects = new ArrayList<String>();
 
 public GprProject getGprProject() {
 	return this.project;
@@ -49,7 +50,7 @@ private void addNewStringVariable(String variableName, String value) {
  *
  * Adds the given simple attribute to the list of found attributes.
  */
-void addNewSimpleAttribute(String attributeName,
+private void addNewSimpleAttribute(String attributeName,
 		ArrayList<String> attributeValue) {
 	this.simpleAttributes.put(attributeName, attributeValue);
 }
@@ -58,7 +59,7 @@ void addNewSimpleAttribute(String attributeName,
  * Returns True if the simple attribute whose name is given as a parameter is defined, False otherwise.
  *
  */
-boolean isSimpleAttributeDefined(String attributeName) {
+private boolean isSimpleAttributeDefined(String attributeName) {
 	return this.simpleAttributes.containsKey(attributeName);
 }
 
@@ -66,7 +67,7 @@ boolean isSimpleAttributeDefined(String attributeName) {
  * Updates the GPR project according to the simple attributes read in GPR file.
  *
  */
-void processSimpleAttributes() {
+private void processSimpleAttributes() {
 	if (this.simpleAttributes.containsKey(EXECUTABLE_DIRECTORY_ATTRIBUTE)) {
 
 		List<String> execDirectories = this.simpleAttributes
@@ -90,13 +91,20 @@ void processSimpleAttributes() {
 			this.project.addExecutableName(executable);
 		}
 	}
-	
-	if(this.simpleAttributes.containsKey(SOURCE_DIRECTORIES_ATTRIBUTE)) {
-	  List<String> sourceDirs = this.simpleAttributes.get(SOURCE_DIRECTORIES_ATTRIBUTE);
-	  
-	  for(String sourceDir : sourceDirs) {
-	    this.project.addSourceDir(sourceDir);
-	  }
+
+	if (this.simpleAttributes.containsKey(SOURCE_DIRECTORIES_ATTRIBUTE)) {
+		List<String> sourceDirs = this.simpleAttributes
+				.get(SOURCE_DIRECTORIES_ATTRIBUTE);
+
+		for (String sourceDir : sourceDirs) {
+			this.project.addSourceDir(sourceDir);
+		}
+	}
+}
+
+private void processWithedProjects() {
+	for (String withedProject : this.withedProjects) {
+		this.project.addWithedProject(withedProject);
 	}
 }
 }
@@ -407,7 +415,7 @@ declarative_item
   simple_declarative_item
   ; //TODO complete rule
 
-simple_project_declaration returns [GprProject simpleProject]
+simple_project_declaration returns [GprProject result]
   :
   PROJECT begin_project_name=name IS declarative_item* END end_project_name=name ';' EOF {$begin_project_name.text.equals($end_project_name.text)}? 
                                                                                                                                                     {
@@ -415,11 +423,44 @@ simple_project_declaration returns [GprProject simpleProject]
                                                                                                                                                     }
   ;
 
-project_declaration
+path_name returns [String result]
   :
-  simple_project_declaration 
+  STRING_LITERAL 
+                 {
+                  result = $STRING_LITERAL.text.replaceAll("\"", "");
+                 }
+  ;
+
+with_clause
+  :
+  WITH first_path=path_name 
+                            {
+                             this.withedProjects.add($first_path.result);
+                            }
+  (',' second_path=path_name 
                              {
-                              this.project = $simple_project_declaration.simpleProject;
-                              this.processSimpleAttributes();
-                             }
+                              this.withedProjects.add($second_path.result);
+                             })* ';'
+  ;
+
+context_clause
+  :
+  with_clause*
+  ;
+
+project
+  :
+  context_clause project_declaration 
+                                     {
+                                      this.project = $project_declaration.result;
+                                      this.processSimpleAttributes();
+                                      this.processWithedProjects();
+                                     }
+  ;
+
+project_declaration returns [GprProject result]
+  :
+  simple_project_declaration {result = $simple_project_declaration.result;}
+
+  //TODO add project_extension
   ;

@@ -11,6 +11,7 @@ public class GprProject {
 	private boolean isExecutable = false;
 	private String execDir = "exe";
 	private List<String> execNames = new ArrayList<String>(1);
+	private List<String> withedProjects = new ArrayList<String>();
 
 	/**
 	 * Create a default GPR project with a default sources directory (".") and a
@@ -107,6 +108,16 @@ public class GprProject {
 		assert isExecutable;
 
 		this.execDir = execDir;
+	}
+	
+	/**
+	 * Add a new withed project
+	 * 
+	 * @param projectPath
+	 *            Path of the withed project.
+	 */
+	public void addWithedProject(String projectPath) {
+		this.withedProjects.add(projectPath);
 	}
 
 	/**
