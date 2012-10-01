@@ -51,7 +51,7 @@ public class AdaLaunchConfigurationMainTab extends AbstractLaunchConfigurationTa
 	@Override
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		try {
-			progText.setText(configuration.getAttribute(AdaLaunchConstants.ExecutablePath, ""));
+			progText.setText(configuration.getAttribute(AdaLaunchConstants.EXECUTABLE_PATH, ""));
 
 		} catch (CoreException e) {
 			// TODO Auto-generated catch block
@@ -61,7 +61,7 @@ public class AdaLaunchConfigurationMainTab extends AbstractLaunchConfigurationTa
 
 	@Override
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-		configuration.setAttribute(AdaLaunchConstants.ExecutablePath, progText.getText());
+		configuration.setAttribute(AdaLaunchConstants.EXECUTABLE_PATH, progText.getText());
 	}
 
 	@Override

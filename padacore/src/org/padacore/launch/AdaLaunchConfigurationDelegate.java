@@ -13,7 +13,7 @@ public class AdaLaunchConfigurationDelegate implements ILaunchConfigurationDeleg
 	public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch,
 			IProgressMonitor monitor) throws CoreException {
 
-		String cmd = configuration.getAttribute(AdaLaunchConstants.ExecutablePath, "");
+		String cmd = configuration.getAttribute(AdaLaunchConstants.EXECUTABLE_PATH, "");
 
 		ExternalProcessJob.runWithDefaultOutput(cmd, cmd);
 	}
