@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         id="adaProjectNature"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="org.padacore.core.AdaProjectNature">
+         </run>
+      </runtime>
+      <builder
+            id="org.padacore.builder.AdaProjectBuilder">
+      </builder>
+   </extension>
+   <extension
+         id="org.padacore.builder.AdaProjectBuilder"
+         name="Ada project builder"
+         point="org.eclipse.core.resources.builders">
+      <builder
+            callOnEmptyDelta="false"
+            hasNature="true"
+            isConfigurable="true"
+            supportsConfigurations="false">
+         <run
+               class="org.padacore.core.builder.AdaProjectBuilder">
+         </run>
+      </builder>
+   </extension>
+   <extension
+         point="org.eclipse.debug.core.launchConfigurationTypes">
+      <launchConfigurationType
+            delegate="org.padacore.core.launch.AdaLaunchConfigurationDelegate"
+            id="org.padacore.core.launch.AdaLaunchConfiguration"
+            modes="run"
+            name="AdaLaunchConfiguration">
+      </launchConfigurationType>
+   </extension>
+
+</plugin>
