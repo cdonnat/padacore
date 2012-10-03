@@ -1,5 +1,5 @@
 gunit GPR;
-@header{package org.padacore.gnat.project;}
+@header{package org.padacore.core.gnat.project;}
 
 IDENTIFIER:
 "i" OK

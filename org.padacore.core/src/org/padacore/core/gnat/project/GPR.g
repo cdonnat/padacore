@@ -2,6 +2,7 @@ grammar GPR;
 
 @header {
 
+
 package org.padacore.core.gnat.project;
 
 import org.padacore.core.*;
@@ -12,10 +13,11 @@ import java.util.Map;
 
 @lexer::header {
 
+
 package org.padacore.core.gnat.project;
 }
 
-@parser::members {
+@parser::members { 
 private final static String EXECUTABLE_DIRECTORY_ATTRIBUTE = "Exec_Dir";
 private final static String OBJECT_DIRECTORY_ATTRIBUTE = "Object_Dir";
 private final static String MAIN_ATTRIBUTE = "Main";
