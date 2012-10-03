@@ -14,6 +14,6 @@ Requirements :
 [3] Import the project into eclipse
 * File > Import > General > Existing project into workspace
 * Select the repository directory as the root directory
-* Select padacore and padacore.test
+* Select org.padacore.core org.padacore.core.test org.padacore.ui org.padacore.ui.test
   
 
