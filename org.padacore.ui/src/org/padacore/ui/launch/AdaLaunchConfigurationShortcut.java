@@ -106,7 +106,7 @@ public class AdaLaunchConfigurationShortcut implements ILaunchShortcut {
 		ILaunchConfiguration launchConfigForFile = this
 				.findExistingLaunchConfigurationFor(selectedFile);
 
-		boolean existingConfigWasFoundForFile = launchConfigForFile == null;
+		boolean existingConfigWasFoundForFile = launchConfigForFile != null;
 
 		if (!existingConfigWasFoundForFile) {
 			try {
@@ -115,6 +115,8 @@ public class AdaLaunchConfigurationShortcut implements ILaunchShortcut {
 				e.printStackTrace();
 			}
 		}
+		
+		assert(launchConfigForFile != null);
 
 		return launchConfigForFile;
 	}
