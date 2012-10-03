@@ -10,11 +10,11 @@
          </run>
       </runtime>
       <builder
-            id="org.padacore.builder.AdaProjectBuilder">
+            id="org.padacore.core.builder.AdaProjectBuilder">
       </builder>
    </extension>
    <extension
-         id="org.padacore.builder.AdaProjectBuilder"
+         id="org.padacore.core.builder.AdaProjectBuilder"
          name="Ada project builder"
          point="org.eclipse.core.resources.builders">
       <builder
