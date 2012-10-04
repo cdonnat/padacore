@@ -3,7 +3,9 @@ package org.padacore.core.builder;
 import java.util.Map;
 import java.util.Observer;
 
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -12,7 +14,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.padacore.core.utils.ExternalProcess;
 import org.padacore.core.utils.ExternalProcessJob;
-import org.padacore.core.utils.ExternalProcessOutput;
 
 public class AdaProjectBuilder extends IncrementalProjectBuilder {
 
@@ -70,7 +71,7 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 
 				ExternalProcess process = new ExternalProcess(
 						new Observer[] { new GprbuildObserver(monitor) },
-						new Observer[] { new ExternalProcessOutput() });
+						new Observer[] { new GprbuildErrObserver(getProject()) });
 
 				process.run(buildCommand(), monitor);
 
@@ -85,6 +86,7 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 	protected IProject[] build(int kind, Map<String, String> args, IProgressMonitor monitor)
 			throws CoreException {
 
+		this.getProject().deleteMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
 		this.build(kind);
 
 		return null;
