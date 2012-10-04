@@ -122,7 +122,7 @@ UPPER_CASE_LETTER
   ;
 
 fragment
-LOWER_CASE_LETTER
+LOWER_CASE_LETTER 
   :
   'a'..'z'
   ;
