@@ -3,9 +3,7 @@ package org.padacore.core.builder;
 import java.util.Map;
 import java.util.Observer;
 
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -85,8 +83,7 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 	@Override
 	protected IProject[] build(int kind, Map<String, String> args, IProgressMonitor monitor)
 			throws CoreException {
-
-		this.getProject().deleteMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
+		
 		this.build(kind);
 
 		return null;

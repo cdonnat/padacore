@@ -9,7 +9,7 @@ public class GprbuildOutput {
 	// private static final String ERROR_PATTERN_STRING =
 	// "(.*.ad?):([0-9]+):([0-9]) (.*)";
 
-	private static final String ERROR_PATTERN_STRING = "^(.+):(\\d+):(\\d+):\\s+(.*)$";
+	private static final String ERROR_PATTERN_STRING = "^(.+):(\\d+):(\\d+):(.*:)?\\s+(.*)$";
 
 	private Pattern progressPattern;
 	private Pattern errorPattern;
@@ -73,7 +73,14 @@ public class GprbuildOutput {
 	 * @return Error containing information about the current error.
 	 */
 	public Error error() {
+		int severity = Error.SEVERITY_ERROR;
+
+		if (errorMatcher.group(4) != null) {
+			severity = errorMatcher.group(4).contains("warning") ? Error.SEVERITY_WARNING
+					: Error.SEVERITY_ERROR;
+		}
+
 		return new Error(errorMatcher.group(1), Integer.parseInt(errorMatcher.group(2)),
-				Integer.parseInt(errorMatcher.group(3)), errorMatcher.group(4));
+				Integer.parseInt(errorMatcher.group(3)), severity, errorMatcher.group(5));
 	}
 }

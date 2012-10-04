@@ -3,7 +3,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="src" path="antlr-generated"/>
 	<classpathentry kind="lib" path="lib/antlr-3.4-complete.jar" sourcepath="D:/Users/RS/Downloads/antlr/antlr-antlr3-release-3.4-172-g7d3d004.zip"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

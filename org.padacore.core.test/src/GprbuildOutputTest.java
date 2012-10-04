@@ -1,22 +1,23 @@
 package src;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.padacore.core.builder.Error;
 import org.padacore.core.builder.GprbuildOutput;
 
-public class GprbuildOutputTest {	
-	
+public class GprbuildOutputTest {
+
 	private GprbuildOutput sut;
-	
+
 	@Before
 	public void createFixture() {
 		sut = new GprbuildOutput();
 	}
-	
-	private void performProgressionTestCase(String input, boolean lastEntryIndicatesProgress, int remaining) {
+
+	private void performProgressionTestCase(String input, boolean lastEntryIndicatesProgress,
+			int remaining) {
 		sut.evaluate(input);
 		assertEquals(sut.lastEntryIndicatesProgress(), lastEntryIndicatesProgress);
 		if (lastEntryIndicatesProgress) {
@@ -32,13 +33,22 @@ public class GprbuildOutputTest {
 		performProgressionTestCase("completed 12 out of 20 (100%)...", true, 8);
 	}
 
+	private void performErrorTestCase(String input, String file, int line, int column,
+			int severity, String message) {
+		sut.evaluate(input);
+		assertEquals("Error indicator", sut.lastEntryIndicatesError(), true);
+		assertEquals("File containing error", sut.error().file(), file);
+		assertEquals("Line containing error", sut.error().line(), line);
+		assertEquals("Column containing error", sut.error().column(), column);
+		assertEquals("Message error", sut.error().message(), message);
+		assertEquals("Severity", sut.error().severity(), severity);
+	}
+
 	@Test
 	public void testError() {
-		sut.evaluate("main.adb:5:35: missing \";\"");
-		assertTrue (sut.lastEntryIndicatesError());
-		assertEquals("File containing error", sut.error().file(), "main.adb");
-		assertEquals("Line containing error", sut.error().line(), 5);
-		assertEquals("Column containing error", sut.error().column(), 35);
-		assertEquals("Message error", sut.error().message(), "missing \";\"");
+		performErrorTestCase("main.adb:5:35: missing \";\"", "main.adb", 5, 35,
+				Error.SEVERITY_ERROR, "missing \";\"");
+		performErrorTestCase("toto_test.ads:5:35:warning: variable toto is not referenced",
+				"toto_test.ads", 5, 35, Error.SEVERITY_WARNING, "variable toto is not referenced");
 	}
 }

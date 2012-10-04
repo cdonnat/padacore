@@ -23,6 +23,12 @@ public class GprbuildErrObserver implements Observer {
 	public GprbuildErrObserver(IProject project) {
 		this.parser = new GprbuildOutput();
 		this.project = project;
+
+		try {
+			this.project.deleteMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -40,13 +46,11 @@ public class GprbuildErrObserver implements Observer {
 				m.setAttribute(IMarker.LINE_NUMBER, error.line());
 				m.setAttribute(IMarker.MESSAGE, error.message());
 				m.setAttribute(IMarker.PRIORITY, IMarker.PRIORITY_HIGH);
-				m.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
+				m.setAttribute(IMarker.SEVERITY, error.severity());
 			} catch (CoreException e) {
 				e.printStackTrace();
 			}
 		}
-
-		System.err.println(line);
 	}
 
 }
