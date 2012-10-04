@@ -28,21 +28,17 @@ public class AdaProjectPropertyTesterTest {
 	}
 
 	private void createTestProjects() {
-		NewAdaProject adaProject = new NewAdaProject("test", true, null);
+		NewAdaProject adaProject = new NewAdaProject("test", null);
 		this.projectWithAdaNature = adaProject.create(false);
 
-		NewAdaProject otherAdaProject = new NewAdaProject("other_test", true,
-				null);
+		NewAdaProject otherAdaProject = new NewAdaProject("other_test", null);
 		this.projectWithoutAdaNature = otherAdaProject.create(false);
 		IProjectDescription adaProjectDescription;
 
 		try {
-			adaProjectDescription = this.projectWithoutAdaNature
-					.getDescription();
-			adaProjectDescription
-					.setNatureIds(new String[] { "org.eclipse.jdt.core.javanature" });
-			this.projectWithoutAdaNature.setDescription(adaProjectDescription,
-					null);
+			adaProjectDescription = this.projectWithoutAdaNature.getDescription();
+			adaProjectDescription.setNatureIds(new String[] { "org.eclipse.jdt.core.javanature" });
+			this.projectWithoutAdaNature.setDescription(adaProjectDescription, null);
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
@@ -53,8 +49,7 @@ public class AdaProjectPropertyTesterTest {
 			if (fileHandle.exists()) {
 				fileHandle.delete(false, null);
 			}
-			fileHandle.create(new ByteArrayInputStream(new byte[] { 'e' }),
-					false, null);
+			fileHandle.create(new ByteArrayInputStream(new byte[] { 'e' }), false, null);
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
@@ -63,8 +58,7 @@ public class AdaProjectPropertyTesterTest {
 
 	private void addFilesToTestProjects() {
 		this.fileInAdaProject = this.projectWithAdaNature.getFile("test_file");
-		this.fileInStandardProject = this.projectWithoutAdaNature
-				.getFile("test_file");
+		this.fileInStandardProject = this.projectWithoutAdaNature.getFile("test_file");
 
 		this.createFile(this.fileInAdaProject);
 		this.createFile(this.fileInStandardProject);
@@ -76,19 +70,19 @@ public class AdaProjectPropertyTesterTest {
 
 		assertTrue("Project with Ada nature",
 				sut.test(this.projectWithAdaNature, "isAdaProject", null, null));
-		assertFalse("Project without Ada nature", sut.test(
-				this.projectWithoutAdaNature, "isAdaProject", null, null));
+		assertFalse("Project without Ada nature",
+				sut.test(this.projectWithoutAdaNature, "isAdaProject", null, null));
 	}
 
 	@Test
 	public void belongsToAdaProjectTest() {
 		AdaProjectPropertyTester sut = new AdaProjectPropertyTester();
 
-		assertTrue("File in project with Ada nature", sut.test(
-				this.fileInAdaProject, "belongsToAdaProject", null, null));
+		assertTrue("File in project with Ada nature",
+				sut.test(this.fileInAdaProject, "belongsToAdaProject", null, null));
 
-		assertFalse("File in project without Ada nature", sut.test(
-				this.fileInStandardProject, "belongsToAdaProject", null, null));
+		assertFalse("File in project without Ada nature",
+				sut.test(this.fileInStandardProject, "belongsToAdaProject", null, null));
 
 	}
 

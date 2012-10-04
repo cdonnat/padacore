@@ -27,15 +27,12 @@ public class NewAdaProject {
 	 * @param location
 	 *            Project location.
 	 */
-	public NewAdaProject(String projectName, boolean useDefaultLocation, URI location) {
+	public NewAdaProject(String projectName, URI location) {
 
 		this.project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 		this.description = project.getWorkspace().newProjectDescription(project.getName());
-
 		this.description.setNatureIds(NATURES);
-
-		URI projectLocation = useDefaultLocation ? null : location;
-		this.description.setLocationURI(projectLocation);
+		this.description.setLocationURI(location);
 	}
 
 	/**
@@ -46,9 +43,8 @@ public class NewAdaProject {
 
 		if (!project.exists()) {
 			try {
-				project.create(null);
+				project.create(description, null);
 				project.open(null);
-				project.setDescription(description, null);
 				addGprProject(addMainProcedure);
 
 			} catch (CoreException e) {

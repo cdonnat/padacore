@@ -1,5 +1,7 @@
 package org.padacore.ui.wizards;
 
+import java.net.URI;
+
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
@@ -26,13 +28,12 @@ public class NewAdaProjectWizard extends Wizard implements INewWizard {
 
 	@Override
 	public boolean performFinish() {
-		NewAdaProject project;
-		project = new NewAdaProject(projectCreationPage
-				.getProjectHandle().getName(),
-				projectCreationPage.useDefaults(),
-				projectCreationPage.getLocationURI());
+		URI projectLocation = projectCreationPage.useDefaults() ? null : projectCreationPage
+				.getLocationURI();
+		NewAdaProject project = new NewAdaProject(projectCreationPage.getProjectHandle().getName(),
+				projectLocation);
 		project.create(projectCreationPage.addMainProcedure());
-		
+
 		return true;
 	}
 
