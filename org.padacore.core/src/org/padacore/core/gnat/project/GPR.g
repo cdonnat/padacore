@@ -121,8 +121,8 @@ UPPER_CASE_LETTER
   'A'..'Z'
   ;
 
-fragment 
-LOWER_CASE_LETTER
+fragment
+LOWER_CASE_LETTER 
   :
   'a'..'z'
   ;
