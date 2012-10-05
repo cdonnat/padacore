@@ -43,8 +43,9 @@ public class NewAdaProject {
 
 		if (!project.exists()) {
 			try {
-				project.create(description, null);
+				project.create(null);
 				project.open(null);
+				project.setDescription(description, null);
 				addGprProject(addMainProcedure);
 
 			} catch (CoreException e) {
