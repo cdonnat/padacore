@@ -33,7 +33,7 @@ public class GprProjectTest {
 				+ "\tfor Source_Dirs use (\".\");\n"
 				+ "\tfor Object_Dir use \"object\";\n"
 				+ "\tfor Exec_Dir use \"exec\";\n"
-				+ "\tfor Main use (\"main.adb\", \"main1.adb\", \"main2.ads\");\n"
+				+ "\tfor Main use (\"main1.adb\", \"main2.ads\");\n"
 				+ "end Test;";		
 
 		assertEquals("Gpr project content", expectedSavedProject,sut.toString());

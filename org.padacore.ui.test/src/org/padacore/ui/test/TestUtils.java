@@ -8,8 +8,8 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
+import org.padacore.core.NewAdaProject;
 import org.padacore.core.launch.AdaLaunchConstants;
-import org.padacore.ui.wizards.NewAdaProject;
 
 public class TestUtils {
 

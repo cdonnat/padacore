@@ -1,4 +1,4 @@
-package org.padacore.ui.wizards;
+package org.padacore.core;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -9,8 +9,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.padacore.core.AdaProjectNature;
-import org.padacore.core.GprProject;
 
 public class NewAdaProject {
 

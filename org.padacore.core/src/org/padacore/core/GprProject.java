@@ -25,7 +25,6 @@ public class GprProject {
 
 		this.name = name;
 		this.addSourceDir(".");
-		this.execNames.add("main.adb");
 	}
 
 	/**

@@ -8,7 +8,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.junit.Before;
 import org.junit.Test;
 import org.padacore.core.AdaProjectNature;
-import org.padacore.ui.wizards.NewAdaProject;
+import org.padacore.core.NewAdaProject;
 
 public class AdaProjectNatureTest {
 
