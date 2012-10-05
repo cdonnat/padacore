@@ -48,7 +48,7 @@ public class NewAdaProjectTest {
 
 	@Test
 	public void testCreateProjectWithDefaultLocation() {
-
+		
 		sut = new NewAdaProject("TestProject", null);
 		
 		IProject createdProject = sut.create(true);
@@ -57,7 +57,7 @@ public class NewAdaProjectTest {
 		checkProjectIsOpen(createdProject);
 		checkProjectContainsAdaNature(createdProject);
 		checkProjectLocation(createdProject,
-				TestUtils.getWorkspaceAbsolutePath() + System.getProperty("file.separator")
+				TestUtils.getWorkspaceAbsolutePath() + "/"
 						+ createdProject.getName());
 		checkGprExists(createdProject);
 	}
