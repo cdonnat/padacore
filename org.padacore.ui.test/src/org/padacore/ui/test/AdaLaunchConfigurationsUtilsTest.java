@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.padacore.core.launch.AdaLaunchConfigurationUtils;
 import org.padacore.core.launch.AdaLaunchConstants;
+import org.padacore.ui.test.utils.TestUtils;
 
 public class AdaLaunchConfigurationsUtilsTest {
 

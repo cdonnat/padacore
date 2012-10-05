@@ -1,4 +1,4 @@
-package org.padacore.ui.test;
+package org.padacore.ui.test.utils;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
