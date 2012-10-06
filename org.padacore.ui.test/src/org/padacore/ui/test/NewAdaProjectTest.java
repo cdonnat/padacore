@@ -55,6 +55,18 @@ public class NewAdaProjectTest {
 	}
 
 	@Test
+	public void testAssociationToExistingGprProject() {
+		sut = new NewAdaProject("TestProjectFromGpr", null);
+		GprProject existingGpr = new GprProject("gpr_project");
+
+		IProject createdProjectFromGpr = sut.createFrom(existingGpr);
+		GprProject retrievedGpr = checkAGprIsAssociatedToProject(createdProjectFromGpr);
+
+		assertTrue("Associated GprProject shall be the one created from",
+				existingGpr == retrievedGpr);
+	}
+
+	@Test
 	public void testCreateProjectWithDefaultLocationWithMain() {
 
 		sut = new NewAdaProject("TestProjectWithMain", null);
@@ -69,7 +81,7 @@ public class NewAdaProjectTest {
 						+ createdProjectWithMain.getName());
 		checkGprExists(createdProjectWithMain);
 
-		GprProject associatedGpr = checkDefaultGprIsAssociatedToProject(createdProjectWithMain);
+		GprProject associatedGpr = checkAGprIsAssociatedToProject(createdProjectWithMain);
 		if (associatedGpr != null) {
 			checkDefaultGprContents(associatedGpr, true);
 		}
@@ -90,7 +102,7 @@ public class NewAdaProjectTest {
 						+ createdProjectWithoutMain.getName());
 		checkGprExists(createdProjectWithoutMain);
 
-		GprProject associatedGpr = checkDefaultGprIsAssociatedToProject(createdProjectWithoutMain);
+		GprProject associatedGpr = checkAGprIsAssociatedToProject(createdProjectWithoutMain);
 		if (associatedGpr != null) {
 			checkDefaultGprContents(associatedGpr, false);
 		}
@@ -114,8 +126,7 @@ public class NewAdaProjectTest {
 
 	}
 
-	private GprProject checkDefaultGprIsAssociatedToProject(
-			IProject createdProject) {
+	private GprProject checkAGprIsAssociatedToProject(IProject createdProject) {
 
 		GprProject associatedGpr = null;
 
