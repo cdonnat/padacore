@@ -37,9 +37,9 @@ public class NewAdaProjectTest {
 	@Test
 	public void testCreateProjectWithDefaultLocation() {
 
-		sut = new NewAdaProject("TestProject", null);
+		sut = new NewAdaProject("ProjectDefaultLocation", null);
 
-		IProject createdProject = sut.create(true);
+		IProject createdProject = sut.create(false);
 
 		checkProjectIsNotNull(createdProject);
 		checkProjectIsOpen(createdProject);

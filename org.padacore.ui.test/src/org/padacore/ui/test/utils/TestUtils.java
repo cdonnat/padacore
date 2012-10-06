@@ -13,13 +13,15 @@ import org.padacore.ui.wizards.NewAdaProject;
 
 public class TestUtils {
 
+	private static int cpt = 0;
+
 	public static IProject createAdaProject() {
-		return createAdaProject("Test project");
+		cpt++;
+		return createAdaProject("TestProject" + cpt);
 	}
 
 	public static IProject createAdaProject(String projectName) {
 		NewAdaProject adaProject = new NewAdaProject(projectName, null);
-
 		return adaProject.create(false);
 	}
 

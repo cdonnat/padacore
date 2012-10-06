@@ -34,7 +34,7 @@ public class NewAdaProject {
 		this.description.setNatureIds(NATURES);
 		this.description.setLocationURI(location);
 	}
-
+	
 	/**
 	 * Create and return an Ada project (IProject) or return existing one if it
 	 * has been already created.
@@ -52,7 +52,6 @@ public class NewAdaProject {
 				e.printStackTrace();
 			}
 		}
-
 		return project;
 	}
 

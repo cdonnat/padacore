@@ -30,7 +30,7 @@ public class AdaLaunchConfigurationsUtilsTest {
 	@Before
 	public void createFixture() {
 
-		this.adaProject = TestUtils.createAdaProject("adaProject");
+		this.adaProject = TestUtils.createAdaProject();
 
 		this.createLaunchConfiguration();
 	}

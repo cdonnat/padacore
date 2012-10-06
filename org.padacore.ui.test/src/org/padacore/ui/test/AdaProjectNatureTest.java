@@ -6,7 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.padacore.core.AdaProjectNature;
 import org.padacore.ui.test.utils.ProjectDescriptionUtils;
-import org.padacore.ui.wizards.NewAdaProject;
+import org.padacore.ui.test.utils.TestUtils;
 
 public class AdaProjectNatureTest {
 
@@ -14,8 +14,7 @@ public class AdaProjectNatureTest {
 
 	@Before
 	public void createAdaProject() {
-		NewAdaProject adaProject = new NewAdaProject("TestProject", null);
-		this.adaProject = adaProject.create(false);
+		this.adaProject = TestUtils.createAdaProject();
 	}
 
 	@Test
