@@ -97,7 +97,7 @@ public class GprProject {
 
 		return execDir;
 	}
-	
+
 	/**
 	 * Return true if the GPR is an executable project, false otherwise.
 	 * 
@@ -117,7 +117,7 @@ public class GprProject {
 
 		this.execDir = execDir;
 	}
-	
+
 	/**
 	 * Add a new withed project
 	 * 
@@ -145,15 +145,17 @@ public class GprProject {
 	public String getFileName() {
 		return this.getName() + ".gpr";
 	}
-	
+
 	/**
 	 * Returns the names of the executable source files of the project.
-	 * @return a list of String corresponding to the names of executable source files.
+	 * 
+	 * @return a list of String corresponding to the names of executable source
+	 *         files.
 	 */
 	public List<String> getExecutableSourceNames() {
 		return this.execSourceNames;
 	}
-	
+
 	/**
 	 * Returns the String corresponding to the list of executable names.
 	 * 
@@ -169,7 +171,8 @@ public class GprProject {
 
 		for (int exec = 0; exec < this.execSourceNames.size(); exec++) {
 
-			listOfExecutablesAsString = listOfExecutablesAsString + "\"" + this.execSourceNames.get(exec) + "\"";
+			listOfExecutablesAsString = listOfExecutablesAsString + "\""
+					+ this.execSourceNames.get(exec) + "\"";
 
 			if (exec != this.execSourceNames.size() - 1) {
 				listOfExecutablesAsString = listOfExecutablesAsString + ", ";
@@ -188,17 +191,24 @@ public class GprProject {
 	 * @return Content of the GPR project.
 	 */
 	public String toString() {
-		String res = "project " + this.getName() + " is\n" + "\tfor Source_Dirs use (";
+		String res = "project " + this.getName() + " is\n"
+				+ "\tfor Source_Dirs use (";
 
 		for (int i = 0; i < this.getSourcesDir().size() - 1; i++) {
 			res += "\"" + this.getSourcesDir().get(i) + "\",\n";
 		}
-		res += "\"" + this.getSourcesDir().get(this.getSourcesDir().size() - 1) + "\");\n";
+		res += "\"" + this.getSourcesDir().get(this.getSourcesDir().size() - 1)
+				+ "\");\n";
 
-		res += "\tfor Object_Dir use \"" + this.getObjectDir() + "\";\n";
+		if (this.getObjectDir() != null) {
+			res += "\tfor Object_Dir use \"" + this.getObjectDir() + "\";\n";
+		}
 
 		if (isExecutable) {
-			res += "\tfor Exec_Dir use \"" + this.getExecutableDir() + "\";\n";
+			if (this.getExecutableDir() != null) {
+				res += "\tfor Exec_Dir use \"" + this.getExecutableDir()
+						+ "\";\n";
+			}
 			res += "\tfor Main use " + this.executableNamesAsString() + ";\n";
 		}
 		res += "end " + this.getName() + ";";
