@@ -88,8 +88,9 @@ public class NewAdaProject {
 			newProjectShallBeCreated = true;
 			
 			try {
-				this.project.create(this.description, null);
+				this.project.create(null);
 				this.project.open(null);
+				this.project.setDescription(description, null);
 
 			} catch (CoreException e) {
 				e.printStackTrace();
