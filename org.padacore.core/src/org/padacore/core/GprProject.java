@@ -97,6 +97,15 @@ public class GprProject {
 
 		return execDir;
 	}
+	
+	/**
+	 * Return true if the GPR is an executable project, false otherwise.
+	 * 
+	 * @return true if the GPR is an executable project, false otherwise.
+	 */
+	public boolean isExecutable() {
+		return this.isExecutable;
+	}
 
 	/**
 	 * Set the executable directory.
@@ -135,6 +144,14 @@ public class GprProject {
 	 */
 	public String fileName() {
 		return name() + ".gpr";
+	}
+	
+	/**
+	 * Returns the executable source files of the project.
+	 * @return a list of String corresponding to the names of executable source files.
+	 */
+	public List<String> getExecutableSourceNames() {
+		return this.execNames;
 	}
 
 	/**

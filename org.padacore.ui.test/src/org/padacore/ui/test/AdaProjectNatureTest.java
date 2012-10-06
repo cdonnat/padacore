@@ -31,7 +31,6 @@ public class AdaProjectNatureTest {
 					getAdaBuilderPositionInBuilderCmdsList(projectBuilderCmds) == 0);
 
 		} catch (CoreException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -49,7 +48,6 @@ public class AdaProjectNatureTest {
 					getAdaBuilderPositionInBuilderCmdsList(projectBuilderCmds) == projectBuilderCmds.length);
 
 		} catch (CoreException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	} 

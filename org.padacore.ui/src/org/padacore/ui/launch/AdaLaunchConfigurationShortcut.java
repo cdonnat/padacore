@@ -3,6 +3,7 @@ package org.padacore.ui.launch;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.ui.ILaunchShortcut;
@@ -10,6 +11,8 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IEditorPart;
 import org.padacore.core.AdaProjectNature;
+import org.padacore.core.GprProject;
+import org.padacore.core.NewAdaProject;
 import org.padacore.core.launch.AdaLaunchConfigurationUtils;
 
 public class AdaLaunchConfigurationShortcut implements ILaunchShortcut {
@@ -56,6 +59,18 @@ public class AdaLaunchConfigurationShortcut implements ILaunchShortcut {
 	// Precondition: selected project is an Ada project
 	private void launchFromProject(IProject selectedProject) {
 		// TODO perform launch from a project
+		try {
+			assert (selectedProject.hasNature(AdaProjectNature.NATURE_ID));
+			QualifiedName gprQualifiedName = new QualifiedName(NewAdaProject.GPR_PROJECT_SESSION_PROPERTY_QUALIFIER, selectedProject.getName());
+			Object gprAsObject = selectedProject.getSessionProperty(gprQualifiedName);
+			assert(gprAsObject instanceof GprProject);
+			
+			GprProject gprProject = (GprProject)gprAsObject;
+			System.out.println(gprProject.getExecutableSourceNames());
+			
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**

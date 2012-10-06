@@ -10,7 +10,7 @@ public class AdaProjectNature implements IProjectNature {
 
 	public static final String NATURE_ID = "org.padacore.core.adaProjectNature";
 	public static final String ADA_BUILDER_ID = "org.padacore.core.builder.AdaProjectBuilder";
-	
+		
 	private IProject project;
 
 	@Override
