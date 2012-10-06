@@ -130,7 +130,7 @@ public class NewAdaProject {
 	private GprProject createDefaultGprProject(boolean addMainProcedure)
 			throws CoreException {
 		GprProject gprProject = new GprProject(project.getName());
-		IFile gprHandle = project.getFile(gprProject.fileName());
+		IFile gprHandle = project.getFile(gprProject.getFileName());
 
 		if (addMainProcedure) {
 			gprProject.setExecutable(true);

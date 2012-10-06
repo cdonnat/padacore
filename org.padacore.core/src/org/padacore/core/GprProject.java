@@ -7,10 +7,10 @@ public class GprProject {
 
 	private String name;
 	private List<String> sourcesDir = new ArrayList<String>();
-	private String objectDir = "obj";
+	private String objectDir = null;
 	private boolean isExecutable = false;
-	private String execDir = "exe";
-	private List<String> execNames = new ArrayList<String>(1);
+	private String execDir = null;
+	private List<String> execSourceNames = new ArrayList<String>(1);
 	private List<String> withedProjects = new ArrayList<String>();
 
 	/**
@@ -42,16 +42,16 @@ public class GprProject {
 	 * 
 	 * @return The list of sources directory.
 	 */
-	public List<String> sourcesDir() {
+	public List<String> getSourcesDir() {
 		return sourcesDir;
 	}
 
 	/**
-	 * Return the object directory.
+	 * Return the object directory or null if none was specified.
 	 * 
 	 * @return Object directory.
 	 */
-	public String objectDir() {
+	public String getObjectDir() {
 		return objectDir;
 	}
 
@@ -83,16 +83,16 @@ public class GprProject {
 	public void addExecutableName(String execName) {
 		assert isExecutable;
 
-		this.execNames.add(execName);
+		this.execSourceNames.add(execName);
 	}
 
 	/**
-	 * Return executable directory.
+	 * Return executable directory or null if none was specified.
 	 * 
 	 * @pre GPR is an executable project.
 	 * @return The executable directory
 	 */
-	public String executableDir() {
+	public String getExecutableDir() {
 		assert isExecutable;
 
 		return execDir;
@@ -133,7 +133,7 @@ public class GprProject {
 	 * 
 	 * @return The project name.
 	 */
-	public String name() {
+	public String getName() {
 		return name;
 	}
 
@@ -142,18 +142,18 @@ public class GprProject {
 	 * 
 	 * @return The name of the GPR file associated.
 	 */
-	public String fileName() {
-		return name() + ".gpr";
+	public String getFileName() {
+		return this.getName() + ".gpr";
 	}
 	
 	/**
-	 * Returns the executable source files of the project.
+	 * Returns the names of the executable source files of the project.
 	 * @return a list of String corresponding to the names of executable source files.
 	 */
 	public List<String> getExecutableSourceNames() {
-		return this.execNames;
+		return this.execSourceNames;
 	}
-
+	
 	/**
 	 * Returns the String corresponding to the list of executable names.
 	 * 
@@ -167,11 +167,11 @@ public class GprProject {
 
 		String listOfExecutablesAsString = "(";
 
-		for (int exec = 0; exec < this.execNames.size(); exec++) {
+		for (int exec = 0; exec < this.execSourceNames.size(); exec++) {
 
-			listOfExecutablesAsString = listOfExecutablesAsString + "\"" + this.execNames.get(exec) + "\"";
+			listOfExecutablesAsString = listOfExecutablesAsString + "\"" + this.execSourceNames.get(exec) + "\"";
 
-			if (exec != this.execNames.size() - 1) {
+			if (exec != this.execSourceNames.size() - 1) {
 				listOfExecutablesAsString = listOfExecutablesAsString + ", ";
 			}
 		}
@@ -188,20 +188,20 @@ public class GprProject {
 	 * @return Content of the GPR project.
 	 */
 	public String toString() {
-		String res = "project " + name() + " is\n" + "\tfor Source_Dirs use (";
+		String res = "project " + this.getName() + " is\n" + "\tfor Source_Dirs use (";
 
-		for (int i = 0; i < sourcesDir().size() - 1; i++) {
-			res += "\"" + sourcesDir().get(i) + "\",\n";
+		for (int i = 0; i < this.getSourcesDir().size() - 1; i++) {
+			res += "\"" + this.getSourcesDir().get(i) + "\",\n";
 		}
-		res += "\"" + sourcesDir().get(sourcesDir().size() - 1) + "\");\n";
+		res += "\"" + this.getSourcesDir().get(this.getSourcesDir().size() - 1) + "\");\n";
 
-		res += "\tfor Object_Dir use \"" + objectDir() + "\";\n";
+		res += "\tfor Object_Dir use \"" + this.getObjectDir() + "\";\n";
 
 		if (isExecutable) {
-			res += "\tfor Exec_Dir use \"" + executableDir() + "\";\n";
+			res += "\tfor Exec_Dir use \"" + this.getExecutableDir() + "\";\n";
 			res += "\tfor Main use " + this.executableNamesAsString() + ";\n";
 		}
-		res += "end " + name() + ";";
+		res += "end " + this.getName() + ";";
 
 		return res;
 	}
