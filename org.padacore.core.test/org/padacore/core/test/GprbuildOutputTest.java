@@ -1,4 +1,4 @@
-package src;
+package org.padacore.core.test;
 
 import static org.junit.Assert.assertEquals;
 

@@ -30,7 +30,6 @@ public class AdaProjectNatureTest {
 			adaNature.deconfigure();
 			ProjectDescriptionUtils.CheckThereIsNoAdaBuilder(adaProject, "Deconfigure project");
 		} catch (CoreException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
