@@ -9,6 +9,7 @@ import java.io.File;
 
 import org.eclipse.core.resources.IProject;
 import org.junit.Test;
+import org.padacore.ui.test.utils.ProjectDescriptionUtils;
 import org.padacore.ui.test.utils.TestUtils;
 import org.padacore.ui.wizards.NewAdaProject;
 
@@ -37,6 +38,7 @@ public class NewAdaProjectTest {
 	@Test
 	public void testCreateProjectWithDefaultLocation() {
 
+		final String comment = "Create new project with default location";
 		sut = new NewAdaProject("ProjectDefaultLocation", null);
 
 		IProject createdProject = sut.create(false);
@@ -46,8 +48,9 @@ public class NewAdaProjectTest {
 		checkProjectLocation(createdProject, TestUtils.getWorkspaceAbsolutePath() + "/"
 				+ createdProject.getName());
 		checkGprExists(createdProject);
+		ProjectDescriptionUtils.CheckAdaBuilderIsTheFirstBuilder(createdProject, comment);
 		
-		CheckProjectContainsAdaNature(createdProject, "Create new project with default location");
+		CheckProjectContainsAdaNature(createdProject, comment);
 	}
 
 }
