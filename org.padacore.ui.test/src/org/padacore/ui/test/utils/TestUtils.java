@@ -3,6 +3,7 @@ package org.padacore.ui.test.utils;
 import static org.junit.Assert.assertTrue;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.QualifiedName;
@@ -25,8 +26,7 @@ public class TestUtils {
 	}
 
 	public static IProject createAdaProject(String projectName) {
-		NewAdaProject adaProject = new NewAdaProject(projectName, null);
-		return adaProject.create(false);
+		return NewAdaProject.Create(projectName, null, false);
 	}
 
 	private static ILaunchConfigurationType getAdaLaunchConfigurationType() {
@@ -68,13 +68,20 @@ public class TestUtils {
 	}
 
 	public static String getFileAbsolutePath(IProject project, String filename) {
-		String workspaceAbsolutePath = project.getWorkspace().getRoot().getRawLocation()
-				.toOSString();
+		String res = project.getWorkspace().getRoot().getRawLocation().toOSString()
+				+ project.getFullPath().toOSString() + System.getProperty("file.separator")
+				+ filename;
 
-		return workspaceAbsolutePath + project.getFullPath().toOSString()
-				+ System.getProperty("file.separator") + filename;
+		try {
+			IProjectDescription desc = project.getDescription();
+			if (desc.getLocationURI() != null) {
+				return desc.getLocationURI().getPath();
+			}
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+		return res;
 	}
-	
 
 	public static GprProject checkAGprIsAssociatedToProject(IProject createdProject) {
 
@@ -83,11 +90,10 @@ public class TestUtils {
 		try {
 			Object associatedProperty = createdProject
 					.getSessionProperty(new QualifiedName(
-							NewAdaProject.GPR_PROJECT_SESSION_PROPERTY_QUALIFIER,
-							createdProject.getName()));
+							NewAdaProject.GPR_PROJECT_SESSION_PROPERTY_QUALIFIER, createdProject
+									.getName()));
 
-			assertTrue("GprProject shall be associated",
-					associatedProperty instanceof GprProject);
+			assertTrue("GprProject shall be associated", associatedProperty instanceof GprProject);
 
 			if (associatedProperty instanceof GprProject) {
 				associatedGpr = (GprProject) associatedProperty;
@@ -98,22 +104,18 @@ public class TestUtils {
 
 		return associatedGpr;
 	}
-	
 
 	public static void checkDefaultGprContents(GprProject gprToCheck,
 			boolean mainProcedureHasBeenGenerated) {
 		assertTrue("GprProject shall be executable: " + mainProcedureHasBeenGenerated,
 				gprToCheck.isExecutable() == mainProcedureHasBeenGenerated);
-		assertTrue(
-				"GprProject shall have " + (mainProcedureHasBeenGenerated ? "1" : "0")
-						+ " executable",
+		assertTrue("GprProject shall have " + (mainProcedureHasBeenGenerated ? "1" : "0")
+				+ " executable",
 				gprToCheck.getExecutableSourceNames().size() == (mainProcedureHasBeenGenerated ? 1
 						: 0));
 		if (mainProcedureHasBeenGenerated) {
-			assertTrue(
-					"GprProject executable shall be called main.adb",
-					gprToCheck.getExecutableSourceNames().get(0)
-							.equals("main.adb"));
+			assertTrue("GprProject executable shall be called main.adb", gprToCheck
+					.getExecutableSourceNames().get(0).equals("main.adb"));
 		}
 
 	}
