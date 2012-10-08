@@ -51,6 +51,25 @@ public class NewAdaProjectTest {
 
 		assertTrue("Associated GprProject shall be the one created from",
 				existingGpr == retrievedGpr);
+
+		IProject createdProject = sut.create(false);
+
+		checkProjectIsNotNull(createdProject);
+		checkProjectIsOpen(createdProject);
+		checkProjectLocation(
+				createdProject,
+				TestUtils.getWorkspaceAbsolutePath() + "/"
+						+ createdProject.getName());
+		checkGprExists(createdProject);
+
+		ProjectDescriptionUtils.CheckProjectContainsAdaNature(createdProject,
+				"Create new project with default location");
+
+		GprProject associatedGpr = TestUtils
+				.checkAGprIsAssociatedToProject(createdProject);
+		if (associatedGpr != null) {
+			TestUtils.checkDefaultGprContents(associatedGpr, false);
+		}
 	}
 
 	@Test
