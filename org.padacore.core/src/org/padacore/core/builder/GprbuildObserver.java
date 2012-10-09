@@ -43,9 +43,6 @@ public class GprbuildObserver implements Observer {
 				monitor.done();
 			}
 		}
-		else {
-			System.out.println(line);
-		}
 	}
 
 }

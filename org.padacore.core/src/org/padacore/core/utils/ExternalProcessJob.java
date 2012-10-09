@@ -16,7 +16,7 @@ public class ExternalProcessJob extends Job {
 			Observer[] errObservers) {
 		super(name);
 		this.cmdWithArgs = cmdWithArgs;
-		this.externalProcess = new ExternalProcess(outputObservers, errObservers);
+		this.externalProcess = new ExternalProcess(name, outputObservers, errObservers);
 	}
 
 	@Override
