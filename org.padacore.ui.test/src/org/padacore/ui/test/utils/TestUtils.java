@@ -20,16 +20,16 @@ public class TestUtils {
 
 	private static int cpt = 0;
 
-	public static IProject createAdaProject() {
+	public static IProject CreateAdaProject() {
 		cpt++;
-		return createAdaProject("TestProject" + cpt);
+		return CreateAdaProject("TestProject" + cpt);
 	}
 
-	public static IProject createAdaProject(String projectName) {
+	public static IProject CreateAdaProject(String projectName) {
 		return NewAdaProject.Create(projectName, null, false);
 	}
 
-	private static ILaunchConfigurationType getAdaLaunchConfigurationType() {
+	private static ILaunchConfigurationType GetAdaLaunchConfigurationType() {
 		ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
 
 		ILaunchConfigurationType adaConfigType = launchManager
@@ -38,23 +38,23 @@ public class TestUtils {
 		return adaConfigType;
 	}
 
-	public static ILaunchConfiguration[] retrieveAdaLaunchConfigurations() throws CoreException {
+	public static ILaunchConfiguration[] RetrieveAdaLaunchConfigurations() throws CoreException {
 		ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
 
-		return launchManager.getLaunchConfigurations(getAdaLaunchConfigurationType());
+		return launchManager.getLaunchConfigurations(GetAdaLaunchConfigurationType());
 	}
 
-	public static ILaunchConfiguration createAdaLaunchConfigurationFor(String launchConfigName,
+	public static ILaunchConfiguration CreateAdaLaunchConfigurationFor(String launchConfigName,
 			IProject project, String executableName) throws CoreException {
 
-		ILaunchConfigurationType adaConfigType = getAdaLaunchConfigurationType();
+		ILaunchConfigurationType adaConfigType = GetAdaLaunchConfigurationType();
 
 		ILaunchConfiguration launchConfig = null;
 
 		ILaunchConfigurationWorkingCopy configWc = adaConfigType
 				.newInstance(null, launchConfigName);
 
-		String fileAbsolutePath = getFileAbsolutePath(project, executableName);
+		String fileAbsolutePath = GetFileAbsolutePath(project, executableName);
 
 		configWc.setAttribute(AdaLaunchConstants.EXECUTABLE_PATH, fileAbsolutePath);
 
@@ -63,11 +63,11 @@ public class TestUtils {
 		return launchConfig;
 	}
 
-	public static String getWorkspaceAbsolutePath() {
+	public static String GetWorkspaceAbsolutePath() {
 		return ResourcesPlugin.getWorkspace().getRoot().getLocationURI().getPath();
 	}
 
-	public static String getFileAbsolutePath(IProject project, String filename) {
+	public static String GetFileAbsolutePath(IProject project, String filename) {
 		String res = project.getWorkspace().getRoot().getRawLocation().toOSString()
 				+ project.getFullPath().toOSString() + System.getProperty("file.separator")
 				+ filename;
@@ -83,7 +83,7 @@ public class TestUtils {
 		return res;
 	}
 
-	public static GprProject checkAGprIsAssociatedToProject(IProject createdProject) {
+	public static GprProject CheckAGprIsAssociatedToProject(IProject createdProject) {
 
 		GprProject associatedGpr = null;
 
@@ -105,7 +105,7 @@ public class TestUtils {
 		return associatedGpr;
 	}
 
-	public static void checkDefaultGprContents(GprProject gprToCheck,
+	public static void CheckDefaultGprContents(GprProject gprToCheck,
 			boolean mainProcedureHasBeenGenerated) {
 		assertTrue("GprProject shall be executable: " + mainProcedureHasBeenGenerated,
 				gprToCheck.isExecutable() == mainProcedureHasBeenGenerated);

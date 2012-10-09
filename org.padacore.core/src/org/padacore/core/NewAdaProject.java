@@ -58,7 +58,7 @@ public class NewAdaProject {
 			IProjectDescription description = ResourcesPlugin.getWorkspace().newProjectDescription(
 					gprProject.getName());
 
-			description.setLocationURI(EvaluateProjectLocation(gprProject.getName(), location));
+			description.setLocationURI(location);
 			project.create(description, null);
 			project.open(null);
 			AddAdaNature(project);
@@ -101,16 +101,6 @@ public class NewAdaProject {
 		project.setSessionProperty(qualifiedName, associatedGpr);
 	}
 
-	private static URI EvaluateProjectLocation(String projectName, URI location) {
-		URI res = location;
-
-		if (location != null && !location.toString().contains(projectName)) {
-			res = URI.create(location.getPath() + System.getProperty("file.separator")
-					+ projectName);
-		}
-		return res;
-	}
-
 	/**
 	 * Returns the project full path as a String.
 	 * 
@@ -121,11 +111,12 @@ public class NewAdaProject {
 	 * @return The project full path.
 	 */
 	private static String GetProjectPath(String projectName, URI location) {
-		String path = (location == null) ? ResourcesPlugin.getWorkspace().getRoot()
-				.getLocationURI().getPath() : location.getPath();
-
-		return path + System.getProperty("file.separator") + projectName
-				+ System.getProperty("file.separator");
+		if (location == null) {
+			return ResourcesPlugin.getWorkspace().getRoot().getLocationURI().getPath()
+					+ System.getProperty("file.separator") + projectName;
+		} else {
+			return location.getPath();
+		}
 	}
 
 	/**
@@ -144,9 +135,11 @@ public class NewAdaProject {
 		if (addMainProcedure) {
 			gprProject.setExecutable(true);
 			gprProject.addExecutableName(DEFAULT_EXECUTABLE_NAME);
-			AddFileToProject(path + DEFAULT_EXECUTABLE_NAME, DefaultMainContents());
+			AddFileToProject(path + System.getProperty("file.separator") + DEFAULT_EXECUTABLE_NAME,
+					DefaultMainContents());
 		}
-		AddFileToProject(path + projectName + ".gpr", gprProject.toString());
+		AddFileToProject(path + System.getProperty("file.separator") + projectName + ".gpr",
+				gprProject.toString());
 
 		return gprProject;
 	}
