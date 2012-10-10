@@ -44,20 +44,21 @@ public class GprProjectInterpreterTest {
 		GprProject gpr = new GprProject("test");
 		gpr.addExecutableName("main.ads");
 		gpr.addExecutableName("procedure.adb");
+		
+		boolean osIsWindows = System.getProperty("os.name").contains(
+				"win") || System.getProperty("os.name").contains("Win");
 
 		List<String> execNames = GprProjectInterpreter.getExecutableNames(gpr);
 
 		assertTrue("Executable names list shall contain 2 elements",
 				execNames.size() == 2);
 
-		String firstExecNameExpected = (System.getProperty("os.name").contains(
-				"win") ? "main.exe" : "main");
+		String firstExecNameExpected = (osIsWindows ? "main.exe" : "main");
 
 		assertTrue("First executable name is correct",
 				execNames.get(0).equals(firstExecNameExpected));
 
-		String secondExecNameExpected = (System.getProperty("os.name")
-				.contains("win") ? "procedure.exe" : "procedure");
+		String secondExecNameExpected = (osIsWindows ? "procedure.exe" : "procedure");
 		assertTrue("Second executable name is correct", execNames.get(1)
 				.equals(secondExecNameExpected));
 	}
