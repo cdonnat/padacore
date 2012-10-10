@@ -57,7 +57,9 @@ public class GprProjectInterpreter {
 	 * @return true if current system is Windows, false otherwise.
 	 */
 	private static boolean isWindowsSystem() {
-		return System.getProperty("os.name").contains("win");
+		String osName = System.getProperty("os.name");
+
+		return osName.contains("win") || osName.contains("Win");
 	}
 
 	/**
@@ -69,7 +71,7 @@ public class GprProjectInterpreter {
 	 */
 	private static String removeExtensionFromFilename(String filename) {
 		final int EXTENSION_LENGTH = 3;
-		
+
 		return filename.substring(0, filename.length() - EXTENSION_LENGTH - 1);
 	}
 

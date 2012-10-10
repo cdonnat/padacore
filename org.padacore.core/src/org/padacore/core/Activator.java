@@ -1,5 +1,7 @@
 package org.padacore.core;
 
+import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Plugin;
 
 /**
@@ -18,6 +20,7 @@ public class Activator extends Plugin {
 	 * The constructor
 	 */
 	public Activator() {
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(new ProjectOpeningListener(), IResourceChangeEvent.POST_CHANGE);
 	}
 	
 }
