@@ -28,8 +28,8 @@ public class AdaProjectPropertyTesterTest {
 	}
 
 	private void createTestProjects() {
-		this.projectWithAdaNature = TestUtils.createAdaProject();
-		this.projectWithoutAdaNature = TestUtils.createAdaProject();
+		this.projectWithAdaNature = TestUtils.CreateAdaProject();
+		this.projectWithoutAdaNature = TestUtils.CreateAdaProject();
 		IProjectDescription adaProjectDescription;
 
 		try {

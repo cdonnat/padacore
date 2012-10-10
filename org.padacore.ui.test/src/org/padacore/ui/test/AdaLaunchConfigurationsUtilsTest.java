@@ -19,8 +19,7 @@ public class AdaLaunchConfigurationsUtilsTest {
 	private void createLaunchConfiguration() {
 		try {
 
-			TestUtils.createAdaLaunchConfigurationFor("conf1", this.adaProject,
-					"existing_file");
+			TestUtils.CreateAdaLaunchConfigurationFor("conf1", this.adaProject, "existing_file");
 
 		} catch (CoreException e) {
 			e.printStackTrace();
@@ -30,7 +29,7 @@ public class AdaLaunchConfigurationsUtilsTest {
 	@Before
 	public void createFixture() {
 
-		this.adaProject = TestUtils.createAdaProject();
+		this.adaProject = TestUtils.CreateAdaProject();
 
 		this.createLaunchConfiguration();
 	}
@@ -45,7 +44,7 @@ public class AdaLaunchConfigurationsUtilsTest {
 					"Existing Ada launch configuration retrieval");
 
 			assertTrue("No new Ada launch configuration has been created",
-					TestUtils.retrieveAdaLaunchConfigurations().length == 1);
+					TestUtils.RetrieveAdaLaunchConfigurations().length == 1);
 
 		} catch (CoreException e) {
 			e.printStackTrace();
@@ -62,22 +61,22 @@ public class AdaLaunchConfigurationsUtilsTest {
 					"New Ada launch configuration creation");
 
 			assertTrue("A new Ada launch configuration has been created",
-					TestUtils.retrieveAdaLaunchConfigurations().length == 2);
+					TestUtils.RetrieveAdaLaunchConfigurations().length == 2);
 
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
 	}
 
-	private void checkRetrievedConfigCorrespondsToFile(IFile file,
-			String comment) throws CoreException {
+	private void checkRetrievedConfigCorrespondsToFile(IFile file, String comment)
+			throws CoreException {
 		ILaunchConfiguration retrievedLaunchConfig = AdaLaunchConfigurationUtils
 				.getLaunchConfigurationFor(file);
 
 		String retrievedExecPath = retrievedLaunchConfig.getAttribute(
 				AdaLaunchConstants.EXECUTABLE_PATH, "");
 
-		String expectedExecPath = TestUtils.getFileAbsolutePath(this.adaProject, file.getName());
+		String expectedExecPath = TestUtils.GetFileAbsolutePath(this.adaProject, file.getName());
 
 		assertTrue(comment, retrievedExecPath.equals(expectedExecPath));
 

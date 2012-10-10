@@ -31,9 +31,9 @@ public class NewAdaProjectWizard extends Wizard implements INewWizard {
 	public boolean performFinish() {
 		URI projectLocation = projectCreationPage.useDefaults() ? null : projectCreationPage
 				.getLocationURI();
-		NewAdaProject project = new NewAdaProject(projectCreationPage.getProjectHandle().getName(),
-				projectLocation);
-		project.create(projectCreationPage.addMainProcedure());
+
+		NewAdaProject.Create(projectCreationPage.getProjectHandle().getName(), projectLocation,
+				projectCreationPage.addMainProcedure());
 
 		return true;
 	}

@@ -11,12 +11,11 @@ import org.padacore.core.AdaProjectNature;
 
 public class ProjectDescriptionUtils {
 
-	public static void CheckProjectContainsAdaNature(IProject project, String comment) {
+	public static void CheckProjectContainsAdaNature(IProject project) {
 		try {
 			IProjectDescription desc = project.getDescription();
-			assertEquals("Project shall contain one nature - " + comment, 1,
-					desc.getNatureIds().length);
-			assertTrue("Project natures shall contain adaProjectNature - " + comment,
+			assertEquals("Project shall contain one nature", 1, desc.getNatureIds().length);
+			assertTrue("Project natures shall contain adaProjectNature",
 					desc.hasNature(AdaProjectNature.NATURE_ID));
 		} catch (CoreException e) {
 			e.printStackTrace();

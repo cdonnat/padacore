@@ -5,9 +5,12 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.eclipse.core.resources.IProject;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.padacore.core.GprProject;
 import org.padacore.core.NewAdaProject;
 import org.padacore.ui.test.utils.ProjectDescriptionUtils;
@@ -17,112 +20,83 @@ public class NewAdaProjectTest {
 
 	// FIXME shall be in core tests but requires workspace
 
-	private NewAdaProject sut;
+	@Rule
+	public TemporaryFolder testFolder = new TemporaryFolder();
 
-	private static void checkProjectIsNotNull(IProject project) {
+	private static void CheckProjectIsNotNull(IProject project) {
 		assertNotNull("Project shall be not null", project);
 	}
 
-	private static void checkProjectIsOpen(IProject project) {
+	private static void CheckProjectIsOpen(IProject project) {
 		assertTrue("Project shall be open", project.isOpen());
 	}
 
-	private static void checkProjectLocation(IProject project,
-			String expectedPath) {
-		assertEquals("Project location", expectedPath, project.getLocationURI()
-				.getPath());
+	private static void CheckProjectLocation(IProject project, String expectedPath) {
+		assertEquals("Project location", expectedPath, project.getLocationURI().getPath());
 	}
 
-	private static void checkGprExists(IProject project) {
-		assertTrue(
-				"GPR project file shall exist",
-				new File(TestUtils.getFileAbsolutePath(project,
-						project.getName() + ".gpr")).exists());
+	private static void CheckGprExists(IProject project) {
+		assertTrue("GPR project file shall exist",
+				new File(TestUtils.GetFileAbsolutePath(project, project.getName() + ".gpr"))
+						.exists());
+	}
+
+	private static void CheckProject(IProject project, String expectedLocation,
+			boolean mainIsExpected) {
+		CheckProjectIsNotNull(project);
+		CheckProjectIsOpen(project);
+		ProjectDescriptionUtils.CheckProjectContainsAdaNature(project);
+		CheckProjectLocation(project, expectedLocation);
+		CheckGprExists(project);
+
+		GprProject associatedGpr = TestUtils.CheckAGprIsAssociatedToProject(project);
+		if (associatedGpr != null) {
+			TestUtils.CheckDefaultGprContents(associatedGpr, mainIsExpected);
+		}
 	}
 
 	@Test
 	public void testAssociationToExistingGprProject() {
-		sut = new NewAdaProject("TestProjectFromGpr", null);
+
 		GprProject existingGpr = new GprProject("gpr_project");
 
-		IProject createdProjectFromGpr = sut.createFrom(existingGpr);
-		GprProject retrievedGpr = TestUtils
-				.checkAGprIsAssociatedToProject(createdProjectFromGpr);
+		IProject createdProjectFromGpr = NewAdaProject.CreateFrom(existingGpr, null);
+		GprProject retrievedGpr = TestUtils.CheckAGprIsAssociatedToProject(createdProjectFromGpr);
 
 		assertTrue("Associated GprProject shall be the one created from",
 				existingGpr == retrievedGpr);
 	}
 
 	@Test
-	public void testCreateProjectWithDefaultLocation() {
-
-		sut = new NewAdaProject("ProjectDefaultLocation", null);
-
-		IProject createdProject = sut.create(false);
-
-		checkProjectIsNotNull(createdProject);
-		checkProjectIsOpen(createdProject);
-		checkProjectLocation(
-				createdProject,
-				TestUtils.getWorkspaceAbsolutePath() + "/"
-						+ createdProject.getName());
-		checkGprExists(createdProject);
-
-		ProjectDescriptionUtils.CheckProjectContainsAdaNature(createdProject,
-				"Create new project with default location");
-
-		GprProject associatedGpr = TestUtils
-				.checkAGprIsAssociatedToProject(createdProject);
-		if (associatedGpr != null) {
-			TestUtils.checkDefaultGprContents(associatedGpr, false);
-		}
-	}
-
-	@Test
 	public void testCreateProjectWithDefaultLocationWithMain() {
 
-		sut = new NewAdaProject("TestProjectWithMain", null);
+		IProject createdProjectWithMain = NewAdaProject.Create("TestProjectWithMain", null, true);
 
-		IProject createdProjectWithMain = sut.create(true);
-
-		checkProjectIsNotNull(createdProjectWithMain);
-		checkProjectIsOpen(createdProjectWithMain);
-		ProjectDescriptionUtils.CheckProjectContainsAdaNature(
-				createdProjectWithMain,
-				"Create new project with default location with main procedure");
-		checkProjectLocation(createdProjectWithMain,
-				TestUtils.getWorkspaceAbsolutePath() + "/"
-						+ createdProjectWithMain.getName());
-		checkGprExists(createdProjectWithMain);
-
-		GprProject associatedGpr = TestUtils
-				.checkAGprIsAssociatedToProject(createdProjectWithMain);
-		if (associatedGpr != null) {
-			TestUtils.checkDefaultGprContents(associatedGpr, true);
-		}
+		CheckProject(createdProjectWithMain, TestUtils.GetWorkspaceAbsolutePath() + "/"
+				+ createdProjectWithMain.getName(), true);
 	}
 
 	@Test
 	public void testCreateProjectWithDefaultLocationWithoutMain() {
 
-		sut = new NewAdaProject("TestProjectWithoutMain", null);
+		IProject createdProjectWithoutMain = NewAdaProject.Create("TestProjectWithoutMain", null,
+				false);
 
-		IProject createdProjectWithoutMain = sut.create(false);
+		CheckProject(createdProjectWithoutMain, TestUtils.GetWorkspaceAbsolutePath() + "/"
+				+ createdProjectWithoutMain.getName(), false);
+	}
 
-		checkProjectIsNotNull(createdProjectWithoutMain);
-		checkProjectIsOpen(createdProjectWithoutMain);
-		ProjectDescriptionUtils
-				.CheckProjectContainsAdaNature(createdProjectWithoutMain,
-						"Create new project with default location without main procedure");
-		checkProjectLocation(createdProjectWithoutMain,
-				TestUtils.getWorkspaceAbsolutePath() + "/"
-						+ createdProjectWithoutMain.getName());
-		checkGprExists(createdProjectWithoutMain);
+	@Test
+	public void testCreateProjectWithSpecificLocationWithoutMain() {
 
-		GprProject associatedGpr = TestUtils
-				.checkAGprIsAssociatedToProject(createdProjectWithoutMain);
-		if (associatedGpr != null) {
-			TestUtils.checkDefaultGprContents(associatedGpr, false);
+		IProject createdProjectWithoutMain = NewAdaProject.Create("SpecificLocWithoutMain",
+				testFolder.getRoot().toURI(), false);
+
+		try {
+			CheckProject(createdProjectWithoutMain, testFolder.getRoot().getCanonicalPath(), false);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 }

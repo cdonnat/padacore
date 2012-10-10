@@ -14,7 +14,7 @@ public class AdaProjectNatureTest {
 
 	@Before
 	public void createAdaProject() {
-		this.adaProject = TestUtils.createAdaProject();
+		this.adaProject = TestUtils.CreateAdaProject();
 	}
 
 	@Test

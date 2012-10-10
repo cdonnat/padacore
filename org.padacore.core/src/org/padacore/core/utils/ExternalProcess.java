@@ -3,12 +3,14 @@ package org.padacore.core.utils;
 import java.io.IOException;
 import java.util.Observer;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 public class ExternalProcess {
 
 	/**
-	 * Monitor an external process in order to stop it when required by the monitor.
+	 * Monitor an external process in order to stop it when required by the
+	 * monitor.
 	 */
 	private class Monitor extends Thread {
 
@@ -29,61 +31,74 @@ public class ExternalProcess {
 			}
 		}
 	}
-	
+
 	private Process process;
 	private Thread outReader;
 	private Thread errReader;
 	private Observer[] outStreamObservers;
 	private Observer[] errStreamObservers;
 	private Monitor processMonitor;
+	private long startTimeInMs;
+	private String processName;
 
 	/**
 	 * Default constructor.
 	 */
-	public ExternalProcess() {
-		this.outStreamObservers = new Observer [0];
-		this.errStreamObservers = new Observer [0];
+	public ExternalProcess(String processName) {
+		this.processName = processName;
+		this.outStreamObservers = new Observer[0];
+		this.errStreamObservers = new Observer[0];
 	}
 
 	/**
-	 * Attach given output stream observers to the external process. No observer is attached 
-	 * to the error stream.
-	 * @param outStreamObservers Output stream observers.
+	 * Attach given output stream observers to the external process. No observer
+	 * is attached to the error stream.
+	 * 
+	 * @param outStreamObservers
+	 *            Output stream observers.
 	 */
-	public ExternalProcess(Observer[] outStreamObservers) {
+	public ExternalProcess(String processName, Observer[] outStreamObservers) {
+		this.processName = processName;
 		this.outStreamObservers = outStreamObservers;
-		this.errStreamObservers = new Observer [0];
+		this.errStreamObservers = new Observer[0];
 	}
-	
+
 	/**
 	 * Attach given output and error stream observers to the external process.
-	 * @param outStreamObservers Output stream observers.
-	 * @param errStreamObservers Error stream observers.
+	 * 
+	 * @param outStreamObservers
+	 *            Output stream observers.
+	 * @param errStreamObservers
+	 *            Error stream observers.
 	 */
-	public ExternalProcess(Observer[] outStreamObservers, Observer[] errStreamObservers) {
+	public ExternalProcess(String processName, Observer[] outStreamObservers,
+			Observer[] errStreamObservers) {
+		this.processName = processName;
 		this.outStreamObservers = outStreamObservers;
 		this.errStreamObservers = errStreamObservers;
-	}	
+	}
 
-	
 	/**
-	 * Run the command given in parameter and attach to observers given to constructors.
-	 * Observers (output stream and error stream) are notify when a new entry is written
-	 * in the stream.
+	 * Run the command given in parameter and attach to observers given to
+	 * constructors. Observers (output stream and error stream) are notify when
+	 * a new entry is written in the stream.
 	 * 
-	 * @param cmdWithArgs Command to run
-	 * @param monitor Progress monitor to display external process progress
+	 * @param cmdWithArgs
+	 *            Command to run
+	 * @param monitor
+	 *            Progress monitor to display external process progress
 	 */
 	public void run(String[] cmdWithArgs, IProgressMonitor monitor) {
 		ProcessBuilder processBuilder = new ProcessBuilder(cmdWithArgs);
 
 		try {
 			process = processBuilder.start();
+			startTimeInMs = System.currentTimeMillis();
 
 			outReader = new Thread(new StreamReader(process.getInputStream(), outStreamObservers));
 			errReader = new Thread(new StreamReader(process.getErrorStream(), errStreamObservers));
-			processMonitor   = new Monitor (this, monitor);
-			
+			processMonitor = new Monitor(this, monitor);
+
 			outReader.start();
 			errReader.start();
 			processMonitor.start();
@@ -95,7 +110,7 @@ public class ExternalProcess {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-
+			computeAndDisplayElapsedTime();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -119,5 +134,17 @@ public class ExternalProcess {
 	 */
 	private void stop() {
 		this.process.destroy();
+	}
+
+	private void computeAndDisplayElapsedTime() {
+		Assert.isLegal(isFinished());
+
+		final double elapsedTimeInS = (System.currentTimeMillis() - startTimeInMs) / 1000.0;
+
+		if (process.exitValue() == 0) {
+			System.out.println(processName + " successful in " + elapsedTimeInS + " seconds");
+		} else {
+			System.err.println(processName + " failed in " + elapsedTimeInS + " seconds");
+		}
 	}
 }
