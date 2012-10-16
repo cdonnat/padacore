@@ -3,7 +3,6 @@ package org.padacore.core;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URI;
 
 import org.antlr.runtime.ANTLRFileStream;
 import org.antlr.runtime.CommonTokenStream;
@@ -12,6 +11,8 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.QualifiedName;
 import org.padacore.core.gnat.project.GPRLexer;
 import org.padacore.core.gnat.project.GPRParser;
@@ -38,7 +39,7 @@ public class NewAdaProject {
 	 * @return The new created project.
 	 * 
 	 */
-	public static IProject Create(String projectName, URI location, boolean addMainProcedure) {
+	public static IProject Create(String projectName, IPath location, boolean addMainProcedure) {
 
 		GprProject defaultGprProject = CreateDefaultGprProject(projectName,
 				GetProjectPath(projectName, location), addMainProcedure);
@@ -62,8 +63,9 @@ public class NewAdaProject {
 			parser.project();
 			
 			GprProject project = parser.getGprProject();
+			IPath projectLocation = new Path(new File(gprProjectAbsolutePath).getParent());
 			
-			return CreateFrom(project, URI.create(new File(gprProjectAbsolutePath).getParent()));
+			return CreateFrom(project, projectLocation);
 			
 		} catch (RecognitionException e) {
 			e.printStackTrace();
@@ -83,7 +85,7 @@ public class NewAdaProject {
 	 *            Location of the GPR project.
 	 * @return The IProject corresponding to the GPR project.
 	 */
-	public static IProject CreateFrom(GprProject gprProject, URI location) {
+	public static IProject CreateFrom(GprProject gprProject, IPath location) {
 
 		IProject project = ResourcesPlugin.getWorkspace().getRoot()
 				.getProject(gprProject.getName());
@@ -91,7 +93,7 @@ public class NewAdaProject {
 			IProjectDescription description = ResourcesPlugin.getWorkspace().newProjectDescription(
 					gprProject.getName());
 
-			description.setLocationURI(location);
+			description.setLocation(location);
 			project.create(description, null);
 			project.open(null);
 			AddAdaNature(project);
@@ -143,12 +145,12 @@ public class NewAdaProject {
 	 *            A location or null for the default project location.
 	 * @return The project full path.
 	 */
-	private static String GetProjectPath(String projectName, URI location) {
+	private static String GetProjectPath(String projectName, IPath location) {
 		if (location == null) {
-			return ResourcesPlugin.getWorkspace().getRoot().getLocationURI().getPath()
+			return ResourcesPlugin.getWorkspace().getRoot().getLocation()
 					+ System.getProperty("file.separator") + projectName;
 		} else {
-			return location.getPath();
+			return location.toOSString();
 		}
 	}
 
