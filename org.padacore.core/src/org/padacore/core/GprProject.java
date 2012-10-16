@@ -14,8 +14,7 @@ public class GprProject {
 	private List<String> withedProjects = new ArrayList<String>();
 
 	/**
-	 * Create a default GPR project with a default sources directory (".") and a
-	 * default object directory ("obj").
+	 * Create a default GPR project with given name.
 	 * 
 	 * @param name
 	 *            GPR name
@@ -24,7 +23,6 @@ public class GprProject {
 		assert !name.isEmpty();
 
 		this.name = name;
-		this.addSourceDir(".");
 	}
 
 	/**
@@ -191,28 +189,50 @@ public class GprProject {
 	 * @return Content of the GPR project.
 	 */
 	public String toString() {
-		String res = "project " + this.getName() + " is\n"
-				+ "\tfor Source_Dirs use (";
+		StringBuilder stringBuilder = new StringBuilder();
 
-		for (int i = 0; i < this.getSourcesDir().size() - 1; i++) {
-			res += "\"" + this.getSourcesDir().get(i) + "\",\n";
-		}
-		res += "\"" + this.getSourcesDir().get(this.getSourcesDir().size() - 1)
-				+ "\");\n";
+		stringBuilder.append("project " + this.getName() + " is\n");
 
-		if (this.getObjectDir() != null) {
-			res += "\tfor Object_Dir use \"" + this.getObjectDir() + "\";\n";
-		}
+		this.appendSourceDirsIfAny(stringBuilder);
 
+		this.appendObjectDirIfDefined(stringBuilder);
+
+		this.appendExecSourceNamesIfAny(stringBuilder);
+
+		stringBuilder.append("end " + this.getName() + ";");
+
+		return stringBuilder.toString();
+	}
+
+	private void appendExecSourceNamesIfAny(StringBuilder stringBuilder) {
 		if (isExecutable) {
 			if (this.getExecutableDir() != null) {
-				res += "\tfor Exec_Dir use \"" + this.getExecutableDir()
-						+ "\";\n";
+				stringBuilder.append("\tfor Exec_Dir use \""
+						+ this.getExecutableDir() + "\";\n");
 			}
-			res += "\tfor Main use " + this.executableNamesAsString() + ";\n";
+			stringBuilder.append("\tfor Main use "
+					+ this.executableNamesAsString() + ";\n");
 		}
-		res += "end " + this.getName() + ";";
+	}
 
-		return res;
+	private void appendObjectDirIfDefined(StringBuilder stringBuilder) {
+		if (this.getObjectDir() != null) {
+			stringBuilder.append("\tfor Object_Dir use \""
+					+ this.getObjectDir() + "\";\n");
+		}
+	}
+
+	private void appendSourceDirsIfAny(StringBuilder stringBuilder) {
+		if (this.getSourcesDir().size() != 0) {
+			stringBuilder.append("\tfor Source_Dirs use (");
+
+			for (int i = 0; i < this.getSourcesDir().size() - 1; i++) {
+				stringBuilder.append("\"" + this.getSourcesDir().get(i)
+						+ "\",\n");
+			}
+			stringBuilder.append("\""
+					+ this.getSourcesDir().get(this.getSourcesDir().size() - 1)
+					+ "\");\n");
+		}
 	}
 }
