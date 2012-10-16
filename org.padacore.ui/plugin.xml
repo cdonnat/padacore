@@ -49,6 +49,14 @@
             name="Ada Implementation"
             project="false">
       </wizard>
+      <wizard
+            category="org.padacore.wizards.ada"
+            class="org.padacore.ui.wizards.NewAdaProjectFromGprWizard"
+            icon="icons/gps.gif"
+            id="org.padacore.ui.wizards.NewAdaProjectFromGprWizard"
+            name="Ada Project from GPR Project"
+            project="true">
+      </wizard>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">

@@ -5,11 +5,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
 
+import org.antlr.runtime.ANTLRFileStream;
+import org.antlr.runtime.CommonTokenStream;
+import org.antlr.runtime.RecognitionException;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.QualifiedName;
+import org.padacore.core.gnat.project.GPRLexer;
+import org.padacore.core.gnat.project.GPRParser;
 
 public class NewAdaProject {
 
@@ -39,6 +44,34 @@ public class NewAdaProject {
 				GetProjectPath(projectName, location), addMainProcedure);
 
 		return CreateFrom(defaultGprProject, location);
+	}
+
+	/**
+	 * Create a project from GPR project at the specified location.
+	 * 
+	 * @param gprProjectAbsolutePath
+	 *            Absolute path of the GPR project
+	 * @return The IProject corresponding to the GPR project or null if no project were created.
+	 */
+	public static IProject CreateFrom(String gprProjectAbsolutePath) {
+
+		try {
+			GPRLexer  lexer  = new GPRLexer(new ANTLRFileStream(gprProjectAbsolutePath));
+			GPRParser parser = new GPRParser( new CommonTokenStream(lexer));
+
+			parser.project();
+			
+			GprProject project = parser.getGprProject();
+			
+			return CreateFrom(project, URI.create(new File(gprProjectAbsolutePath).getParent()));
+			
+		} catch (RecognitionException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return null;
 	}
 
 	/**

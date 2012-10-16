@@ -17,3 +17,5 @@ Export-Package: org.padacore.core;
    org.osgi.framework",
  org.padacore.core.builder,
  org.padacore.core.launch
+Bundle-ClassPath: lib/antlr-3.4-complete.jar,
+ .
