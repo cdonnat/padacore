@@ -6,7 +6,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
@@ -30,7 +29,8 @@ public class TestUtils {
 	}
 
 	private static ILaunchConfigurationType GetAdaLaunchConfigurationType() {
-		ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
+		ILaunchManager launchManager = DebugPlugin.getDefault()
+				.getLaunchManager();
 
 		ILaunchConfigurationType adaConfigType = launchManager
 				.getLaunchConfigurationType(AdaLaunchConstants.ID_LAUNCH_ADA_APP);
@@ -38,25 +38,30 @@ public class TestUtils {
 		return adaConfigType;
 	}
 
-	public static ILaunchConfiguration[] RetrieveAdaLaunchConfigurations() throws CoreException {
-		ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
+	public static ILaunchConfiguration[] RetrieveAdaLaunchConfigurations()
+			throws CoreException {
+		ILaunchManager launchManager = DebugPlugin.getDefault()
+				.getLaunchManager();
 
-		return launchManager.getLaunchConfigurations(GetAdaLaunchConfigurationType());
+		return launchManager
+				.getLaunchConfigurations(GetAdaLaunchConfigurationType());
 	}
 
-	public static ILaunchConfiguration CreateAdaLaunchConfigurationFor(String launchConfigName,
-			IProject project, String executableName) throws CoreException {
+	public static ILaunchConfiguration CreateAdaLaunchConfigurationFor(
+			String launchConfigName, IProject project, String executableName)
+			throws CoreException {
 
 		ILaunchConfigurationType adaConfigType = GetAdaLaunchConfigurationType();
 
 		ILaunchConfiguration launchConfig = null;
 
-		ILaunchConfigurationWorkingCopy configWc = adaConfigType
-				.newInstance(null, launchConfigName);
+		ILaunchConfigurationWorkingCopy configWc = adaConfigType.newInstance(
+				null, launchConfigName);
 
 		String fileAbsolutePath = GetFileAbsolutePath(project, executableName);
 
-		configWc.setAttribute(AdaLaunchConstants.EXECUTABLE_PATH, fileAbsolutePath);
+		configWc.setAttribute(AdaLaunchConstants.EXECUTABLE_PATH,
+				fileAbsolutePath);
 
 		launchConfig = configWc.doSave();
 
@@ -64,13 +69,15 @@ public class TestUtils {
 	}
 
 	public static String GetWorkspaceAbsolutePath() {
-		return ResourcesPlugin.getWorkspace().getRoot().getLocationURI().getPath();
+		return ResourcesPlugin.getWorkspace().getRoot().getLocationURI()
+				.getPath();
 	}
 
 	public static String GetFileAbsolutePath(IProject project, String filename) {
-		String res = project.getWorkspace().getRoot().getRawLocation().toOSString()
-				+ project.getFullPath().toOSString() + System.getProperty("file.separator")
-				+ filename;
+		String res = project.getWorkspace().getRoot().getRawLocation()
+				.toOSString()
+				+ project.getFullPath().toOSString()
+				+ System.getProperty("file.separator") + filename;
 
 		try {
 			IProjectDescription desc = project.getDescription();
@@ -83,21 +90,17 @@ public class TestUtils {
 		return res;
 	}
 
-	public static GprProject CheckAGprIsAssociatedToProject(IProject createdProject) {
+	public static GprProject CheckAGprIsAssociatedToProject(
+			IProject createdProject) {
 
 		GprProject associatedGpr = null;
 
 		try {
-			Object associatedProperty = createdProject
-					.getSessionProperty(new QualifiedName(
-							NewAdaProject.GPR_PROJECT_SESSION_PROPERTY_QUALIFIER, createdProject
-									.getName()));
+			associatedGpr = NewAdaProject
+					.GetAssociatedGprProject(createdProject);
 
-			assertTrue("GprProject shall be associated", associatedProperty instanceof GprProject);
+			assertTrue("GprProject shall be associated", associatedGpr != null);
 
-			if (associatedProperty instanceof GprProject) {
-				associatedGpr = (GprProject) associatedProperty;
-			}
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
@@ -107,15 +110,20 @@ public class TestUtils {
 
 	public static void CheckDefaultGprContents(GprProject gprToCheck,
 			boolean mainProcedureHasBeenGenerated) {
-		assertTrue("GprProject shall be executable: " + mainProcedureHasBeenGenerated,
+		assertTrue("GprProject shall be executable: "
+				+ mainProcedureHasBeenGenerated,
 				gprToCheck.isExecutable() == mainProcedureHasBeenGenerated);
-		assertTrue("GprProject shall have " + (mainProcedureHasBeenGenerated ? "1" : "0")
-				+ " executable",
+		assertTrue(
+				"GprProject shall have "
+						+ (mainProcedureHasBeenGenerated ? "1" : "0")
+						+ " executable",
 				gprToCheck.getExecutableSourceNames().size() == (mainProcedureHasBeenGenerated ? 1
 						: 0));
 		if (mainProcedureHasBeenGenerated) {
-			assertTrue("GprProject executable shall be called main.adb", gprToCheck
-					.getExecutableSourceNames().get(0).equals("main.adb"));
+			assertTrue(
+					"GprProject executable shall be called main.adb",
+					gprToCheck.getExecutableSourceNames().get(0)
+							.equals("main.adb"));
 		}
 
 	}

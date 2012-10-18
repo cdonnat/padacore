@@ -1,5 +1,6 @@
 package org.padacore.ui.wizards;
 
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
@@ -21,7 +22,7 @@ public class NewAdaProjectFromGprWizard extends Wizard implements INewWizard {
 
 	@Override
 	public boolean performFinish() {
-		NewAdaProject.CreateFrom(page.getGprProjectPath());
+		NewAdaProject.CreateFrom(new Path(page.getGprProjectPath()));
 		return true;
 	}
 
