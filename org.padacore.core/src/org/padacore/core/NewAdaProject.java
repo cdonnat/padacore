@@ -4,25 +4,23 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import org.antlr.runtime.ANTLRFileStream;
-import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.QualifiedName;
-import org.padacore.core.gnat.project.GPRLexer;
-import org.padacore.core.gnat.project.GPRParser;
 
 public class NewAdaProject {
 
-	public static final String GPR_PROJECT_SESSION_PROPERTY_QUALIFIER = "org.padacore";
+	private static final String GPR_PROJECT_SESSION_PROPERTY_QUALIFIER = "org.padacore";
 
 	private static final String[] NATURES = { AdaProjectNature.NATURE_ID };
 	private static final String DEFAULT_EXECUTABLE_NAME = "main.adb";
+	private static final String GNAT_PROJECT_EXTENSION = ".gpr";
 
 	/**
 	 * Create and return an Eclipse Ada project. A default GPR project is
@@ -39,7 +37,8 @@ public class NewAdaProject {
 	 * @return The new created project.
 	 * 
 	 */
-	public static IProject Create(String projectName, IPath location, boolean addMainProcedure) {
+	public static IProject Create(String projectName, IPath location,
+			boolean addMainProcedure) {
 
 		GprProject defaultGprProject = CreateDefaultGprProject(projectName,
 				GetProjectPath(projectName, location), addMainProcedure);
@@ -52,21 +51,20 @@ public class NewAdaProject {
 	 * 
 	 * @param gprProjectAbsolutePath
 	 *            Absolute path of the GPR project
-	 * @return The IProject corresponding to the GPR project or null if no project were created.
+	 * @return The IProject corresponding to the GPR project or null if no
+	 *         project were created.
 	 */
-	public static IProject CreateFrom(String gprProjectAbsolutePath) {
+	public static IProject CreateFrom(IPath gprProjectAbsolutePath) {
 
 		try {
-			GPRLexer  lexer  = new GPRLexer(new ANTLRFileStream(gprProjectAbsolutePath));
-			GPRParser parser = new GPRParser( new CommonTokenStream(lexer));
 
-			parser.project();
-			
-			GprProject project = parser.getGprProject();
-			IPath projectLocation = new Path(new File(gprProjectAbsolutePath).getParent());
-			
+			IPath projectLocation = new Path(new File(
+					gprProjectAbsolutePath.toOSString()).getParent());
+			GprProject project = GprProjectFactory
+					.CreateGprProjectFromFile(gprProjectAbsolutePath);
+
 			return CreateFrom(project, projectLocation);
-			
+
 		} catch (RecognitionException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -90,8 +88,8 @@ public class NewAdaProject {
 		IProject project = ResourcesPlugin.getWorkspace().getRoot()
 				.getProject(gprProject.getName());
 		try {
-			IProjectDescription description = ResourcesPlugin.getWorkspace().newProjectDescription(
-					gprProject.getName());
+			IProjectDescription description = ResourcesPlugin.getWorkspace()
+					.newProjectDescription(gprProject.getName());
 
 			description.setLocation(location);
 			project.create(description, null);
@@ -119,21 +117,63 @@ public class NewAdaProject {
 	}
 
 	/**
-	 * Associate a GPR project to an Ada project (IProject) using the
-	 * SessionProjerty of the IProject class.
+	 * Associate an existing GPR project to an Ada project.
 	 * 
 	 * @param project
-	 *            IProject project
+	 *            the project to which the GPR project will be associated.
 	 * @param associatedGpr
-	 *            GPR project
+	 *            the GPR project to associate.
 	 * @throws CoreException
+	 *             if GPR project could not be associated to Ada project.
 	 */
-	private static void AssociateIProjectToGprProject(IProject project, GprProject associatedGpr)
-			throws CoreException {
-		QualifiedName qualifiedName = new QualifiedName(GPR_PROJECT_SESSION_PROPERTY_QUALIFIER,
-				project.getName());
+	private static void AssociateIProjectToGprProject(IProject project,
+			GprProject associatedGpr) throws CoreException {
+		QualifiedName qualifiedName = new QualifiedName(
+				GPR_PROJECT_SESSION_PROPERTY_QUALIFIER, project.getName());
 
 		project.setSessionProperty(qualifiedName, associatedGpr);
+	}
+
+	/**
+	 * Associate a new GPR project (created from given GPR file) to an Ada
+	 * project.
+	 * 
+	 * @param project
+	 *            the project to which the GPR project will be associated.
+	 * @param gprFileAbsolutePath
+	 *            the absolute path of GPR file (filename included)
+	 * @throws IOException
+	 *             if the GPR file could not be opened.
+	 * @throws RecognitionException
+	 *             if the GPR file format is invalid.
+	 * @throws CoreException
+	 *             if GPR project could not be associated to Ada project.
+	 */
+	public static void AssociateIProjectToGprProject(IProject project,
+			IPath gprFileAbsolutePath) throws IOException,
+			RecognitionException, CoreException {
+		GprProject gprProjectToAssociate = GprProjectFactory
+				.CreateGprProjectFromFile(gprFileAbsolutePath);
+
+		AssociateIProjectToGprProject(project, gprProjectToAssociate);
+	}
+
+	/**
+	 * Returns the GPR project associated to given Ada project (or null if there
+	 * is none).
+	 * 
+	 * @param project
+	 *            the project from which to retrieve the associated GPR project.
+	 * @return the GPR project associated to given project or null if there is
+	 *         none
+	 * @throws CoreException
+	 */
+	public static GprProject GetAssociatedGprProject(IProject project)
+			throws CoreException {
+		QualifiedName qualifiedName = new QualifiedName(
+				GPR_PROJECT_SESSION_PROPERTY_QUALIFIER, project.getName());
+
+		return (GprProject) project.getSessionProperty(qualifiedName);
 	}
 
 	/**
@@ -160,8 +200,8 @@ public class NewAdaProject {
 	 * @throws CoreException
 	 * @throws IOException
 	 */
-	private static GprProject CreateDefaultGprProject(String projectName, String path,
-			boolean addMainProcedure) {
+	private static GprProject CreateDefaultGprProject(String projectName,
+			String path, boolean addMainProcedure) {
 
 		GprProject gprProject = new GprProject(projectName);
 
@@ -170,11 +210,11 @@ public class NewAdaProject {
 		if (addMainProcedure) {
 			gprProject.setExecutable(true);
 			gprProject.addExecutableName(DEFAULT_EXECUTABLE_NAME);
-			AddFileToProject(path + System.getProperty("file.separator") + DEFAULT_EXECUTABLE_NAME,
-					DefaultMainContents());
+			AddFileToProject(path + System.getProperty("file.separator")
+					+ DEFAULT_EXECUTABLE_NAME, DefaultMainContents());
 		}
-		AddFileToProject(path + System.getProperty("file.separator") + projectName + ".gpr",
-				gprProject.toString());
+		AddFileToProject(path + System.getProperty("file.separator")
+				+ projectName + ".gpr", gprProject.toString());
 
 		return gprProject;
 	}
@@ -206,5 +246,25 @@ public class NewAdaProject {
 	 */
 	private static String DefaultMainContents() {
 		return "procedure Main is\n" + "begin\n" + "\tnull;\n" + "end Main;\n";
+	}
+
+	/**
+	 * Return the file system absolute path for the GPR file associated to given project.
+	 * 
+	 * @param project the project for which the GPR file path is requested 
+	 * @return the file system absolute path for the GPR file associated to given project.
+	 */
+	public static IPath GetGprAbsolutePath(IProject project) {
+
+		IWorkspaceRoot workspaceRoot = project.getWorkspace().getRoot();
+		StringBuilder pathBuilder = new StringBuilder();
+
+		pathBuilder.append(workspaceRoot.getLocation());
+		pathBuilder.append(project.getFullPath());
+		pathBuilder.append('/');
+		pathBuilder.append(project.getName());
+		pathBuilder.append(GNAT_PROJECT_EXTENSION);
+
+		return new Path(pathBuilder.toString());
 	}
 }
