@@ -1,0 +1,164 @@
+gunit test;
+@header{package org.padacore.core.gnat.project;}
+
+IDENTIFIER:
+"i" OK
+"identifier" OK
+"identi_f_1er" OK
+"identi_f_1er" OK
+
+"identif*er" FAIL // contains unauthorized characters
+"1dentifier" FAIL // starts with a digit
+"_dentifier" FAIL // starts with an underscore
+"identif__er" FAIL // 2 underscores next to each other
+"identifier_" FAIL // ends with an underscore
+
+STRING_ELEMENT : 
+"\"\"" OK
+"n" OK
+"*" OK
+
+"\n" FAIL // end of line character not allowed
+"\r" FAIL // end of line character not allowed
+
+STRING_LITERAL: 
+<<"Message of the day">> OK
+<<"">> OK                  
+<<" ">> OK
+<<"$tr@ng3|Ch*ra%ter$">> OK
+  
+ALL:
+"all" OK
+
+AT  :  
+"at" OK
+
+CASE :
+"case" OK
+
+END   :
+"end" OK
+
+FOR   :  
+"for" OK
+
+IS  :
+"is" OK
+
+LIMITED : 
+"limited" OK
+NULL  :  
+"null" OK
+
+OTHERS  :  
+"others" OK
+
+PACKAGE :
+"package" OK
+
+RENAMES :  
+"renames" OK
+
+TYPE  :  
+"type" OK
+
+USE   :
+"use" OK
+
+WHEN  :  
+"when" OK
+
+WITH  :  
+"with" OK
+
+EXTENDS :  
+"extends" OK
+
+EXTERNAL : 
+"external" OK
+
+PROJECT : 
+"project" OK
+
+name:
+<<simple_identifier>> OK
+"one_level.identifier" OK
+"two.levels.identifier" OK
+"two__nextToEachOther" FAIL
+
+empty_declaration :
+"null;" OK
+"null" FAIL // missing semicolon
+
+expression :
+<<"simple_string">> OK
+<<"string" & "string">> OK
+<<"string" & ("first", "second")>> OK
+
+variable_declaration :
+<<That_OS := "GNU/Linux";>> OK
+<<Name      := "readme.txt";>> OK
+<<Save_Name := "name" & ".saved";>> OK
+
+<<variable = "missing_colon";>> FAIL
+<<variable = "missing_semicolon">> FAIL
+<<typed_variable : type := "GNU/Linux";>> FAIL
+
+typed_variable_declaration :
+<<That_OS : OS := "GNU/Linux";>> OK
+<<That_OS : OS := "Missing_Semicolon">> FAIL
+
+<<Untyped_variable := "GNU/Linux";>> FAIL
+<<This_OS : OS := external ("OS");>> OK
+
+string_list :
+<<("One_Element")>> OK
+<<("First", "Second", "Third")>> OK
+
+<<("First" "Second")>> FAIL
+
+//comment:
+//"--Ada comment" OK
+//"//Java comment" FAIL
+
+attribute_declaration :
+//simple attributes
+<<for Object_Dir use "objects";>> OK
+<<for Source_Dirs use ("units", "test/drivers");>> OK
+
+//indexed attributes
+<<for Body ("main") use "Main.ada";>> OK
+<<for Switches ("main.ada") use ("-v", "-gnatv");>> OK
+
+external_value : 
+<<external ("Variable")>> OK
+<<external ("Variable", "Default_Value")>> OK
+
+project_declaration :
+"project Empty is    \n\r  end Empty;" OK
+
+"project Missing_Semicolon is end Missing_Semicolon" FAIL 
+"project Missing_End is Missing_End;" FAIL
+<<project First_Name is 
+end Second_Name;>> FAIL
+<<project My_Proj is
+my_var : my_type := "Value";
+my_var : my_type := "New_Value";
+end My_Proj;>> FAIL // multiple definitions for typed variable
+
+with_clause :
+<<with "../../my_project.gpr";>> OK
+<<with "..\..\my_project_windows.gpr", "../my_project_linux.gpr";>> OK
+
+<<with "../../missing_semicolon.gpr">> FAIL
+
+context_clause :
+"" OK
+<<with "../../my_project.gpr";
+with "..\..\my_project_windows.gpr";>> OK
+
+project :
+<<with "../../included.gpr";
+project My_Project is
+end My_Project;>> OK
+sample_project.gpr OK
