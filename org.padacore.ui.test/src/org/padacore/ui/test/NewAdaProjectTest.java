@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.Path;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -98,7 +99,7 @@ public class NewAdaProjectTest {
 	public void testCreateProjectWithSpecificLocationWithoutMain() {
 
 		IProject createdProjectWithoutMain = NewAdaProject.Create(
-				"SpecificLocWithoutMain", testFolder.getRoot().toURI(), false);
+				"SpecificLocWithoutMain", new Path(testFolder.getRoot().getPath()), false);
 
 		CheckProject(createdProjectWithoutMain, testFolder.getRoot()
 				.getAbsolutePath(), false);

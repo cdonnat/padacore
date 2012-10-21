@@ -11,7 +11,7 @@ public class AdaProjectPropertyTester extends PropertyTester {
 	private final static String BELONGS_TO_ADA_PROJECT = "belongsToAdaProject";
 	private final static String IS_ADA_PROJECT = "isAdaProject";
 	
-	//TODO check that project is indeed executable
+	//TODO check that project is indeed executable and open
 
 	@Override
 	public boolean test(Object receiver, String property, Object[] args,

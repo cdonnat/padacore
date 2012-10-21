@@ -2,8 +2,10 @@ package org.padacore.ui.launch;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.QualifiedName;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.ui.ILaunchShortcut;
@@ -56,29 +58,36 @@ public class AdaLaunchConfigurationShortcut implements ILaunchShortcut {
 	 * 
 	 * @param selectedProject
 	 *            the selected project.
-	 * @pre selectedProject is an Ada project.
+	 * @pre selectedProject is an Ada project and has an associated GPR project.
 	 */
 	private void launchFromProject(IProject selectedProject) {
 		// TODO perform launch from a project
 		try {
-			assert (selectedProject.hasNature(AdaProjectNature.NATURE_ID));
-			
-			QualifiedName gprQualifiedName = new QualifiedName(
-					NewAdaProject.GPR_PROJECT_SESSION_PROPERTY_QUALIFIER,
-					selectedProject.getName());
-			Object gprAsObject = selectedProject
-					.getSessionProperty(gprQualifiedName);
-			
-			if (gprAsObject != null) {
+			Assert.isLegal(selectedProject
+					.hasNature(AdaProjectNature.NATURE_ID));
+			Assert.isLegal(NewAdaProject
+					.GetAssociatedGprProject(selectedProject) != null);
 
-				GprProject gprProject = (GprProject) gprAsObject;
+			GprProject associatedGprProject = NewAdaProject
+					.GetAssociatedGprProject(selectedProject);
 
-				System.out.println("I'd like to run:"
-						+ GprProjectInterpreter
-								.getExecutableDirectoryPath(gprProject)
-						+ System.getProperty("file.separator")
-						+ GprProjectInterpreter.getExecutableNames(gprProject)
-								.get(0));
+			if (GprProjectInterpreter.getExecutableNames(associatedGprProject)
+					.size() == 1) {
+
+				IPath execPath = new Path(
+						GprProjectInterpreter
+								.getExecutableDirectoryPath(associatedGprProject)
+								+ System.getProperty("file.separator")
+								+ GprProjectInterpreter.getExecutableNames(
+										associatedGprProject).get(0));
+
+				IFile execFile = selectedProject.getFile(execPath);
+
+				this.launchFromFile(execFile);
+
+			} else {
+				System.err
+						.println("Launching a project with multiple executables is not implemented yet");
 			}
 
 		} catch (CoreException e) {
@@ -91,16 +100,19 @@ public class AdaLaunchConfigurationShortcut implements ILaunchShortcut {
 	 * 
 	 * @param selectedFile
 	 *            the selected file.
+	 * @pre selected file belongs to Ada project
 	 * 
 	 */
-	// Precondition: selected file belongs to Ada project
 	private void launchFromFile(IFile selectedFile) {
 		try {
-			assert (selectedFile.getProject()
-					.hasNature(AdaProjectNature.NATURE_ID));
+			Assert.isLegal(selectedFile.getProject().hasNature(
+					AdaProjectNature.NATURE_ID));
+
 			ILaunchConfiguration configForFile = AdaLaunchConfigurationUtils
 					.getLaunchConfigurationFor(selectedFile);
+
 			configForFile.launch(ILaunchManager.RUN_MODE, null);
+
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
@@ -108,8 +120,6 @@ public class AdaLaunchConfigurationShortcut implements ILaunchShortcut {
 
 	@Override
 	public void launch(IEditorPart editor, String mode) {
-		// TODO Auto-generated method stub
-
 	}
 
 }

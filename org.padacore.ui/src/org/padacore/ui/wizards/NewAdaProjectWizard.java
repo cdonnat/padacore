@@ -1,7 +1,6 @@
 package org.padacore.ui.wizards;
 
-import java.net.URI;
-
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
@@ -29,8 +28,8 @@ public class NewAdaProjectWizard extends Wizard implements INewWizard {
 
 	@Override
 	public boolean performFinish() {
-		URI projectLocation = projectCreationPage.useDefaults() ? null : projectCreationPage
-				.getLocationURI();
+		IPath projectLocation = projectCreationPage.useDefaults() ? null : projectCreationPage
+				.getLocationPath();
 
 		NewAdaProject.Create(projectCreationPage.getProjectHandle().getName(), projectLocation,
 				projectCreationPage.addMainProcedure());
