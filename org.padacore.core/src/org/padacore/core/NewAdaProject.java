@@ -13,6 +13,7 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.QualifiedName;
+import org.padacore.core.gnat.project.GprBuilder;
 import org.padacore.core.gnat.project.GPRLexer;
 import org.padacore.core.gnat.project.GPRParser;
 
@@ -59,9 +60,9 @@ public class NewAdaProject {
 			GPRLexer  lexer  = new GPRLexer(new ANTLRFileStream(gprProjectAbsolutePath));
 			GPRParser parser = new GPRParser( new CommonTokenStream(lexer));
 
-			parser.project();
+			GprBuilder builder = parser.project();
 			
-			GprProject project = parser.getGprProject();
+			GprProject project = builder.build();
 			
 			return CreateFrom(project, URI.create(new File(gprProjectAbsolutePath).getParent()));
 			

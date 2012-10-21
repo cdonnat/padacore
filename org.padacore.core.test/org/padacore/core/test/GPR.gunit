@@ -92,13 +92,13 @@ empty_declaration :
 
 expression :
 <<"simple_string">> OK
-//<<"string" & "string">> OK  //FIXME add concatenation
-//<<"string" & ("first", "second")>> OK  //FIXME add concatenation
+<<"string" & "string">> OK
+<<"string" & ("first", "second")>> OK
 
 variable_declaration :
 <<That_OS := "GNU/Linux";>> OK
 <<Name      := "readme.txt";>> OK
-//<<Save_Name := "name" & ".saved";>> OK //FIXME add concatenation
+<<Save_Name := "name" & ".saved";>> OK
 
 <<variable = "missing_colon";>> FAIL
 <<variable = "missing_semicolon">> FAIL
@@ -109,7 +109,7 @@ typed_variable_declaration :
 <<That_OS : OS := "Missing_Semicolon">> FAIL
 
 <<Untyped_variable := "GNU/Linux";>> FAIL
-//<<This_OS : OS := external ("OS");>> OK
+<<This_OS : OS := external ("OS");>> OK
 
 string_list :
 <<("One_Element")>> OK
@@ -117,16 +117,16 @@ string_list :
 
 <<("First" "Second")>> FAIL
 
-comment:
-"--Ada comment" OK
-"//Java comment" FAIL
+//comment:
+//"--Ada comment" OK
+//"//Java comment" FAIL
 
 attribute_declaration :
-// simple attributes
+//simple attributes
 <<for Object_Dir use "objects";>> OK
 <<for Source_Dirs use ("units", "test/drivers");>> OK
 
-// indexed attributes
+//indexed attributes
 <<for Body ("main") use "Main.ada";>> OK
 <<for Switches ("main.ada") use ("-v", "-gnatv");>> OK
 
@@ -144,7 +144,7 @@ end Second_Name;>> FAIL
 <<project My_Proj is
 my_var : my_type := "Value";
 my_var : my_type := "New_Value";
-end My_Proj;>> FAIL // multiple definitions for typed variable
+end My_Proj;>> OK // multiple definitions for typed variable but not checked by the grammar
 
 with_clause :
 <<with "../../my_project.gpr";>> OK
