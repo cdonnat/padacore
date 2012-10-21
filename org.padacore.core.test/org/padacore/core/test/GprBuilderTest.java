@@ -13,7 +13,7 @@ import org.padacore.core.gnat.project.GprBuilder;
 import org.padacore.core.gnat.project.GPRV2Lexer;
 import org.padacore.core.gnat.project.GPRV2Parser;
 
-public class GPRBuilderTest {
+public class GprBuilderTest {
 
 	@Test
 	public void test() {
@@ -29,9 +29,9 @@ public class GPRBuilderTest {
 			assertEquals("Toto", gpr.getName());
 			assertEquals("new_exe", gpr.getExecutableDir());
 			assertEquals("objects", gpr.getObjectDir());
-			assertEquals(3, gpr.getSourcesDir().size());
-			assertEquals("src", gpr.getSourcesDir().get(1));
-			assertEquals("include", gpr.getSourcesDir().get(2));
+			assertEquals(2, gpr.getSourcesDir().size());
+			assertEquals("src", gpr.getSourcesDir().get(0));
+			assertEquals("include", gpr.getSourcesDir().get(1));
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();

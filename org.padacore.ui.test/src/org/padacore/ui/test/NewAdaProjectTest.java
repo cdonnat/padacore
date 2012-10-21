@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Path;
@@ -31,17 +32,20 @@ public class NewAdaProjectTest {
 		assertTrue("Project shall be open", project.isOpen());
 	}
 
-	private static void CheckProjectLocation(IProject project,
-			String expectedPath) {
-		assertEquals("Project location", new File(expectedPath), project
-				.getLocation().toFile());
+	private static void CheckProjectLocation(IProject project, String expectedPath) {
+		try {
+			assertEquals("Project location", new File(expectedPath).getCanonicalFile(), project
+					.getLocation().toFile());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	private static void CheckGprExists(IProject project) {
-		assertTrue(
-				"GPR project file shall exist",
-				new File(TestUtils.GetFileAbsolutePath(project,
-						project.getName() + ".gpr")).exists());
+		assertTrue("GPR project file shall exist",
+				new File(TestUtils.GetFileAbsolutePath(project, project.getName() + ".gpr"))
+						.exists());
 	}
 
 	private static void CheckProject(IProject project, String expectedLocation,
@@ -52,8 +56,7 @@ public class NewAdaProjectTest {
 		CheckProjectLocation(project, expectedLocation);
 		CheckGprExists(project);
 
-		GprProject associatedGpr = TestUtils
-				.CheckAGprIsAssociatedToProject(project);
+		GprProject associatedGpr = TestUtils.CheckAGprIsAssociatedToProject(project);
 		if (associatedGpr != null) {
 			TestUtils.CheckDefaultGprContents(associatedGpr, mainIsExpected);
 		}
@@ -64,10 +67,8 @@ public class NewAdaProjectTest {
 
 		GprProject existingGpr = new GprProject("gpr_project");
 
-		IProject createdProjectFromGpr = NewAdaProject.CreateFrom(existingGpr,
-				null);
-		GprProject retrievedGpr = TestUtils
-				.CheckAGprIsAssociatedToProject(createdProjectFromGpr);
+		IProject createdProjectFromGpr = NewAdaProject.CreateFrom(existingGpr, null);
+		GprProject retrievedGpr = TestUtils.CheckAGprIsAssociatedToProject(createdProjectFromGpr);
 
 		assertTrue("Associated GprProject shall be the one created from",
 				existingGpr == retrievedGpr);
@@ -76,32 +77,28 @@ public class NewAdaProjectTest {
 	@Test
 	public void testCreateProjectWithDefaultLocationWithMain() {
 
-		IProject createdProjectWithMain = NewAdaProject.Create(
-				"TestProjectWithMain", null, true);
+		IProject createdProjectWithMain = NewAdaProject.Create("TestProjectWithMain", null, true);
 
-		CheckProject(createdProjectWithMain,
-				TestUtils.GetWorkspaceAbsolutePath() + "/"
-						+ createdProjectWithMain.getName(), true);
+		CheckProject(createdProjectWithMain, TestUtils.GetWorkspaceAbsolutePath() + "/"
+				+ createdProjectWithMain.getName(), true);
 	}
 
 	@Test
 	public void testCreateProjectWithDefaultLocationWithoutMain() {
 
-		IProject createdProjectWithoutMain = NewAdaProject.Create(
-				"TestProjectWithoutMain", null, false);
+		IProject createdProjectWithoutMain = NewAdaProject.Create("TestProjectWithoutMain", null,
+				false);
 
-		CheckProject(createdProjectWithoutMain,
-				TestUtils.GetWorkspaceAbsolutePath() + "/"
-						+ createdProjectWithoutMain.getName(), false);
+		CheckProject(createdProjectWithoutMain, TestUtils.GetWorkspaceAbsolutePath() + "/"
+				+ createdProjectWithoutMain.getName(), false);
 	}
 
 	@Test
 	public void testCreateProjectWithSpecificLocationWithoutMain() {
 
-		IProject createdProjectWithoutMain = NewAdaProject.Create(
-				"SpecificLocWithoutMain", new Path(testFolder.getRoot().getPath()), false);
+		IProject createdProjectWithoutMain = NewAdaProject.Create("SpecificLocWithoutMain",
+				new Path(testFolder.getRoot().getPath()), false);
 
-		CheckProject(createdProjectWithoutMain, testFolder.getRoot()
-				.getAbsolutePath(), false);
+		CheckProject(createdProjectWithoutMain, testFolder.getRoot().getAbsolutePath(), false);
 	}
 }
