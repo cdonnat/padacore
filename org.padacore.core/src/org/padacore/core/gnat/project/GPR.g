@@ -11,11 +11,11 @@ package org.padacore.core.gnat.project;
 } 
 
 @parser::members { 
-  private GPRBuilder builder = new GPRBuilder();
+  private GprBuilder builder = new GprBuilder();
 }
   
 
-project returns [GPRBuilder result]
+project returns [GprBuilder result]
   : 
   context_clause project_declaration EOF
   {result = builder;}
