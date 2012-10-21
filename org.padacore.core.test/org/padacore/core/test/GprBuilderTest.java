@@ -9,19 +9,19 @@ import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
 import org.padacore.core.GprProject;
+import org.padacore.core.gnat.project.GPRLexer;
+import org.padacore.core.gnat.project.GPRParser;
 import org.padacore.core.gnat.project.GprBuilder;
-import org.padacore.core.gnat.project.GPRV2Lexer;
-import org.padacore.core.gnat.project.GPRV2Parser;
 
 public class GprBuilderTest {
 
 	@Test
 	public void test() {
-		GPRV2Lexer lexer;
+		GPRLexer lexer;
 		try {
-			lexer = new GPRV2Lexer(new ANTLRFileStream(getClass().getResource("sample_project.gpr")
+			lexer = new GPRLexer(new ANTLRFileStream(getClass().getResource("sample_project.gpr")
 					.getPath()));
-			GPRV2Parser parser = new GPRV2Parser(new CommonTokenStream(lexer));
+			GPRParser parser = new GPRParser(new CommonTokenStream(lexer));
 
 			GprBuilder builder = parser.project();
 			GprProject gpr = builder.build();

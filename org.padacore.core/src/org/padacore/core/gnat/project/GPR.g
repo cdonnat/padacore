@@ -162,6 +162,16 @@ empty_declaration
   NULL ';'
   ;
   
+COMMENT
+  :
+  '--'
+  ~(
+    '\n'
+    | '\r'
+    | '\f'
+   )*
+  ;
+  
 STRING_LITERAL  
   : 
   '"' 
