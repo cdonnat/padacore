@@ -4,6 +4,7 @@ grammar GPR;
 package org.padacore.core.gnat.project;
 
 import java.util.ArrayList;
+import org.padacore.core.GprProject;
 }
 
 @lexer::header {
@@ -15,10 +16,10 @@ package org.padacore.core.gnat.project;
 }
   
 
-project returns [GprBuilder result]
+project returns [GprProject result]
   : 
   context_clause project_declaration EOF
-  {result = builder;}
+  {result = builder.build();}
   ;
 
 context_clause : with_clause*;
@@ -82,6 +83,8 @@ typed_variable_declaration
    ':='
    string_expression
    ';'
+   {!builder.variableIsDefined($simple_name.text)}?
+   {builder.addVar ($simple_name.text, $string_expression.result);}
    ;
    
 attribute_declaration
@@ -170,7 +173,7 @@ COMMENT
     | '\r'
     | '\f'
    )*
-  ;
+  { $channel = HIDDEN; };
   
 STRING_LITERAL  
   : 

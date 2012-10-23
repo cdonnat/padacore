@@ -144,7 +144,7 @@ end Second_Name;>> FAIL
 <<project My_Proj is
 my_var : my_type := "Value";
 my_var : my_type := "New_Value";
-end My_Proj;>> OK // multiple definitions for typed variable but not checked by the grammar
+end My_Proj;>> FAIL // multiple definitions for typed variable
 
 with_clause :
 <<with "../../my_project.gpr";>> OK
@@ -162,3 +162,4 @@ project :
 project My_Project is
 end My_Project;>> OK
 sample_project.gpr OK
+//test1.gpr OK FIXME

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.runtime.Assert;
 import org.padacore.core.GprProject;
 
 public class GprBuilder {
@@ -11,6 +12,7 @@ public class GprBuilder {
 	private String projectName;
 	private ArrayList<String> referencedProjects = new ArrayList<String>();
 	private Map<String, ArrayList<String>> simpleAttributes = new HashMap<String, ArrayList<String>>();
+	private Map<String, String> vars = new HashMap<String, String>();
 
 	private final static String EXECUTABLE_DIRECTORY_ATTRIBUTE = "Exec_Dir";
 	private final static String OBJECT_DIRECTORY_ATTRIBUTE = "Object_Dir";
@@ -25,21 +27,29 @@ public class GprBuilder {
 		referencedProjects.add(referencedProject);
 	}
 
-	private ArrayList<String> removeQuotes (ArrayList<String> input) {
-		ArrayList<String> res = new ArrayList<String> (input.size());
+	private ArrayList<String> removeQuotes(ArrayList<String> input) {
+		ArrayList<String> res = new ArrayList<String>(input.size());
 		for (String element : input) {
 			if (element.startsWith("\"") && element.endsWith("\"")) {
 				res.add(element.substring(1, element.length() - 1));
-			}
-			else {
+			} else {
 				res.add(element);
 			}
 		}
 		return res;
 	}
-	
+
 	public void addSimpleAttribute(String attribute, ArrayList<String> attributeValue) {
 		simpleAttributes.put(attribute, removeQuotes(attributeValue));
+	}
+
+	public boolean variableIsDefined(String varName) {
+		return vars.containsKey(varName);
+	}
+
+	public void addVar(String varName, String varValue) {
+		Assert.isLegal(!variableIsDefined(varName));
+		vars.put(varName, varValue);
 	}
 
 	public GprProject build() {

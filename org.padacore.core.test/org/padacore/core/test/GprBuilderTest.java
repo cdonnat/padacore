@@ -11,7 +11,6 @@ import org.junit.Test;
 import org.padacore.core.GprProject;
 import org.padacore.core.gnat.project.GPRLexer;
 import org.padacore.core.gnat.project.GPRParser;
-import org.padacore.core.gnat.project.GprBuilder;
 
 public class GprBuilderTest {
 
@@ -23,8 +22,7 @@ public class GprBuilderTest {
 					.getPath()));
 			GPRParser parser = new GPRParser(new CommonTokenStream(lexer));
 
-			GprBuilder builder = parser.project();
-			GprProject gpr = builder.build();
+			GprProject gpr = parser.project();
 
 			assertEquals("Toto", gpr.getName());
 			assertEquals("new_exe", gpr.getExecutableDir());

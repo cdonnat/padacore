@@ -8,7 +8,6 @@ import org.antlr.runtime.RecognitionException;
 import org.eclipse.core.runtime.IPath;
 import org.padacore.core.gnat.project.GPRLexer;
 import org.padacore.core.gnat.project.GPRParser;
-import org.padacore.core.gnat.project.GprBuilder;
 
 public class GprProjectFactory {
 
@@ -29,10 +28,8 @@ public class GprProjectFactory {
 		GPRLexer lexer = new GPRLexer(new ANTLRFileStream(
 				gprFilePath.toOSString()));
 		GPRParser parser = new GPRParser(new CommonTokenStream(lexer));
-
-		GprBuilder builder = parser.project();
-
-		return builder.build();
+		
+		return parser.project();
 	}
 
 }
