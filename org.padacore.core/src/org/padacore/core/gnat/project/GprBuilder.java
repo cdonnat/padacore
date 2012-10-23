@@ -44,15 +44,15 @@ public class GprBuilder {
 
 	public GprProject build() {
 		GprProject res = new GprProject(projectName);
-		addReferencedProject(res);
-		addSourceDir(res);
+		addReferencedProjects(res);
+		addSourceDirs(res);
 		addExecDir(res);
 		addObjectDir(res);
-		addExecutable(res);
+		addExecutables(res);
 		return res;
 	}
 
-	private void addExecutable(GprProject gprProject) {
+	private void addExecutables(GprProject gprProject) {
 		if (simpleAttributes.containsKey(MAIN_ATTRIBUTE)) {
 			for (String execName : simpleAttributes.get(MAIN_ATTRIBUTE)) {
 				gprProject.addExecutableName(execName);
@@ -74,7 +74,7 @@ public class GprBuilder {
 		}
 	}
 
-	private void addSourceDir(GprProject gprProject) {
+	private void addSourceDirs(GprProject gprProject) {
 		if (simpleAttributes.containsKey(SOURCE_DIRECTORIES_ATTRIBUTE)) {
 			for (String sourceDir : simpleAttributes.get(SOURCE_DIRECTORIES_ATTRIBUTE)) {
 				gprProject.addSourceDir(sourceDir);
@@ -82,7 +82,7 @@ public class GprBuilder {
 		}
 	}
 
-	private void addReferencedProject(GprProject gprProject) {
+	private void addReferencedProjects(GprProject gprProject) {
 		for (String referencedProject : referencedProjects) {
 			gprProject.addWithedProject(referencedProject);
 		}
