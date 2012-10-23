@@ -32,6 +32,9 @@
             id="org.padacore.wizards.NewGnatProjectWizard"
             name="Ada Project"
             project="true">
+            <description>
+            Create an Ada project
+            </description>
       </wizard>
       <wizard
             category="org.padacore.wizards.ada"
@@ -56,6 +59,9 @@
             id="org.padacore.ui.wizards.NewAdaProjectFromGprWizard"
             name="Ada Project from GPR Project"
             project="true">
+            <description>
+            Create an Ada project from an existing GPR project
+            </description>
       </wizard>
    </extension>
    <extension
