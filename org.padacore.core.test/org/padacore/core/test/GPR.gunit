@@ -157,9 +157,25 @@ context_clause :
 <<with "../../my_project.gpr";
 with "..\..\my_project_windows.gpr";>> OK
 
+package_declaration:
+<<package Compiler renames Logging.Compiler;>> OK
+
+typed_string_declaration:
+<<type OS is ("NT", "nt", "Unix", "GNU/Linux", "other OS");>> OK
+
+case_statement:
+<<case OS is
+when "GNU/Linux" | "Unix" =>
+  for Switches ("Ada") use ("-gnath");
+when "NT" =>
+  for Switches ("Ada") use ("-gnatP");
+when others =>
+  null;
+end case;>> OK
+          
 project :
 <<with "../../included.gpr";
 project My_Project is
 end My_Project;>> OK
 sample_project.gpr OK
-//test1.gpr OK FIXME
+test1.gpr OK
