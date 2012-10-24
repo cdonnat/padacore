@@ -1,4 +1,4 @@
-package org.padacore.ui.test.utils;
+package org.padacore.core.test.utils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

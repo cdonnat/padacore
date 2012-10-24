@@ -16,11 +16,12 @@ import org.padacore.core.gnat.project.GprBuilder;
 public class GprBuilderTest {
 
 	@Test
-	public void test() {
+	public void testBuildingFromGprFile() {
 		GPRLexer lexer;
+
 		try {
-			lexer = new GPRLexer(new ANTLRFileStream(getClass().getResource("sample_project.gpr")
-					.getPath()));
+			lexer = new GPRLexer(new ANTLRFileStream(System.getProperty("user.dir") + 
+					"/src/org/padacore/core/test/sample_project.gpr"));
 			GPRParser parser = new GPRParser(new CommonTokenStream(lexer));
 
 			GprBuilder builder = parser.project();
@@ -32,11 +33,10 @@ public class GprBuilderTest {
 			assertEquals(2, gpr.getSourcesDir().size());
 			assertEquals("src", gpr.getSourcesDir().get(0));
 			assertEquals("include", gpr.getSourcesDir().get(1));
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+
+		} catch (IOException e) {
+			e.printStackTrace();
 		} catch (RecognitionException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

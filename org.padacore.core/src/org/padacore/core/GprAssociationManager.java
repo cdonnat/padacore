@@ -23,7 +23,10 @@ public class GprAssociationManager implements IGprAssociationManager,
 			if (NewAdaProject.GetAssociatedGprProject(adaProject) == null) {
 				NewAdaProject.AssociateIProjectToGprProject(adaProject,
 						gprFilePath);
+
 			}
+
+			Assert.isTrue(NewAdaProject.GetAssociatedGprProject(adaProject) != null);
 		} catch (CoreException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -31,20 +34,14 @@ public class GprAssociationManager implements IGprAssociationManager,
 		} catch (RecognitionException e) {
 			e.printStackTrace();
 		}
-
-		try {
-			Assert.isTrue(NewAdaProject.GetAssociatedGprProject(adaProject) != null);
-		} catch (CoreException e) {
-			e.printStackTrace();
-		}
-
 	}
 
 	/**
 	 * Associate a new GPR project (created from given GPR file) to all Ada
 	 * projects found in workspace.
 	 * 
-	 * @param workspace the workspace in which Ada projects are looked for.
+	 * @param workspace
+	 *            the workspace in which Ada projects are looked for.
 	 **/
 	public void performAssociationToGprProjectForAllAdaProjectsOf(
 			IWorkspace workspace) {
@@ -56,7 +53,8 @@ public class GprAssociationManager implements IGprAssociationManager,
 			currentProject = workspaceProjects[project];
 
 			try {
-				if (currentProject.isOpen() && currentProject.hasNature(AdaProjectNature.NATURE_ID)) {
+				if (currentProject.isOpen()
+						&& currentProject.hasNature(AdaProjectNature.NATURE_ID)) {
 
 					this.performAssociationToGprProject(currentProject,
 							NewAdaProject.GetGprAbsolutePath(currentProject));

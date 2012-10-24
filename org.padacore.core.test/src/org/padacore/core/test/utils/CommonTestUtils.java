@@ -1,11 +1,16 @@
-package org.padacore.ui.test.utils;
+package org.padacore.core.test.utils;
 
 import static org.junit.Assert.assertTrue;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
@@ -15,9 +20,36 @@ import org.padacore.core.GprProject;
 import org.padacore.core.NewAdaProject;
 import org.padacore.core.launch.AdaLaunchConstants;
 
-public class TestUtils {
+public class CommonTestUtils {
 
 	private static int cpt = 0;
+
+	public static void CreateGprFileIn(IPath gprContainingFolder,
+			String gprProjectName) {
+		File gprFile = new File(gprContainingFolder
+				+ System.getProperty("file.separator") + gprProjectName
+				+ ".gpr");
+
+		FileWriter gprWriter = null;
+		try {
+
+			gprWriter = new FileWriter(gprFile);
+
+			gprWriter.write("project " + gprProjectName + " is " + "end "
+					+ gprProjectName + ";");
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (gprWriter != null) {
+					gprWriter.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+	}
 
 	public static IProject CreateAdaProject() {
 		cpt++;
@@ -26,46 +58,6 @@ public class TestUtils {
 
 	public static IProject CreateAdaProject(String projectName) {
 		return NewAdaProject.Create(projectName, null, false);
-	}
-
-	private static ILaunchConfigurationType GetAdaLaunchConfigurationType() {
-		ILaunchManager launchManager = DebugPlugin.getDefault()
-				.getLaunchManager();
-
-		ILaunchConfigurationType adaConfigType = launchManager
-				.getLaunchConfigurationType(AdaLaunchConstants.ID_LAUNCH_ADA_APP);
-
-		return adaConfigType;
-	}
-
-	public static ILaunchConfiguration[] RetrieveAdaLaunchConfigurations()
-			throws CoreException {
-		ILaunchManager launchManager = DebugPlugin.getDefault()
-				.getLaunchManager();
-
-		return launchManager
-				.getLaunchConfigurations(GetAdaLaunchConfigurationType());
-	}
-
-	public static ILaunchConfiguration CreateAdaLaunchConfigurationFor(
-			String launchConfigName, IProject project, String executableName)
-			throws CoreException {
-
-		ILaunchConfigurationType adaConfigType = GetAdaLaunchConfigurationType();
-
-		ILaunchConfiguration launchConfig = null;
-
-		ILaunchConfigurationWorkingCopy configWc = adaConfigType.newInstance(
-				null, launchConfigName);
-
-		String fileAbsolutePath = GetFileAbsolutePath(project, executableName);
-
-		configWc.setAttribute(AdaLaunchConstants.EXECUTABLE_PATH,
-				fileAbsolutePath);
-
-		launchConfig = configWc.doSave();
-
-		return launchConfig;
 	}
 
 	public static String GetWorkspaceAbsolutePath() {
@@ -126,6 +118,46 @@ public class TestUtils {
 							.equals("main.adb"));
 		}
 
+	}
+
+	public static ILaunchConfiguration[] RetrieveAdaLaunchConfigurations()
+			throws CoreException {
+		ILaunchManager launchManager = DebugPlugin.getDefault()
+				.getLaunchManager();
+
+		return launchManager
+				.getLaunchConfigurations(GetAdaLaunchConfigurationType());
+	}
+
+	private static ILaunchConfigurationType GetAdaLaunchConfigurationType() {
+		ILaunchManager launchManager = DebugPlugin.getDefault()
+				.getLaunchManager();
+
+		ILaunchConfigurationType adaConfigType = launchManager
+				.getLaunchConfigurationType(AdaLaunchConstants.ID_LAUNCH_ADA_APP);
+
+		return adaConfigType;
+	}
+
+	public static ILaunchConfiguration CreateAdaLaunchConfigurationFor(
+			String launchConfigName, IProject project, String executableName)
+			throws CoreException {
+
+		ILaunchConfigurationType adaConfigType = GetAdaLaunchConfigurationType();
+
+		ILaunchConfiguration launchConfig = null;
+
+		ILaunchConfigurationWorkingCopy configWc = adaConfigType.newInstance(
+				null, launchConfigName);
+
+		String fileAbsolutePath = GetFileAbsolutePath(project, executableName);
+
+		configWc.setAttribute(AdaLaunchConstants.EXECUTABLE_PATH,
+				fileAbsolutePath);
+
+		launchConfig = configWc.doSave();
+
+		return launchConfig;
 	}
 
 }

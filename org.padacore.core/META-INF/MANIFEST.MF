@@ -6,16 +6,16 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.padacore.core.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources;bundle-version="3.7.101",
- org.eclipse.debug.core;bundle-version="3.7.1"
+ org.eclipse.debug.core;bundle-version="3.7.1",
+ org.padacore.antlr;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Export-Package: org.padacore.core;
-  uses:="org.eclipse.osgi.util,
-   org.padacore.editor.scanners,
+Export-Package: org.padacore.core;uses:="org.eclipse.core.runtime,org.eclipse.core.resources,org.osgi.framework",
+ org.padacore.core.builder;uses:="org.eclipse.core.runtime,org.eclipse.core.resources",
+ org.padacore.core.gnat.project,
+ org.padacore.core.launch;
+  uses:="org.eclipse.debug.core,
+   org.eclipse.core.runtime,
    org.eclipse.core.resources,
-   org.eclipse.ui.plugin,
-   org.osgi.framework",
- org.padacore.core.builder,
- org.padacore.core.launch
-Bundle-ClassPath: lib/antlr-3.4-complete.jar,
- .
+   org.eclipse.debug.core.model"
+Bundle-ClassPath: src/

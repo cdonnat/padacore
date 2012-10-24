@@ -5,8 +5,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.junit.Before;
 import org.junit.Test;
 import org.padacore.core.AdaProjectNature;
-import org.padacore.ui.test.utils.ProjectDescriptionUtils;
-import org.padacore.ui.test.utils.TestUtils;
+import org.padacore.core.test.utils.CommonTestUtils;
+import org.padacore.core.test.utils.ProjectDescriptionUtils;
 
 public class AdaProjectNatureTest {
 
@@ -14,12 +14,13 @@ public class AdaProjectNatureTest {
 
 	@Before
 	public void createAdaProject() {
-		this.adaProject = TestUtils.CreateAdaProject();
+		this.adaProject = CommonTestUtils.CreateAdaProject();
 	}
 
 	@Test
 	public void testConfigureProject() {
-		ProjectDescriptionUtils.CheckAdaBuilderIsTheFirstBuilder(adaProject, "Configure project");
+		ProjectDescriptionUtils.CheckAdaBuilderIsTheFirstBuilder(adaProject,
+				"Configure project");
 	}
 
 	@Test
@@ -28,7 +29,8 @@ public class AdaProjectNatureTest {
 		adaNature.setProject(this.adaProject);
 		try {
 			adaNature.deconfigure();
-			ProjectDescriptionUtils.CheckThereIsNoAdaBuilder(adaProject, "Deconfigure project");
+			ProjectDescriptionUtils.CheckThereIsNoAdaBuilder(adaProject,
+					"Deconfigure project");
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}

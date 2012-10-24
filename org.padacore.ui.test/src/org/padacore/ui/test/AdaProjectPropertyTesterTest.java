@@ -11,8 +11,8 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
 import org.junit.Before;
 import org.junit.Test;
+import org.padacore.core.test.utils.CommonTestUtils;
 import org.padacore.ui.launch.AdaProjectPropertyTester;
-import org.padacore.ui.test.utils.TestUtils;
 
 public class AdaProjectPropertyTesterTest {
 
@@ -28,8 +28,8 @@ public class AdaProjectPropertyTesterTest {
 	}
 
 	private void createTestProjects() {
-		this.projectWithAdaNature = TestUtils.CreateAdaProject();
-		this.projectWithoutAdaNature = TestUtils.CreateAdaProject();
+		this.projectWithAdaNature = CommonTestUtils.CreateAdaProject();
+		this.projectWithoutAdaNature = CommonTestUtils.CreateAdaProject();
 		IProjectDescription adaProjectDescription;
 
 		try {
