@@ -4,6 +4,7 @@ grammar GPR;
 package org.padacore.core.gnat.project;
 
 import java.util.ArrayList;
+import org.padacore.core.GprProject;
 }
 
 @lexer::header {
@@ -15,10 +16,10 @@ package org.padacore.core.gnat.project;
 }
   
 
-project returns [GprBuilder result]
+project returns [GprProject result]
   : 
   context_clause project_declaration EOF
-  {result = builder;}
+  {result = builder.build();}
   ;
 
 context_clause : with_clause*;
@@ -61,17 +62,69 @@ simple_name
   IDENTIFIER
   ;
 
-declarative_item // TODO
+declarative_item 
   :
   simple_declarative_item 
+  | typed_string_declaration
+  | package_declaration
   ;
   
- simple_declarative_item // TODO
+simple_declarative_item
   :
   variable_declaration
   | typed_variable_declaration
   | attribute_declaration
+  | case_statement
   | empty_declaration
+  ;
+
+typed_string_declaration 
+  :
+  TYPE simple_name IS '(' STRING_LITERAL (',' STRING_LITERAL)* ')' ';'
+  ;
+
+case_statement 
+  :
+  CASE name IS (case_item)* END CASE ';'
+  ;
+
+case_item
+  :
+  WHEN discrete_choice_list '=>'
+  (case_statement
+  | attribute_declaration
+  | variable_declaration
+  | empty_declaration)+
+  ;
+  
+discrete_choice_list
+  :
+  STRING_LITERAL ( '|' STRING_LITERAL)* 
+  | OTHERS
+  ;
+
+package_declaration 
+  :
+  package_spec 
+  | package_renaming 
+  | package_extension
+  ;
+  
+package_spec
+  :
+  PACKAGE simple_name IS (simple_declarative_item)* END simple_name ';'
+  ;
+   
+package_renaming
+  :
+  PACKAGE simple_name RENAMES simple_name '.' simple_name ';'
+  ;
+     
+package_extension
+  :
+  PACKAGE simple_name EXTENDS simple_name '.' simple_name IS 
+  (simple_declarative_item)*
+  END simple_name ';'
   ;
 
 typed_variable_declaration 
@@ -82,6 +135,8 @@ typed_variable_declaration
    ':='
    string_expression
    ';'
+   {!builder.variableIsDefined($simple_name.text)}?
+   {builder.addVar ($simple_name.text, $string_expression.result);}
    ;
    
 attribute_declaration
@@ -170,7 +225,7 @@ COMMENT
     | '\r'
     | '\f'
    )*
-  ;
+  { $channel = HIDDEN; };
   
 STRING_LITERAL  
   : 

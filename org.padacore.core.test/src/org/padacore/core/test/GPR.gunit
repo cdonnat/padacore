@@ -144,7 +144,7 @@ end Second_Name;>> FAIL
 <<project My_Proj is
 my_var : my_type := "Value";
 my_var : my_type := "New_Value";
-end My_Proj;>> OK // multiple definitions for typed variable but not checked by the grammar
+end My_Proj;>> FAIL // multiple definitions for typed variable
 
 with_clause :
 <<with "../../my_project.gpr";>> OK
@@ -157,8 +157,25 @@ context_clause :
 <<with "../../my_project.gpr";
 with "..\..\my_project_windows.gpr";>> OK
 
+package_declaration:
+<<package Compiler renames Logging.Compiler;>> OK
+
+typed_string_declaration:
+<<type OS is ("NT", "nt", "Unix", "GNU/Linux", "other OS");>> OK
+
+case_statement:
+<<case OS is
+when "GNU/Linux" | "Unix" =>
+  for Switches ("Ada") use ("-gnath");
+when "NT" =>
+  for Switches ("Ada") use ("-gnatP");
+when others =>
+  null;
+end case;>> OK
+          
 project :
 <<with "../../included.gpr";
 project My_Project is
 end My_Project;>> OK
 sample_project.gpr OK
+test1.gpr OK
