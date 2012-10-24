@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: org.padacore.antlr
+Bundle-SymbolicName: org.padacore.antlr
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ClassPath: lib/antlr-3.4-complete.jar
+Export-Package: org.antlr.runtime
