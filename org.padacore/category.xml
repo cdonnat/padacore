@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/org.padacore_1.0.0.qualifier.jar" id="org.padacore" version="1.0.0.qualifier">
+      <category name="org.padacore"/>
+   </feature>
+   <category-def name="org.padacore" label="Padacore">
+      <description>
+         Enables Ada developemnt within the Eclipse environment.
+      </description>
+   </category-def>
+</site>
