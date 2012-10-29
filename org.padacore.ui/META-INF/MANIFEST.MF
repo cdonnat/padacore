@@ -36,3 +36,5 @@ Export-Package: org.padacore.ui;
    org.eclipse.jface.viewers,
    org.eclipse.ui.dialogs,
    org.eclipse.swt.widgets"
+Bundle-ClassPath: bin/,
+ .
