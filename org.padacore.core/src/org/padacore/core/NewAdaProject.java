@@ -246,7 +246,14 @@ public class NewAdaProject {
 	 * @return the default contents for main file as InputStream.
 	 */
 	private static String DefaultMainContents() {
-		return "procedure Main is\n" + "begin\n" + "\tnull;\n" + "end Main;\n";
+		StringBuilder mainContents = new StringBuilder();
+		mainContents.append("with GNAT.IO;\n");
+		mainContents.append("procedure Main is\n");
+		mainContents.append("begin\n");
+		mainContents.append("GNAT.IO.Put_Line(\"Hello world\");\n");
+		mainContents.append("end Main;");
+		
+		return mainContents.toString();
 	}
 
 	/**
