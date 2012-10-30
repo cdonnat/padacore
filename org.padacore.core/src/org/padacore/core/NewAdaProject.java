@@ -15,7 +15,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.QualifiedName;
 
-
 public class NewAdaProject {
 
 	private static final String GPR_PROJECT_SESSION_PROPERTY_QUALIFIER = "org.padacore";
@@ -229,21 +228,30 @@ public class NewAdaProject {
 	 *            Content of the file to add.
 	 */
 	private static void AddFileToProject(String absolutefileName, String content) {
+		FileWriter writer = null;
+
 		try {
 			File gprFile = new File(absolutefileName);
 			gprFile.createNewFile();
-			FileWriter writer = new FileWriter(gprFile);
+			writer = new FileWriter(gprFile);
 			writer.write(content);
-			writer.close();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				if (writer != null) {
+					writer.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
 	/**
 	 * Return the default contents for the file containing the main procedure.
 	 * 
-	 * @return the default contents for main file as InputStream.
+	 * @return the default contents for main file as String.
 	 */
 	private static String DefaultMainContents() {
 		StringBuilder mainContents = new StringBuilder();
@@ -252,15 +260,18 @@ public class NewAdaProject {
 		mainContents.append("begin\n");
 		mainContents.append("GNAT.IO.Put_Line(\"Hello world\");\n");
 		mainContents.append("end Main;");
-		
+
 		return mainContents.toString();
 	}
 
 	/**
-	 * Return the file system absolute path for the GPR file associated to given project.
+	 * Return the file system absolute path for the GPR file associated to given
+	 * project.
 	 * 
-	 * @param project the project for which the GPR file path is requested 
-	 * @return the file system absolute path for the GPR file associated to given project.
+	 * @param project
+	 *            the project for which the GPR file path is requested
+	 * @return the file system absolute path for the GPR file associated to
+	 *         given project.
 	 */
 	public static IPath GetGprAbsolutePath(IProject project) {
 

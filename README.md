@@ -1,19 +1,5 @@
-Padacore is an Eclipse plugin providing Ada support for Eclipse.
+Welcome to the Padacore github repository!
 
-### How to import Padacore into eclipse
+Padacore is an Eclipse plugin aiming at enabling Ada development within the Eclipse environment.
 
-Requirements :
-* git
-* eclipse (3.7.2 or above)
-
-[1] Clone Padacore repository 
-* git clone https://github.com/cdonnat/padacore.git
-    
-[2] Open Eclipse and select the directory containing Padacore repository as a workspace
-
-[3] Import the project into eclipse
-* File > Import > General > Existing project into workspace
-* Select the repository directory as the root directory
-* Select org.padacore.core org.padacore.core.test org.padacore.ui org.padacore.ui.test
-  
-
+Please refer to Wiki for more details including installation instructions.
