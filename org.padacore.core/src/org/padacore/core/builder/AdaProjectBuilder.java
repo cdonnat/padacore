@@ -15,9 +15,6 @@ import org.padacore.core.utils.ExternalProcessJob;
 
 public class AdaProjectBuilder extends IncrementalProjectBuilder {
 
-	private static final String RUNNING_GPRBUILD = "Running GPRbuild...";
-	private static final String RUNNING_GPRCLEAN = "Running GPRclean...";
-
 	public AdaProjectBuilder() {
 
 	}
@@ -63,12 +60,12 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 	private void build(int kind) throws CoreException {
 		assert (kind == FULL_BUILD || kind == INCREMENTAL_BUILD || kind == AUTO_BUILD);
 
-		Job job = new Job(RUNNING_GPRBUILD) {
+		final String message = "Compilation of " + getProject().getName();
+		Job job = new Job(message) {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 
-				ExternalProcess process = new ExternalProcess(
-						"Compilation of " + getProject().getName(),
+				ExternalProcess process = new ExternalProcess(message,
 						new Observer[] { new GprbuildObserver(monitor) },
 						new Observer[] { new GprbuildErrObserver(getProject()) });
 
@@ -78,13 +75,12 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 			}
 		};
 		job.schedule();
-
 	}
 
 	@Override
 	protected IProject[] build(int kind, Map<String, String> args, IProgressMonitor monitor)
 			throws CoreException {
-		
+
 		this.build(kind);
 
 		return null;
@@ -92,7 +88,8 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 
 	@Override
 	protected void clean(IProgressMonitor monitor) throws CoreException {
-		ExternalProcessJob.runWithDefaultOutput(RUNNING_GPRCLEAN, cleanCommand());
+		ExternalProcessJob.runWithDefaultOutput("Cleaning of " + getProject().getName(),
+				cleanCommand());
 	}
 
 }

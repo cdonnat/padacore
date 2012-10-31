@@ -5,13 +5,12 @@ import java.util.Observer;
 
 public class ExternalProcessOutput implements Observer {
 
-	public ExternalProcessOutput() {
+	public ExternalProcessOutput(String name) {
 	}
 
 	@Override
 	public void update(Observable arg0, Object arg1) {
 		String line = (String) arg1;
-		System.out.println(line);
+		Console.Print(line);
 	}
-
 }

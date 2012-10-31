@@ -7,7 +7,9 @@ Bundle-Activator: org.padacore.core.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources;bundle-version="3.7.101",
  org.eclipse.debug.core;bundle-version="3.7.1",
- org.padacore.antlr;bundle-version="1.0.0"
+ org.padacore.antlr;bundle-version="1.0.0",
+ org.eclipse.ui.console;bundle-version="3.5.100",
+ org.eclipse.jface;bundle-version="3.8.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: org.padacore.core;uses:="org.eclipse.core.runtime,org.eclipse.core.resources,org.osgi.framework",

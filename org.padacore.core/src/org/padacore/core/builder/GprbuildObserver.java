@@ -5,10 +5,9 @@ import java.util.Observer;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
+import org.padacore.core.utils.Console;
 
 public class GprbuildObserver implements Observer {
-
-	private static final String BUILDING_PROJECT = "Building project";
 
 	private IProgressMonitor monitor;
 	private SubMonitor subMonitor;
@@ -23,8 +22,8 @@ public class GprbuildObserver implements Observer {
 
 	private void start() {
 		monitorIsStarted = true;
-		monitor.beginTask(BUILDING_PROJECT, outputParser.remainingFileToProcess());
-		subMonitor = SubMonitor.convert(monitor, BUILDING_PROJECT, 100);
+		monitor.beginTask("", outputParser.remainingFileToProcess());
+		subMonitor = SubMonitor.convert(monitor, "", 100);
 	}
 
 	@Override
@@ -43,6 +42,7 @@ public class GprbuildObserver implements Observer {
 				monitor.done();
 			}
 		}
+		Console.Print(line);
 	}
 
 }
