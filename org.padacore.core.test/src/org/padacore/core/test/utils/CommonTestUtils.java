@@ -60,6 +60,20 @@ public class CommonTestUtils {
 		return NewAdaProject.Create(projectName, null, false);
 	}
 
+	public static IProject CreateNonAdaProject(String projectName)
+			throws CoreException {
+		IProject project = ResourcesPlugin.getWorkspace().getRoot()
+				.getProject(projectName);
+
+		IProjectDescription description = ResourcesPlugin.getWorkspace()
+				.newProjectDescription(projectName);
+		project.create(description, null);
+		project.open(null);
+
+		return project;
+
+	}
+
 	public static String GetWorkspaceAbsolutePath() {
 		return ResourcesPlugin.getWorkspace().getRoot().getLocationURI()
 				.getPath();
@@ -82,8 +96,8 @@ public class CommonTestUtils {
 		return res;
 	}
 
-	public static GprProject CheckAGprIsAssociatedToProject(
-			IProject createdProject) {
+	public static GprProject CheckGprAssociationToProject(
+			IProject createdProject, boolean shallBeAssociated) {
 
 		GprProject associatedGpr = null;
 
@@ -91,7 +105,8 @@ public class CommonTestUtils {
 			associatedGpr = NewAdaProject
 					.GetAssociatedGprProject(createdProject);
 
-			assertTrue("GprProject shall be associated", associatedGpr != null);
+			assertTrue("GprProject shall be associated",
+					associatedGpr != null == shallBeAssociated);
 
 		} catch (CoreException e) {
 			e.printStackTrace();
@@ -160,4 +175,8 @@ public class CommonTestUtils {
 		return launchConfig;
 	}
 
+	public static String GetPathToSampleProject() {
+		return System.getProperty("user.dir")
+				+ "/src/org/padacore/core/test/sample_project.gpr";
+	}
 }

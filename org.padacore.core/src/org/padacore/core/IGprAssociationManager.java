@@ -23,6 +23,7 @@ public interface IGprAssociationManager {
 	 *             if the GPR file format is invalid.
 	 * @throws CoreException
 	 *             if GPR project could not be associated to Ada project.
+	 * @pre adaProject is indeed an Ada project and is opened.            
 	 * @post a GPR project is associated to Ada project.
 	 */
 	public void performAssociationToGprProject(IProject adaProject,
