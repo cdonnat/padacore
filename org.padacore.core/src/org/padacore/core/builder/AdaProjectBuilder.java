@@ -4,14 +4,16 @@ import java.util.Map;
 import java.util.Observer;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.padacore.core.utils.ExternalProcess;
-import org.padacore.core.utils.ExternalProcessJob;
+import org.padacore.core.utils.ExternalProcessOutput;
 
 public class AdaProjectBuilder extends IncrementalProjectBuilder {
 
@@ -60,7 +62,7 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 	private void build(int kind) throws CoreException {
 		assert (kind == FULL_BUILD || kind == INCREMENTAL_BUILD || kind == AUTO_BUILD);
 
-		final String message = "Compilation of " + getProject().getName();
+		final String message = "Building of " + getProject().getName();
 		Job job = new Job(message) {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
@@ -70,7 +72,7 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 						new Observer[] { new GprbuildErrObserver(getProject()) });
 
 				process.run(buildCommand(), monitor);
-
+				refresh();
 				return Status.OK_STATUS;
 			}
 		};
@@ -88,8 +90,28 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 
 	@Override
 	protected void clean(IProgressMonitor monitor) throws CoreException {
-		ExternalProcessJob.runWithDefaultOutput("Cleaning of " + getProject().getName(),
-				cleanCommand());
+		final String message = "Cleaning of " + getProject().getName();
+		Job job = new Job(message) {
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+
+				ExternalProcess process = new ExternalProcess(message,
+						new Observer[] { new ExternalProcessOutput() },
+						new Observer[] { new ExternalProcessOutput() });
+
+				process.run(cleanCommand(), monitor);
+				refresh();
+				return Status.OK_STATUS;
+			}
+		};
+		job.schedule();
 	}
 
+	private void refresh() {
+		try {
+			getProject().refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+	}
 }

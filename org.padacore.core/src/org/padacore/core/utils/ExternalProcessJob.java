@@ -56,12 +56,12 @@ public class ExternalProcessJob extends Job {
 	}
 
 	public static void runWithDefaultOutput(String name, String cmd) {
-		run(name, new String[] { cmd }, new Observer[] { new ExternalProcessOutput(name) },
-				new Observer[] { new ExternalProcessOutput(name) });
+		run(name, new String[] { cmd }, new Observer[] { new ExternalProcessOutput() },
+				new Observer[] { new ExternalProcessOutput() });
 	}
 
 	public static void runWithDefaultOutput(String name, String[] cmdWithArgs) {
-		run(name, cmdWithArgs, new Observer[] { new ExternalProcessOutput(name) },
-				new Observer[] { new ExternalProcessOutput(name) });
+		run(name, cmdWithArgs, new Observer[] { new ExternalProcessOutput() },
+				new Observer[] { new ExternalProcessOutput() });
 	}
 }

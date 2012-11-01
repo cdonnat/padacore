@@ -5,7 +5,7 @@ import java.util.Observer;
 
 public class ExternalProcessOutput implements Observer {
 
-	public ExternalProcessOutput(String name) {
+	public ExternalProcessOutput() {
 	}
 
 	@Override
