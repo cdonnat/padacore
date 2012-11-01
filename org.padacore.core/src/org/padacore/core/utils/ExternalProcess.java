@@ -1,6 +1,9 @@
 package org.padacore.core.utils;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Observer;
 
 import org.eclipse.core.runtime.Assert;
@@ -41,13 +44,13 @@ public class ExternalProcess {
 	private long startTimeInMs;
 	private String processName;
 
+	private static final DateFormat Format = new SimpleDateFormat("HH:mm:ss");
+
 	/**
 	 * Default constructor.
 	 */
 	public ExternalProcess(String processName) {
-		this.processName = processName;
-		this.outStreamObservers = new Observer[0];
-		this.errStreamObservers = new Observer[0];
+		this(processName, new Observer[0], new Observer[0]);
 	}
 
 	/**
@@ -58,9 +61,7 @@ public class ExternalProcess {
 	 *            Output stream observers.
 	 */
 	public ExternalProcess(String processName, Observer[] outStreamObservers) {
-		this.processName = processName;
-		this.outStreamObservers = outStreamObservers;
-		this.errStreamObservers = new Observer[0];
+		this(processName, outStreamObservers, new Observer[0]);
 	}
 
 	/**
@@ -92,28 +93,42 @@ public class ExternalProcess {
 		ProcessBuilder processBuilder = new ProcessBuilder(cmdWithArgs);
 
 		try {
-			process = processBuilder.start();
-			startTimeInMs = System.currentTimeMillis();
-
-			outReader = new Thread(new StreamReader(process.getInputStream(), outStreamObservers));
-			errReader = new Thread(new StreamReader(process.getErrorStream(), errStreamObservers));
-			processMonitor = new Monitor(this, monitor);
-
-			outReader.start();
-			errReader.start();
-			processMonitor.start();
-
-			try {
-				outReader.join();
-				errReader.join();
-				processMonitor.join();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			displayRunCmd(cmdWithArgs);
+			runCmd(monitor, processBuilder);
 			computeAndDisplayElapsedTime();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private void runCmd(IProgressMonitor monitor, ProcessBuilder processBuilder) throws IOException {
+		process = processBuilder.start();
+		startTimeInMs = System.currentTimeMillis();
+
+		outReader = new Thread(new StreamReader(process.getInputStream(), outStreamObservers));
+		errReader = new Thread(new StreamReader(process.getErrorStream(), errStreamObservers));
+		processMonitor = new Monitor(this, monitor);
+
+		outReader.start();
+		errReader.start();
+		processMonitor.start();
+
+		try {
+			outReader.join();
+			errReader.join();
+			processMonitor.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void displayRunCmd(String[] cmdWithArgs) {
+		StringBuilder cmd = new StringBuilder();
+		for (int i = 0; i < cmdWithArgs.length; i++) {
+			cmd.append(cmdWithArgs[i]);
+			cmd.append(" ");
+		}
+		Console.Print(cmd.toString());
 	}
 
 	/**
@@ -135,16 +150,24 @@ public class ExternalProcess {
 	private void stop() {
 		this.process.destroy();
 	}
-
+	
 	private void computeAndDisplayElapsedTime() {
 		Assert.isLegal(isFinished());
 
 		final double elapsedTimeInS = (System.currentTimeMillis() - startTimeInMs) / 1000.0;
 
+		StringBuilder message = new StringBuilder(Format.format(new Date()));
+		message.append(" ");
+		message.append(processName);
+
 		if (process.exitValue() == 0) {
-			System.out.println(processName + " successful in " + elapsedTimeInS + " seconds");
+			message.append(" successful in ");
 		} else {
-			System.err.println(processName + " failed in " + elapsedTimeInS + " seconds");
+			message.append(" failed in ");
 		}
+		message.append(elapsedTimeInS);
+		message.append(" seconds");
+
+		Console.Print(message.toString());
 	}
 }
