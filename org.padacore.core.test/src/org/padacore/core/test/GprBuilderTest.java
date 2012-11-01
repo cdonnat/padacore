@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.padacore.core.GprProject;
 import org.padacore.core.gnat.project.GPRLexer;
 import org.padacore.core.gnat.project.GPRParser;
+import org.padacore.core.test.utils.CommonTestUtils;
 
 public class GprBuilderTest {
 
@@ -18,8 +19,7 @@ public class GprBuilderTest {
 	public void test() {
 		GPRLexer lexer;
 		try {
-			lexer = new GPRLexer(new ANTLRFileStream(System.getProperty("user.dir") + 
-					"/src/org/padacore/core/test/sample_project.gpr"));
+			lexer = new GPRLexer(new ANTLRFileStream(CommonTestUtils.GetPathToSampleProject()));
 			GPRParser parser = new GPRParser(new CommonTokenStream(lexer));
 
 			GprProject gpr = parser.project();

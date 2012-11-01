@@ -57,7 +57,7 @@ public class NewAdaProjectTest {
 		CheckGprExists(project);
 
 		GprProject associatedGpr = CommonTestUtils
-				.CheckAGprIsAssociatedToProject(project);
+				.CheckGprAssociationToProject(project, true);
 		if (associatedGpr != null) {
 			CommonTestUtils.CheckDefaultGprContents(associatedGpr,
 					mainIsExpected);
@@ -66,7 +66,7 @@ public class NewAdaProjectTest {
 
 	@Test
 	public void testAssociationToExistingGprProject() {
-		
+
 		String gprProjectName = "test_gpr_project";
 
 		CommonTestUtils.CreateGprFileIn(new Path(this.testFolder.getRoot()
@@ -74,10 +74,10 @@ public class NewAdaProjectTest {
 
 		IProject createdProjectFromGpr = NewAdaProject.CreateFrom(new Path(
 				testFolder.getRoot().getPath()
-						+ System.getProperty("file.separator")
-						+ gprProjectName + ".gpr"));
-		GprProject retrievedGpr = CommonTestUtils
-				.CheckAGprIsAssociatedToProject(createdProjectFromGpr);
+						+ System.getProperty("file.separator") + gprProjectName
+						+ ".gpr"));
+		GprProject retrievedGpr = CommonTestUtils.CheckGprAssociationToProject(
+				createdProjectFromGpr, true);
 
 		assertTrue("Associated GprProject shall be the one created from",
 				retrievedGpr.getName().equals(gprProjectName));

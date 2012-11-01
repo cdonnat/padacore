@@ -31,10 +31,12 @@ public class ProjectOpeningVisitor implements IResourceDeltaVisitor {
 					IProject concernedProject = delta.getResource()
 							.getProject();
 
-					gprAssociationManager.performAssociationToGprProject(
-							concernedProject,
-							new Path(concernedProject.getLocation() + "/"
-									+ concernedProject.getName() + ".gpr"));
+					if (concernedProject.hasNature(AdaProjectNature.NATURE_ID)) {
+						gprAssociationManager.performAssociationToGprProject(
+								concernedProject,
+								new Path(concernedProject.getLocation() + "/"
+										+ concernedProject.getName() + ".gpr"));
+					}
 
 					processChildren = false;
 				} else {

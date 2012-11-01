@@ -4,26 +4,26 @@ import java.io.IOException;
 
 import org.antlr.runtime.RecognitionException;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResourceChangeEvent;
-import org.eclipse.core.resources.IResourceChangeListener;
-import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 
-public class GprAssociationManager implements IGprAssociationManager,
-		IResourceChangeListener {
+public class GprAssociationManager implements IGprAssociationManager {
 
 	@Override
 	public void performAssociationToGprProject(IProject adaProject,
 			IPath gprFilePath) {
 		try {
+			Assert.isLegal(adaProject.hasNature(AdaProjectNature.NATURE_ID) && adaProject.isOpen());
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+		
+		try {
 			if (NewAdaProject.GetAssociatedGprProject(adaProject) == null) {
 				NewAdaProject.AssociateIProjectToGprProject(adaProject,
 						gprFilePath);
-
 			}
 
 			Assert.isTrue(NewAdaProject.GetAssociatedGprProject(adaProject) != null);
@@ -63,28 +63,5 @@ public class GprAssociationManager implements IGprAssociationManager,
 				e.printStackTrace();
 			}
 		}
-	}
-
-	/**
-	 * @pre Event type is POST_CHANGE
-	 */
-	@Override
-	public void resourceChanged(IResourceChangeEvent event) {
-		Assert.isLegal(event.getType() == IResourceChangeEvent.POST_CHANGE);
-
-		IResourceDelta rootDelta = event.getDelta();
-
-		try {
-			this.findAllProjectsWhichHaveBeenOpened(rootDelta);
-		} catch (CoreException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private void findAllProjectsWhichHaveBeenOpened(IResourceDelta delta)
-			throws CoreException {
-		IResourceDeltaVisitor projectVisitor = new ProjectOpeningVisitor(this);
-
-		delta.accept(projectVisitor);
 	}
 }

@@ -1,6 +1,7 @@
 package org.padacore.core;
 
 import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;
@@ -19,9 +20,11 @@ public class Activator extends Plugin {
 	public Activator() {
 
 		this.gprAssociationManager = new GprAssociationManager();
+		IResourceChangeListener projectOpeningListener = new ProjectOpeningListener(
+				this.gprAssociationManager);
 
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(
-				gprAssociationManager, IResourceChangeEvent.POST_CHANGE);
+				projectOpeningListener, IResourceChangeEvent.POST_CHANGE);
 	}
 
 	@Override
