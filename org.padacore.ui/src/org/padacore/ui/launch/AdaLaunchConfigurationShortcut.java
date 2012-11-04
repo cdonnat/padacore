@@ -61,7 +61,6 @@ public class AdaLaunchConfigurationShortcut implements ILaunchShortcut {
 	 * @pre selectedProject is an Ada project and has an associated GPR project.
 	 */
 	private void launchFromProject(IProject selectedProject) {
-		// TODO perform launch from a project
 		try {
 			Assert.isLegal(selectedProject
 					.hasNature(AdaProjectNature.NATURE_ID));
@@ -86,6 +85,7 @@ public class AdaLaunchConfigurationShortcut implements ILaunchShortcut {
 				this.launchFromFile(execFile);
 
 			} else {
+				// TODO replace by Error Log message
 				System.err
 						.println("Launching a project with multiple executables is not implemented yet");
 			}

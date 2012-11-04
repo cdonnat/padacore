@@ -16,11 +16,12 @@ public class Activator extends Plugin {
 	@SuppressWarnings("unused")
 	private static Activator plugin;
 	private GprAssociationManager gprAssociationManager;
+	private IResourceChangeListener projectOpeningListener;
 
 	public Activator() {
 
 		this.gprAssociationManager = new GprAssociationManager();
-		IResourceChangeListener projectOpeningListener = new ProjectOpeningListener(
+		this.projectOpeningListener = new ProjectOpeningListener(
 				this.gprAssociationManager);
 
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(
@@ -34,5 +35,13 @@ public class Activator extends Plugin {
 		this.gprAssociationManager
 				.performAssociationToGprProjectForAllAdaProjectsOf(ResourcesPlugin
 						.getWorkspace());
+	}
+
+	@Override
+	public void stop(BundleContext context) throws Exception {
+		ResourcesPlugin.getWorkspace().removeResourceChangeListener(
+				this.projectOpeningListener);
+
+		super.stop(context);
 	}
 }

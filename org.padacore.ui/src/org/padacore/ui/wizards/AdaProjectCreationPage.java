@@ -9,6 +9,8 @@ import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 import org.padacore.ui.Messages;
 
 public class AdaProjectCreationPage extends WizardNewProjectCreationPage {
+	
+	//FIXME project name shall be validated to make sure it's not an Ada keyword
 
 	private static final String ADD_MAIN_PROCEDURE = Messages.AdaProjectCreationPage_AddMainProcedure;
 	

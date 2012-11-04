@@ -32,6 +32,7 @@ public class ExternalProcess {
 					this.process.stop();
 				}
 			}
+			//TODO should we call monitor.done() here ??
 		}
 	}
 
