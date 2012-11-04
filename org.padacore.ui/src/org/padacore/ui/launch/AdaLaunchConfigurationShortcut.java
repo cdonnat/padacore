@@ -82,6 +82,8 @@ public class AdaLaunchConfigurationShortcut implements ILaunchShortcut {
 
 				IFile execFile = selectedProject.getFile(execPath);
 
+				// TODO what shall be do when executable does not exist: request
+				// build or display error ?
 				this.launchFromFile(execFile);
 
 			} else {
