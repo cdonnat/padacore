@@ -5,7 +5,6 @@ import java.util.Observer;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
-import org.padacore.core.utils.Console;
 
 public class GprbuildObserver implements Observer {
 
@@ -41,8 +40,7 @@ public class GprbuildObserver implements Observer {
 			if (outputParser.remainingFileToProcess() == 0) {
 				monitor.done();
 			}
-		}
-		Console.Print(line);
+		}		
 	}
 
 }

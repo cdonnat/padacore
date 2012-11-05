@@ -12,6 +12,9 @@ package org.padacore.core.gnat.project;
 } 
 
 @parser::members { 
+ public GPRParser(GprBuilder builder, TokenStream input) {
+        this(input, new RecognizerSharedState());
+    }
   private GprBuilder builder = new GprBuilder();
 }
   
