@@ -4,6 +4,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
 public class ProjectOpeningVisitor implements IResourceDeltaVisitor {
@@ -34,7 +35,9 @@ public class ProjectOpeningVisitor implements IResourceDeltaVisitor {
 					if (concernedProject.hasNature(AdaProjectNature.NATURE_ID)) {
 						gprAssociationManager.performAssociationToGprProject(
 								concernedProject,
-								new Path(concernedProject.getLocation() + "/"
+								new Path(concernedProject.getLocation()
+										.toString()
+										+ IPath.SEPARATOR
 										+ concernedProject.getName() + ".gpr"));
 					}
 

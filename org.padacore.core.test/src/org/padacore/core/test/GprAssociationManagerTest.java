@@ -1,11 +1,9 @@
 package org.padacore.core.test;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.Path;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,6 +14,7 @@ public class GprAssociationManagerTest {
 
 	private GprAssociationManager sut;
 	private IProject adaProject;
+	private IProject nonAdaProject;
 
 	// private GprAssociationManagerStub gprAssociationManager;
 	//
@@ -43,46 +42,50 @@ public class GprAssociationManagerTest {
 	public void createFixture() {
 		this.sut = new GprAssociationManager();
 		this.adaProject = CommonTestUtils.CreateAdaProject("adaProject");
+		this.nonAdaProject = CommonTestUtils
+				.CreateAndOpenNonAdaProject("nonAdaProject");
 	}
 
 	@After
 	public void tearDown() {
 		try {
-			IResource[] resourcesToDelete = new IResource[1];
-			resourcesToDelete[0] = ResourcesPlugin.getWorkspace().getRoot()
-					.getProject("adaProject");
-			ResourcesPlugin.getWorkspace()
-					.delete(resourcesToDelete, true, null);
+			this.adaProject.delete(true, null);
+			this.nonAdaProject.delete(true, null);
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void runAssociationTest(IProject project, boolean associationShallBePerformed) {
+		CommonTestUtils.CheckGprAssociationToProject(project, associationShallBePerformed);
+
+		try {
+			project.close(null);
+			project.open(null);
+			CommonTestUtils.CheckGprAssociationToProject(project, associationShallBePerformed);
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
 	}
 
 	@Test
-	public void testAssociationToGprIsRestoredOnProjectOpening() {
-		this.sut.performAssociationToGprProject(this.adaProject, new Path(
-				CommonTestUtils.GetPathToSampleProject()));
+	public void testAssociationToGprIsRestoredOnAdaProjectOpening() {
+		this.runAssociationTest(this.adaProject, true);
+	}
 
-		CommonTestUtils.CheckGprAssociationToProject(this.adaProject, true);
+	@Test
+	public void testAssociationToGprIsNotPerformedOnNonAdaProjectOpening() {
+		this.runAssociationTest(this.nonAdaProject, false);
 	}
 
 	@Test
 	public void testAssociationIsRestoredForAllOpenedAdaProjectsInWorkspace() {
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 
-		IProject nonAdaProject = null;
-
-		try {
-			nonAdaProject = CommonTestUtils
-					.CreateNonAdaProject("nonAdaProject");
-		} catch (CoreException e) {
-			e.printStackTrace();
-		}
-
 		this.sut.performAssociationToGprProjectForAllAdaProjectsOf(workspace);
 
 		CommonTestUtils.CheckGprAssociationToProject(this.adaProject, true);
 
-		CommonTestUtils.CheckGprAssociationToProject(nonAdaProject, false);
+		CommonTestUtils.CheckGprAssociationToProject(this.nonAdaProject, false);
 	}
 }

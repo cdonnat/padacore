@@ -11,6 +11,7 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
@@ -57,18 +58,38 @@ public class CommonTestUtils {
 	}
 
 	public static IProject CreateAdaProject(String projectName) {
-		return NewAdaProject.Create(projectName, null, false);
+		return CreateAdaProject(projectName, true);
 	}
 
-	public static IProject CreateNonAdaProject(String projectName)
-			throws CoreException {
+	public static IProject CreateAdaProject(String projectName,
+			boolean openProject) {
+		IProject adaProject = NewAdaProject.Create(projectName, null, false);
+
+		if (!openProject) {
+			try {
+				adaProject.setSessionProperty(new QualifiedName("org.padacore",
+						projectName), null);
+				adaProject.close(null);
+			} catch (CoreException e) {
+				e.printStackTrace();
+			}			
+		}
+		
+		return adaProject;
+	}
+
+	public static IProject CreateAndOpenNonAdaProject(String projectName) {
 		IProject project = ResourcesPlugin.getWorkspace().getRoot()
 				.getProject(projectName);
 
 		IProjectDescription description = ResourcesPlugin.getWorkspace()
 				.newProjectDescription(projectName);
-		project.create(description, null);
-		project.open(null);
+		try {
+			project.create(description, null);
+			project.open(null);
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
 
 		return project;
 
