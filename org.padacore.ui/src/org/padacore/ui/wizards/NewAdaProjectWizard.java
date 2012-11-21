@@ -1,13 +1,28 @@
 package org.padacore.ui.wizards;
 
+import java.io.File;
+
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
-import org.padacore.core.NewAdaProject;
+import org.padacore.core.EclipseAdaProjectBuilder;
+import org.padacore.core.gnat.project.GnatAdaProjectAssociationManager;
+import org.padacore.core.gnat.project.GprProject;
+import org.padacore.core.gnat.project.GprProjectFactory;
 import org.padacore.ui.Messages;
 
+/**
+ * This class defines a wizard which enables user to create a new empty Eclipse
+ * project with Ada nature. A sample main procedure can be added to the project
+ * upon user request.
+ * 
+ * @author rs
+ * 
+ */
 public class NewAdaProjectWizard extends Wizard implements INewWizard {
 
 	private static final String PAGE_NAME = Messages.NewAdaProjectWizard_PageName;
@@ -16,9 +31,12 @@ public class NewAdaProjectWizard extends Wizard implements INewWizard {
 	private static final String NEW_PROJECT_DESCRIPTION = Messages.NewAdaProjectWizard_Description;
 
 	private AdaProjectCreationPage projectCreationPage;
+	private EclipseAdaProjectBuilder eclipseAdaProjectBuilder;
 
 	public NewAdaProjectWizard() {
 		setWindowTitle(WIZARD_NAME);
+		this.eclipseAdaProjectBuilder = new EclipseAdaProjectBuilder(
+				new GnatAdaProjectAssociationManager());
 	}
 
 	@Override
@@ -28,13 +46,87 @@ public class NewAdaProjectWizard extends Wizard implements INewWizard {
 
 	@Override
 	public boolean performFinish() {
-		IPath projectLocation = projectCreationPage.useDefaults() ? null : projectCreationPage
-				.getLocationPath();
 
-		NewAdaProject.Create(projectCreationPage.getProjectHandle().getName(), projectLocation,
-				projectCreationPage.addMainProcedure());
+		this.createNewDefaultProjectWithAdaNature();
 
 		return true;
+	}
+
+	/**
+	 * Creates a new default project with Ada nature.
+	 */
+	private void createNewDefaultProjectWithAdaNature() {
+		IPath projectLocation = projectCreationPage.useDefaults() ? null
+				: projectCreationPage.getLocationPath();
+
+		IProject projectHandle = projectCreationPage.getProjectHandle();
+
+		this.addDefaultGprProjectFileToProject(projectHandle, projectLocation);
+
+		eclipseAdaProjectBuilder.createProjectWithAdaNatureAt(projectHandle.getName(),
+				projectLocation, projectCreationPage.addMainProcedure());
+	}
+
+	/**
+	 * Adds a default GPR project file to the Eclipse project.
+	 * 
+	 * @param projectHandle
+	 *            handle to the Eclipse project.
+	 * @param projectLocation
+	 *            location of the Eclipse project.
+	 */
+	private void addDefaultGprProjectFileToProject(IProject projectHandle,
+			IPath projectLocation) {
+
+		String eclipseProjectPath = EclipseAdaProjectBuilder.GetProjectPath(
+				projectHandle.getName(), projectLocation);
+
+		this.createProjectDirectory(eclipseProjectPath);
+
+		this.createAndWriteDefaultGprProjectFile(projectHandle, eclipseProjectPath);
+
+	}
+
+	/**
+	 * Creates and write to Eclipse project directory a default GPR project
+	 * file.
+	 * 
+	 * @param projectHandle
+	 *            handle to the Eclipse project.
+	 * @param projectDirectoryPath
+	 *            absolute path of the Eclipse project.
+	 */
+	private void createAndWriteDefaultGprProjectFile(IProject projectHandle,
+			String projectDirectoryPath) {
+
+		GprProject defaultGpr = GprProjectFactory.CreateDefaultGprProject(
+				projectHandle.getName(),
+				projectCreationPage.addMainProcedure(),
+				EclipseAdaProjectBuilder.DEFAULT_EXECUTABLE_NAME);
+
+		IPath gprProjectFilePath = this.getGprAbsolutePath(
+				projectHandle.getName(), projectDirectoryPath);
+
+		EclipseAdaProjectBuilder.AddFileToProject(
+				gprProjectFilePath.toOSString(), defaultGpr.toString());
+
+	}
+
+	private void createProjectDirectory(String projectDirectory) {
+		File projectFolder = new File(projectDirectory);
+		projectFolder.mkdirs();
+
+	}
+
+	private IPath getGprAbsolutePath(String projectName, String projectPath) {
+
+		StringBuilder pathBuilder = new StringBuilder(projectPath);
+
+		pathBuilder.append(IPath.SEPARATOR);
+		pathBuilder.append(projectName);
+		pathBuilder.append(GprProjectFactory.GetGprProjectFileExtension());
+
+		return new Path(pathBuilder.toString());
 	}
 
 	@Override

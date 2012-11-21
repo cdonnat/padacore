@@ -9,10 +9,11 @@ import org.eclipse.core.runtime.CoreException;
 
 public class ProjectOpeningListener implements IResourceChangeListener {
 
-	private IGprAssociationManager gprAssociationManager;
+	private AbstractAdaProjectAssociationManager adaProjectAssociationManager;
 
-	public ProjectOpeningListener(IGprAssociationManager gprAssociationManager) {
-		this.gprAssociationManager = gprAssociationManager;
+	public ProjectOpeningListener(
+			AbstractAdaProjectAssociationManager adaProjectAssociationManager) {
+		this.adaProjectAssociationManager = adaProjectAssociationManager;
 	}
 
 	/**
@@ -31,10 +32,15 @@ public class ProjectOpeningListener implements IResourceChangeListener {
 		}
 	}
 
+	/**
+	 * Visits the resource delta to find all the projects that have just been opened.
+	 * @param delta the resource delta to examine.
+	 * @throws CoreException if visiting could not be performed.
+	 */
 	private void findAllProjectsWhichHaveBeenOpened(IResourceDelta delta)
 			throws CoreException {
 		IResourceDeltaVisitor projectVisitor = new ProjectOpeningVisitor(
-				this.gprAssociationManager);
+				this.adaProjectAssociationManager);
 
 		delta.accept(projectVisitor);
 	}

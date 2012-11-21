@@ -1,7 +1,9 @@
-package org.padacore.core;
+package org.padacore.core.gnat.project;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.eclipse.core.runtime.*;
 
 public class GprProject {
 
@@ -18,9 +20,10 @@ public class GprProject {
 	 * 
 	 * @param name
 	 *            GPR name
+	 * @pre name is not empty.
 	 */
 	public GprProject(String name) {
-		assert !name.isEmpty();
+		Assert.isLegal(!name.isEmpty());
 
 		this.name = name;
 	}
@@ -79,7 +82,7 @@ public class GprProject {
 	 * @param execName
 	 */
 	public void addExecutableName(String execName) {
-		assert isExecutable;
+		Assert.isLegal(this.isExecutable());
 
 		this.execSourceNames.add(execName);
 	}
@@ -91,7 +94,7 @@ public class GprProject {
 	 * @return The executable directory
 	 */
 	public String getExecutableDir() {
-		assert isExecutable;
+		Assert.isLegal(this.isExecutable());
 
 		return execDir;
 	}
@@ -111,7 +114,7 @@ public class GprProject {
 	 * @pre GPR is an executable project.
 	 */
 	public void setExecutableDir(String execDir) {
-		assert isExecutable;
+		Assert.isLegal(this.isExecutable());
 
 		this.execDir = execDir;
 	}
@@ -157,13 +160,13 @@ public class GprProject {
 	/**
 	 * Returns the String corresponding to the list of executable names.
 	 * 
-	 * Precondition: the project is executable.
+	 * @pre the project is executable.
 	 * 
 	 * @return the String corresponding to the list of executable names under
 	 *         the form ("exe1", "exe2",...)
 	 */
 	private String executableNamesAsString() {
-		assert (this.isExecutable);
+		Assert.isLegal(this.isExecutable());
 
 		String listOfExecutablesAsString = "(";
 

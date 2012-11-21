@@ -1,7 +1,5 @@
 package org.padacore.core.builder;
 
-import static org.padacore.core.NewAdaProject.GetAssociatedGprProject;
-
 import java.util.Observable;
 import java.util.Observer;
 
@@ -9,7 +7,8 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.padacore.core.GprProject;
+import org.padacore.core.AbstractAdaProjectAssociationManager;
+import org.padacore.core.IAdaProject;
 
 /**
  * Display error messages from gprbuild.
@@ -63,13 +62,14 @@ public class GprbuildErrObserver implements Observer {
 
 	private IResource findResource(String fileName) throws CoreException {
 		IResource file = project.findMember(fileName);
-		GprProject gprProject = GetAssociatedGprProject(project);
+		IAdaProject adaProject = AbstractAdaProjectAssociationManager
+				.GetAssociatedAdaProject(project);
 
 		int i = 0;
 
-		while (file == null && i < gprProject.getSourcesDir().size()) {
-			String path = gprProject.getSourcesDir().get(i) + System.getProperty("file.separator")
-					+ fileName;
+		while (file == null && i < adaProject.getSourcesDir().size()) {
+			String path = adaProject.getSourcesDir().get(i)
+					+ System.getProperty("file.separator") + fileName;
 			file = project.findMember(path);
 			i++;
 		}

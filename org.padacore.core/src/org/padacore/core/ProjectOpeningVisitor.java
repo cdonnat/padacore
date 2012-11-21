@@ -4,22 +4,21 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 
 public class ProjectOpeningVisitor implements IResourceDeltaVisitor {
 
-	private IGprAssociationManager gprAssociationManager;
+	private AbstractAdaProjectAssociationManager adaProjectAssociationManager;
 
 	/**
 	 * Builds a new project opening visitor.
 	 * 
-	 * @param gprAssociationManager
-	 *            the GPR association manager to notify when an opened project
-	 *            is found.
+	 * @param adaProjectAssociationManager
+	 *            the Ada project association manager to notify when an opened
+	 *            project is found.
 	 */
-	public ProjectOpeningVisitor(IGprAssociationManager gprAssociationManager) {
-		this.gprAssociationManager = gprAssociationManager;
+	public ProjectOpeningVisitor(
+			AbstractAdaProjectAssociationManager adaProjectAssociationManager) {
+		this.adaProjectAssociationManager = adaProjectAssociationManager;
 	}
 
 	@Override
@@ -33,12 +32,8 @@ public class ProjectOpeningVisitor implements IResourceDeltaVisitor {
 							.getProject();
 
 					if (concernedProject.hasNature(AdaProjectNature.NATURE_ID)) {
-						gprAssociationManager.performAssociationToGprProject(
-								concernedProject,
-								new Path(concernedProject.getLocation()
-										.toString()
-										+ IPath.SEPARATOR
-										+ concernedProject.getName() + ".gpr"));
+						adaProjectAssociationManager
+								.associateToAdaProject(concernedProject);
 					}
 
 					processChildren = false;

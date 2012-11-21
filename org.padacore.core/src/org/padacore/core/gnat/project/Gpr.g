@@ -1,10 +1,9 @@
-grammar GPR;
+grammar Gpr;
 
 @header {
 package org.padacore.core.gnat.project;
 
 import java.util.ArrayList;
-import org.padacore.core.GprProject;
 }
 
 @lexer::header {

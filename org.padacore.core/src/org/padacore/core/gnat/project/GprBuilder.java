@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
-import org.padacore.core.GprProject;
 
 public class GprBuilder {
 
@@ -64,10 +63,14 @@ public class GprBuilder {
 
 	private void addExecutables(GprProject gprProject) {
 		if (simpleAttributes.containsKey(MAIN_ATTRIBUTE)) {
+			
+			gprProject.setExecutable(true);
+			
 			for (String execName : simpleAttributes.get(MAIN_ATTRIBUTE)) {
 				gprProject.addExecutableName(execName);
 			}
 		}
+		
 	}
 
 	private void addObjectDir(GprProject gprProject) {

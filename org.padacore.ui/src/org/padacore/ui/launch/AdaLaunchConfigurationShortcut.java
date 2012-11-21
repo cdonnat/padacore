@@ -12,10 +12,9 @@ import org.eclipse.debug.ui.ILaunchShortcut;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IEditorPart;
+import org.padacore.core.AbstractAdaProjectAssociationManager;
 import org.padacore.core.AdaProjectNature;
-import org.padacore.core.GprProject;
-import org.padacore.core.GprProjectInterpreter;
-import org.padacore.core.NewAdaProject;
+import org.padacore.core.IAdaProject;
 import org.padacore.core.launch.AdaLaunchConfigurationUtils;
 
 public class AdaLaunchConfigurationShortcut implements ILaunchShortcut {
@@ -64,21 +63,19 @@ public class AdaLaunchConfigurationShortcut implements ILaunchShortcut {
 		try {
 			Assert.isLegal(selectedProject
 					.hasNature(AdaProjectNature.NATURE_ID));
-			Assert.isLegal(NewAdaProject
-					.GetAssociatedGprProject(selectedProject) != null);
+			Assert.isLegal(AbstractAdaProjectAssociationManager
+					.GetAssociatedAdaProject(selectedProject) != null);
 
-			GprProject associatedGprProject = NewAdaProject
-					.GetAssociatedGprProject(selectedProject);
+			IAdaProject associatedAdaProject = AbstractAdaProjectAssociationManager
+					.GetAssociatedAdaProject(selectedProject);
 
-			if (GprProjectInterpreter.getExecutableNames(associatedGprProject)
-					.size() == 1) {
+			if (associatedAdaProject.getExecutableNames().size() == 1) {
 
 				IPath execPath = new Path(
-						GprProjectInterpreter
-								.getExecutableDirectoryPath(associatedGprProject)
+						associatedAdaProject.getExecutableDirectoryPath()
 								+ System.getProperty("file.separator")
-								+ GprProjectInterpreter.getExecutableNames(
-										associatedGprProject).get(0));
+								+ associatedAdaProject.getExecutableNames()
+										.get(0));
 
 				IFile execFile = selectedProject.getFile(execPath);
 
