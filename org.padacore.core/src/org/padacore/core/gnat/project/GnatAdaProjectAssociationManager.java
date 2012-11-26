@@ -4,14 +4,11 @@ import java.io.IOException;
 
 import org.antlr.runtime.RecognitionException;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.padacore.core.AbstractAdaProjectAssociationManager;
 import org.padacore.core.AdaProjectNature;
-import org.padacore.core.EclipseAdaProjectBuilder;
 import org.padacore.core.IAdaProjectFactory;
 
 public class GnatAdaProjectAssociationManager extends

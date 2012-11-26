@@ -10,9 +10,10 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 import org.padacore.core.EclipseAdaProjectBuilder;
+import org.padacore.core.gnat.project.AbstractGprProjectFactory;
+import org.padacore.core.gnat.project.DefaultGprProjectFactory;
 import org.padacore.core.gnat.project.GnatAdaProjectAssociationManager;
 import org.padacore.core.gnat.project.GprProject;
-import org.padacore.core.gnat.project.GprProjectFactory;
 import org.padacore.ui.Messages;
 
 /**
@@ -63,8 +64,9 @@ public class NewAdaProjectWizard extends Wizard implements INewWizard {
 
 		this.addDefaultGprProjectFileToProject(projectHandle, projectLocation);
 
-		eclipseAdaProjectBuilder.createProjectWithAdaNatureAt(projectHandle.getName(),
-				projectLocation, projectCreationPage.addMainProcedure());
+		eclipseAdaProjectBuilder.createProjectWithAdaNatureAt(
+				projectHandle.getName(), projectLocation,
+				projectCreationPage.addMainProcedure());
 	}
 
 	/**
@@ -83,7 +85,8 @@ public class NewAdaProjectWizard extends Wizard implements INewWizard {
 
 		this.createProjectDirectory(eclipseProjectPath);
 
-		this.createAndWriteDefaultGprProjectFile(projectHandle, eclipseProjectPath);
+		this.createAndWriteDefaultGprProjectFile(projectHandle,
+				eclipseProjectPath);
 
 	}
 
@@ -99,10 +102,10 @@ public class NewAdaProjectWizard extends Wizard implements INewWizard {
 	private void createAndWriteDefaultGprProjectFile(IProject projectHandle,
 			String projectDirectoryPath) {
 
-		GprProject defaultGpr = GprProjectFactory.CreateDefaultGprProject(
-				projectHandle.getName(),
-				projectCreationPage.addMainProcedure(),
-				EclipseAdaProjectBuilder.DEFAULT_EXECUTABLE_NAME);
+		AbstractGprProjectFactory gprFactory = new DefaultGprProjectFactory(
+				projectHandle.getName(), projectCreationPage.addMainProcedure());
+
+		GprProject defaultGpr = gprFactory.createGprProject();
 
 		IPath gprProjectFilePath = this.getGprAbsolutePath(
 				projectHandle.getName(), projectDirectoryPath);
@@ -124,7 +127,7 @@ public class NewAdaProjectWizard extends Wizard implements INewWizard {
 
 		pathBuilder.append(IPath.SEPARATOR);
 		pathBuilder.append(projectName);
-		pathBuilder.append(GprProjectFactory.GetGprProjectFileExtension());
+		pathBuilder.append(AbstractGprProjectFactory.GetGprProjectFileExtension());
 
 		return new Path(pathBuilder.toString());
 	}

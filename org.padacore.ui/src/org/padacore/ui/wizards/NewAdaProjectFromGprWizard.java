@@ -9,9 +9,9 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 import org.padacore.core.EclipseAdaProjectBuilder;
+import org.padacore.core.gnat.project.FileGprProjectFactory;
 import org.padacore.core.gnat.project.GnatAdaProjectAssociationManager;
 import org.padacore.core.gnat.project.GprProject;
-import org.padacore.core.gnat.project.GprProjectFactory;
 
 /**
  * This class defines a wizard which enables user to create a new Eclipse
@@ -50,14 +50,16 @@ public class NewAdaProjectFromGprWizard extends Wizard implements INewWizard {
 	private void createProjectFromGprProjectFileWithAdaNature() {
 		IPath gprProjectAbsolutePath = new Path(this.page.getGprProjectPath());
 
-		GprProject gprFromFile = GprProjectFactory
-				.CreateGprProjectFromFile(gprProjectAbsolutePath);
+		FileGprProjectFactory gprFactory = new FileGprProjectFactory(
+				gprProjectAbsolutePath);
+
+		GprProject gprFromFile = gprFactory.createGprProject();
 
 		IPath projectLocation = new Path(new File(
 				gprProjectAbsolutePath.toOSString()).getParent());
 
-		eclipseAdaProjectBuilder.createProjectWithAdaNatureAt(gprFromFile.getName(),
-				projectLocation, false);
+		eclipseAdaProjectBuilder.createProjectWithAdaNatureAt(
+				gprFromFile.getName(), projectLocation, false);
 	}
 
 	@Override
