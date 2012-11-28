@@ -1,7 +1,5 @@
 package org.padacore.core;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 
 import org.eclipse.core.resources.IProject;
@@ -9,6 +7,7 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.padacore.core.utils.FileUtils;
 
 public class EclipseAdaProjectBuilder {
 
@@ -50,7 +49,7 @@ public class EclipseAdaProjectBuilder {
 			description.setLocation(location);
 			project.create(description, null);
 			project.open(null);
-			AddAdaNature(project);
+			this.addAdaNature(project);
 			this.adaProjectAssociationManager.associateToAdaProject(project);
 		} catch (CoreException e) {
 			e.printStackTrace();
@@ -63,11 +62,15 @@ public class EclipseAdaProjectBuilder {
 			boolean addMainProcedure) {
 
 		if (addMainProcedure) {
-			AddFileToProject(
-					GetProjectPath(projectName, location)
-							+ System.getProperty("file.separator")
-							+ DEFAULT_EXECUTABLE_NAME,
-					this.defaultMainContents());
+			try {
+				FileUtils.CreateNewFileWithContents(
+						GetProjectPath(projectName, location)
+								+ System.getProperty("file.separator")
+								+ DEFAULT_EXECUTABLE_NAME,
+						this.defaultMainContents());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 
 	}
@@ -79,7 +82,7 @@ public class EclipseAdaProjectBuilder {
 	 *            Project to which the Ada nature shall be added.
 	 * @throws CoreException
 	 */
-	private static void AddAdaNature(IProject project) throws CoreException {
+	private void addAdaNature(IProject project) throws CoreException {
 		IProjectDescription description = project.getDescription();
 		description.setNatureIds(NATURES);
 		project.setDescription(description, null);
@@ -100,35 +103,6 @@ public class EclipseAdaProjectBuilder {
 					+ System.getProperty("file.separator") + projectName;
 		} else {
 			return location.toOSString();
-		}
-	}
-
-	/**
-	 * Add a file to the project with the specified content.
-	 * 
-	 * @param absolutefileName
-	 *            Absolute file name of the file to add.
-	 * @param contents
-	 *            Contents of the file to add.
-	 */
-	public static void AddFileToProject(String absolutefileName, String contents) {
-		FileWriter writer = null;
-
-		try {
-			File addedFile = new File(absolutefileName);
-			addedFile.createNewFile();
-			writer = new FileWriter(addedFile);
-			writer.write(contents);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (writer != null) {
-					writer.close();
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
 		}
 	}
 

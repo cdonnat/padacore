@@ -19,7 +19,8 @@ public class AdaLaunchConfigurationsUtilsTest {
 	private void createLaunchConfiguration() {
 		try {
 
-			CommonTestUtils.CreateAdaLaunchConfigurationFor("conf1", this.adaProject, "existing_file");
+			CommonTestUtils.CreateAdaLaunchConfigurationFor("conf1",
+					this.adaProject, "existing_file");
 
 		} catch (CoreException e) {
 			e.printStackTrace();
@@ -43,7 +44,8 @@ public class AdaLaunchConfigurationsUtilsTest {
 			this.checkRetrievedConfigCorrespondsToFile(fileWithExistingConfig,
 					"Existing Ada launch configuration retrieval");
 
-			assertTrue("No new Ada launch configuration has been created",
+			assertTrue(
+					"No new Ada launch configuration has been created",
 					CommonTestUtils.RetrieveAdaLaunchConfigurations().length == 1);
 
 		} catch (CoreException e) {
@@ -60,7 +62,8 @@ public class AdaLaunchConfigurationsUtilsTest {
 			this.checkRetrievedConfigCorrespondsToFile(fileWithNoConfig,
 					"New Ada launch configuration creation");
 
-			assertTrue("A new Ada launch configuration has been created",
+			assertTrue(
+					"A new Ada launch configuration has been created",
 					CommonTestUtils.RetrieveAdaLaunchConfigurations().length == 2);
 
 		} catch (CoreException e) {
@@ -68,15 +71,16 @@ public class AdaLaunchConfigurationsUtilsTest {
 		}
 	}
 
-	private void checkRetrievedConfigCorrespondsToFile(IFile file, String comment)
-			throws CoreException {
+	private void checkRetrievedConfigCorrespondsToFile(IFile file,
+			String comment) throws CoreException {
 		ILaunchConfiguration retrievedLaunchConfig = AdaLaunchConfigurationUtils
 				.getLaunchConfigurationFor(file);
 
 		String retrievedExecPath = retrievedLaunchConfig.getAttribute(
 				AdaLaunchConstants.EXECUTABLE_PATH, "");
 
-		String expectedExecPath = CommonTestUtils.GetFileAbsolutePath(this.adaProject, file.getName());
+		String expectedExecPath = CommonTestUtils.GetFileAbsolutePath(
+				this.adaProject, file.getName());
 
 		assertTrue(comment, retrievedExecPath.equals(expectedExecPath));
 

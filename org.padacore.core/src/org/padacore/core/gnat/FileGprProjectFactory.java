@@ -1,4 +1,4 @@
-package org.padacore.core.gnat.project;
+package org.padacore.core.gnat;
 
 import java.io.IOException;
 

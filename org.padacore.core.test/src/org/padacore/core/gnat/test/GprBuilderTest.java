@@ -1,4 +1,4 @@
-package org.padacore.core.test;
+package org.padacore.core.gnat.test;
 
 import static org.junit.Assert.assertEquals;
 
@@ -8,19 +8,19 @@ import org.antlr.runtime.ANTLRFileStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
-import org.padacore.core.GprProject;
-import org.padacore.core.gnat.project.GPRLexer;
-import org.padacore.core.gnat.project.GPRParser;
+import org.padacore.core.gnat.GprLexer;
+import org.padacore.core.gnat.GprParser;
+import org.padacore.core.gnat.GprProject;
 import org.padacore.core.test.utils.CommonTestUtils;
 
 public class GprBuilderTest {
 
 	@Test
 	public void test() {
-		GPRLexer lexer;
+		GprLexer lexer;
 		try {
-			lexer = new GPRLexer(new ANTLRFileStream(CommonTestUtils.GetPathToSampleProject()));
-			GPRParser parser = new GPRParser(new CommonTokenStream(lexer));
+			lexer = new GprLexer(new ANTLRFileStream(CommonTestUtils.GetPathToSampleProject()));
+			GprParser parser = new GprParser(new CommonTokenStream(lexer));
 
 			GprProject gpr = parser.project();
 

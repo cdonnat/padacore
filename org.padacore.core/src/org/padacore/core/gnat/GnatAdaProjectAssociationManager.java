@@ -1,4 +1,4 @@
-package org.padacore.core.gnat.project;
+package org.padacore.core.gnat;
 
 import java.io.IOException;
 
@@ -59,7 +59,7 @@ public class GnatAdaProjectAssociationManager extends
 	 * @throws CoreException
 	 *             if GPR project could not be associated to Eclipse project.
 	 */
-	public void performAssociationToGnatAdaProject(IProject project,
+	private void performAssociationToGnatAdaProject(IProject project,
 			IPath gprFileAbsolutePath) throws IOException,
 			RecognitionException, CoreException {
 

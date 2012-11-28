@@ -1,19 +1,14 @@
 package org.padacore.ui.wizards;
 
-import java.io.File;
-
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 import org.padacore.core.EclipseAdaProjectBuilder;
-import org.padacore.core.gnat.project.AbstractGprProjectFactory;
-import org.padacore.core.gnat.project.DefaultGprProjectFactory;
-import org.padacore.core.gnat.project.GnatAdaProjectAssociationManager;
-import org.padacore.core.gnat.project.GprProject;
+import org.padacore.core.gnat.DefaultGprProjectFactory;
+import org.padacore.core.gnat.GnatAdaProjectAssociationManager;
 import org.padacore.ui.Messages;
 
 /**
@@ -62,74 +57,17 @@ public class NewAdaProjectWizard extends Wizard implements INewWizard {
 
 		IProject projectHandle = projectCreationPage.getProjectHandle();
 
-		this.addDefaultGprProjectFileToProject(projectHandle, projectLocation);
+		String eclipseProjectPath = EclipseAdaProjectBuilder.GetProjectPath(
+				projectHandle.getName(), projectLocation);
+
+		DefaultGprProjectFactory gprFactory = new DefaultGprProjectFactory(
+				projectHandle.getName(),
+				projectCreationPage.addMainProcedure(), eclipseProjectPath);
+		gprFactory.createGprProject();
 
 		eclipseAdaProjectBuilder.createProjectWithAdaNatureAt(
 				projectHandle.getName(), projectLocation,
 				projectCreationPage.addMainProcedure());
-	}
-
-	/**
-	 * Adds a default GPR project file to the Eclipse project.
-	 * 
-	 * @param projectHandle
-	 *            handle to the Eclipse project.
-	 * @param projectLocation
-	 *            location of the Eclipse project.
-	 */
-	private void addDefaultGprProjectFileToProject(IProject projectHandle,
-			IPath projectLocation) {
-
-		String eclipseProjectPath = EclipseAdaProjectBuilder.GetProjectPath(
-				projectHandle.getName(), projectLocation);
-
-		this.createProjectDirectory(eclipseProjectPath);
-
-		this.createAndWriteDefaultGprProjectFile(projectHandle,
-				eclipseProjectPath);
-
-	}
-
-	/**
-	 * Creates and write to Eclipse project directory a default GPR project
-	 * file.
-	 * 
-	 * @param projectHandle
-	 *            handle to the Eclipse project.
-	 * @param projectDirectoryPath
-	 *            absolute path of the Eclipse project.
-	 */
-	private void createAndWriteDefaultGprProjectFile(IProject projectHandle,
-			String projectDirectoryPath) {
-
-		AbstractGprProjectFactory gprFactory = new DefaultGprProjectFactory(
-				projectHandle.getName(), projectCreationPage.addMainProcedure());
-
-		GprProject defaultGpr = gprFactory.createGprProject();
-
-		IPath gprProjectFilePath = this.getGprAbsolutePath(
-				projectHandle.getName(), projectDirectoryPath);
-
-		EclipseAdaProjectBuilder.AddFileToProject(
-				gprProjectFilePath.toOSString(), defaultGpr.toString());
-
-	}
-
-	private void createProjectDirectory(String projectDirectory) {
-		File projectFolder = new File(projectDirectory);
-		projectFolder.mkdirs();
-
-	}
-
-	private IPath getGprAbsolutePath(String projectName, String projectPath) {
-
-		StringBuilder pathBuilder = new StringBuilder(projectPath);
-
-		pathBuilder.append(IPath.SEPARATOR);
-		pathBuilder.append(projectName);
-		pathBuilder.append(AbstractGprProjectFactory.GetGprProjectFileExtension());
-
-		return new Path(pathBuilder.toString());
 	}
 
 	@Override

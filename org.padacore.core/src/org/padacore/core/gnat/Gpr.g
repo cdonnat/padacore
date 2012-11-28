@@ -1,13 +1,17 @@
 grammar Gpr;
 
 @header {
-package org.padacore.core.gnat.project;
+
+
+package org.padacore.core.gnat;
 
 import java.util.ArrayList;
 }
 
+
 @lexer::header {
-package org.padacore.core.gnat.project;
+
+package org.padacore.core.gnat;
 } 
 
 @parser::members { 

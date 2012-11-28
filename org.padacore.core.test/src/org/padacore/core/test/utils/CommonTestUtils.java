@@ -17,8 +17,10 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
-import org.padacore.core.GprProject;
-import org.padacore.core.NewAdaProject;
+import org.padacore.core.AbstractAdaProjectAssociationManager;
+import org.padacore.core.AdaProjectNature;
+import org.padacore.core.IAdaProject;
+import org.padacore.core.gnat.GprProject;
 import org.padacore.core.launch.AdaLaunchConstants;
 
 public class CommonTestUtils {
@@ -63,18 +65,46 @@ public class CommonTestUtils {
 
 	public static IProject CreateAdaProject(String projectName,
 			boolean openProject) {
-		IProject adaProject = NewAdaProject.Create(projectName, null, false);
-
-		if (!openProject) {
-			try {
-				adaProject.setSessionProperty(new QualifiedName("org.padacore",
-						projectName), null);
-				adaProject.close(null);
-			} catch (CoreException e) {
-				e.printStackTrace();
-			}			
-		}
 		
+		IProject adaProject = ResourcesPlugin.getWorkspace().getRoot()
+				.getProject(projectName);
+		
+		FileWriter filewriter = null;
+
+		try {
+			IProjectDescription description = ResourcesPlugin.getWorkspace()
+					.newProjectDescription(projectName);
+
+			description.setLocation(null);
+			adaProject.create(description, null);
+			adaProject.open(null);
+			
+			description.setNatureIds(new String[] {AdaProjectNature.NATURE_ID});
+			adaProject.setDescription(description, null);
+			
+			GprProject gpr = new GprProject(projectName);
+			filewriter = new FileWriter(new File(adaProject.getLocation().toOSString() + IPath.SEPARATOR + projectName + ".gpr"));
+			filewriter.write(gpr.toString());
+			filewriter.close();
+			
+			if(!openProject) {
+				adaProject.close(null);
+			}
+		} catch (CoreException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if(filewriter != null) {
+				try {
+					filewriter.close();
+				} catch (IOException e) {
+					
+				}
+			}
+			
+		}
+
 		return adaProject;
 	}
 
@@ -117,41 +147,43 @@ public class CommonTestUtils {
 		return res;
 	}
 
-	public static GprProject CheckGprAssociationToProject(
+	public static IAdaProject CheckAdaProjectAssociationToProject(
 			IProject createdProject, boolean shallBeAssociated) {
 
-		GprProject associatedGpr = null;
+		IAdaProject associatedAdaProject = null;
 
+		associatedAdaProject = AbstractAdaProjectAssociationManager
+				.GetAssociatedAdaProject(createdProject);
+
+		assertTrue("GprProject shall be associated",
+				associatedAdaProject != null == shallBeAssociated);
+
+		return associatedAdaProject;
+	}
+
+	public static void RemoveAssociationToAdaProject(IProject project) {
 		try {
-			associatedGpr = NewAdaProject
-					.GetAssociatedGprProject(createdProject);
-
-			assertTrue("GprProject shall be associated",
-					associatedGpr != null == shallBeAssociated);
-
+			project.setSessionProperty(
+					new QualifiedName("org.padacore", project.getName()), null);
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
-
-		return associatedGpr;
 	}
 
-	public static void CheckDefaultGprContents(GprProject gprToCheck,
+	public static void CheckDefaultAdaProjectContents(IAdaProject adaProject,
 			boolean mainProcedureHasBeenGenerated) {
 		assertTrue("GprProject shall be executable: "
 				+ mainProcedureHasBeenGenerated,
-				gprToCheck.isExecutable() == mainProcedureHasBeenGenerated);
+				adaProject.isExecutable() == mainProcedureHasBeenGenerated);
 		assertTrue(
 				"GprProject shall have "
 						+ (mainProcedureHasBeenGenerated ? "1" : "0")
 						+ " executable",
-				gprToCheck.getExecutableSourceNames().size() == (mainProcedureHasBeenGenerated ? 1
+				adaProject.getExecutableNames().size() == (mainProcedureHasBeenGenerated ? 1
 						: 0));
 		if (mainProcedureHasBeenGenerated) {
-			assertTrue(
-					"GprProject executable shall be called main.adb",
-					gprToCheck.getExecutableSourceNames().get(0)
-							.equals("main.adb"));
+			assertTrue("GprProject executable shall be called main.adb",
+					adaProject.getExecutableNames().get(0).equals("main.adb"));
 		}
 
 	}

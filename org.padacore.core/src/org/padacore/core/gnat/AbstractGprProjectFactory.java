@@ -1,4 +1,4 @@
-package org.padacore.core.gnat.project;
+package org.padacore.core.gnat;
 
 /**
  * Abstract class for a GPR project factory.

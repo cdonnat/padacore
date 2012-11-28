@@ -5,7 +5,7 @@ import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;
-import org.padacore.core.gnat.project.GnatAdaProjectAssociationManager;
+import org.padacore.core.gnat.GnatAdaProjectAssociationManager;
 
 /**
  * The activator class controls the plug-in life cycle

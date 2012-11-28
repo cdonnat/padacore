@@ -9,9 +9,9 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 import org.padacore.core.EclipseAdaProjectBuilder;
-import org.padacore.core.gnat.project.FileGprProjectFactory;
-import org.padacore.core.gnat.project.GnatAdaProjectAssociationManager;
-import org.padacore.core.gnat.project.GprProject;
+import org.padacore.core.gnat.FileGprProjectFactory;
+import org.padacore.core.gnat.GnatAdaProjectAssociationManager;
+import org.padacore.core.gnat.GprProject;
 
 /**
  * This class defines a wizard which enables user to create a new Eclipse
