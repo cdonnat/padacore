@@ -8,7 +8,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
-import org.padacore.core.EclipseAdaProjectBuilder;
+import org.padacore.core.ProjectBuilder;
 import org.padacore.core.gnat.FileGprProjectFactory;
 import org.padacore.core.gnat.GnatAdaProjectAssociationManager;
 import org.padacore.core.gnat.GprProject;
@@ -23,11 +23,11 @@ import org.padacore.core.gnat.GprProject;
 public class NewAdaProjectFromGprWizard extends Wizard implements INewWizard {
 
 	private AdaProjectFromGprCreationPage page;
-	private EclipseAdaProjectBuilder eclipseAdaProjectBuilder;
+	private ProjectBuilder eclipseAdaProjectBuilder;
 
 	public NewAdaProjectFromGprWizard() {
 		setWindowTitle("New Ada Project from a GPR Project");
-		this.eclipseAdaProjectBuilder = new EclipseAdaProjectBuilder(
+		this.eclipseAdaProjectBuilder = new ProjectBuilder(
 				new GnatAdaProjectAssociationManager());
 	}
 

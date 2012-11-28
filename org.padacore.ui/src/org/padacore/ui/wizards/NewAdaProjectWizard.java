@@ -6,7 +6,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
-import org.padacore.core.EclipseAdaProjectBuilder;
+import org.padacore.core.ProjectBuilder;
 import org.padacore.core.gnat.DefaultGprProjectFactory;
 import org.padacore.core.gnat.GnatAdaProjectAssociationManager;
 import org.padacore.ui.Messages;
@@ -27,11 +27,11 @@ public class NewAdaProjectWizard extends Wizard implements INewWizard {
 	private static final String NEW_PROJECT_DESCRIPTION = Messages.NewAdaProjectWizard_Description;
 
 	private AdaProjectCreationPage projectCreationPage;
-	private EclipseAdaProjectBuilder eclipseAdaProjectBuilder;
+	private ProjectBuilder eclipseAdaProjectBuilder;
 
 	public NewAdaProjectWizard() {
 		setWindowTitle(WIZARD_NAME);
-		this.eclipseAdaProjectBuilder = new EclipseAdaProjectBuilder(
+		this.eclipseAdaProjectBuilder = new ProjectBuilder(
 				new GnatAdaProjectAssociationManager());
 	}
 
@@ -57,7 +57,7 @@ public class NewAdaProjectWizard extends Wizard implements INewWizard {
 
 		IProject projectHandle = projectCreationPage.getProjectHandle();
 
-		String eclipseProjectPath = EclipseAdaProjectBuilder.GetProjectPath(
+		String eclipseProjectPath = ProjectBuilder.GetProjectPath(
 				projectHandle.getName(), projectLocation);
 
 		DefaultGprProjectFactory gprFactory = new DefaultGprProjectFactory(

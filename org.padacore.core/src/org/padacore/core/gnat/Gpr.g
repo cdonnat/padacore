@@ -1,20 +1,20 @@
 grammar Gpr;
 
 @header {
-
-
 package org.padacore.core.gnat;
 
 import java.util.ArrayList;
+import org.padacore.core.gnat.GprProject;
 }
 
-
 @lexer::header {
-
 package org.padacore.core.gnat;
 } 
 
 @parser::members { 
+ public GprParser(GprBuilder builder, TokenStream input) {
+        this(input, new RecognizerSharedState());
+    }
   private GprBuilder builder = new GprBuilder();
 }
   

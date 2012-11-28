@@ -59,7 +59,7 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 	 *         (command followed by arguments).
 	 */
 	private String[] cleanCommand() {
-		return new String[] { "gprclean", "-P", getGprFullPath() };
+		return new String[] { "gprclean", "-r", "-P", getGprFullPath() };
 	}
 
 	/**
@@ -83,8 +83,10 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 
 				ExternalProcess process = new ExternalProcess(
 						message,
-						new Observer[] { new GprbuildObserver(monitor) },
-						new Observer[] { new GprbuildErrObserver(getProject()) });
+						new Observer[] { new GprbuildObserver(monitor) ,
+								         new ExternalProcessOutput() },
+						new Observer[] { new GprbuildErrObserver(getProject()),
+						                 new ExternalProcessOutput() });
 
 				process.run(buildCommand(), monitor);
 				refreshBuiltProject();

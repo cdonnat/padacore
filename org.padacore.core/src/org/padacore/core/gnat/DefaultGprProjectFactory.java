@@ -5,7 +5,7 @@ import java.io.IOException;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.padacore.core.EclipseAdaProjectBuilder;
+import org.padacore.core.ProjectBuilder;
 import org.padacore.core.utils.FileUtils;
 
 /**
@@ -49,7 +49,7 @@ public class DefaultGprProjectFactory extends AbstractGprProjectFactory {
 		if (this.addMainProcedure) {
 			gprProject.setExecutable(true);
 			gprProject
-					.addExecutableName(EclipseAdaProjectBuilder.DEFAULT_EXECUTABLE_NAME);
+					.addExecutableName(ProjectBuilder.DEFAULT_EXECUTABLE_NAME);
 		}
 
 		return gprProject;
