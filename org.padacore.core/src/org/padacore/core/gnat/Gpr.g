@@ -4,33 +4,32 @@ grammar Gpr;
 package org.padacore.core.gnat;
 
 import java.util.ArrayList;
-import org.padacore.core.gnat.GprProject;
 }
 
 @lexer::header {
 package org.padacore.core.gnat;
 } 
 
-@parser::members { 
- public GprParser(GprBuilder builder, TokenStream input) {
+@parser::members {
+ private GprLoader gprLoader = new GprLoader();
+ 
+ public GprParser(GprLoader gprLoader, TokenStream input) {
         this(input, new RecognizerSharedState());
+        this.gprLoader = gprLoader;
     }
-  private GprBuilder builder = new GprBuilder();
 }
   
-
-project returns [GprProject result]
+project
   : 
   context_clause project_declaration EOF
-  {result = builder.build();}
   ;
 
 context_clause : with_clause*;
 
 with_clause 
   : WITH 
-    first_path=path_name {builder.addReferencedProject(first_path);}
-    (',' other_path=path_name {builder.addReferencedProject(other_path);})* 
+    first_path=path_name {gprLoader.addProject($first_path.result);}
+    (',' other_path=path_name)* 
     ';';
 
 path_name returns [String result] 
@@ -51,7 +50,6 @@ simple_project_declaration
   end_project_name=name
   ';'
   {$begin_project_name.text.equals($end_project_name.text)}?
-  {builder.setProjectName($begin_project_name.text);}
   ;
 
 name returns [String result]
@@ -138,35 +136,24 @@ typed_variable_declaration
    ':='
    string_expression
    ';'
-   {!builder.variableIsDefined($simple_name.text)}?
-   {builder.addVar ($simple_name.text, $string_expression.result);}
+   {!gprLoader.variableIsDefined($simple_name.text)}?
+   {gprLoader.addVariable ($simple_name.text, $string_expression.result);}
    ;
    
 attribute_declaration
-  :
-  simple_attribute_declaration 
-  | indexed_attribute_declaration
-  ;
-
-indexed_attribute_declaration 
-  :
-  FOR simple_name '(' STRING_LITERAL ')' USE expression 
-  ;
-
-simple_attribute_declaration
  :
- 'for' 
+ FOR 
  attribute_designator 
- 'use' 
+ USE
  expression 
  ';'
- {builder.addSimpleAttribute($attribute_designator.result, $expression.result);}
+ {gprLoader.addAttribute($attribute_designator.result, $expression.result);}
  ;
  
 attribute_designator returns [String result]
   :
   att = simple_name {$result = $att.text;}
-  | att = simple_name ( '(' STRING_LITERAL ')' ) {$result = $att.text + "(\"" + $STRING_LITERAL.text + "\")";}
+  | att = simple_name ( '(' STRING_LITERAL ')' ) {$result = $att.text + "(" + $STRING_LITERAL.text + ")";}
   ; 
  
 external_value returns [String result] // FIXME : return an array?
@@ -184,34 +171,35 @@ variable_declaration
   ':='
   expression
   ';'
+  {gprLoader.addVariable ($simple_name.text, $expression.result);}
   ;
 
-expression returns [ArrayList<String> result]
+expression returns [Symbol result]
   :
   first = term {result = $first.result;}
-  ( '&' term)* // TODO : add to result
+  ( '&' other = term {result = Symbol.Concat(result, $other.result);} )* 
   ;
 
-term returns [ArrayList<String> result]
+term returns [Symbol result]
   :
   string_expression 
-    {result = new ArrayList<String>(1); result.add($string_expression.result);}
+    {$result = $string_expression.result;}
   | string_list 
     {$result = $string_list.result;}
   ;
   
-string_expression returns [String result] // TODO : complete rule
+string_expression returns [Symbol result] // TODO : complete rule
   :
-  STRING_LITERAL {result = $STRING_LITERAL.text;}
-  | name {result = $name.result;}
-  | external_value {result = $external_value.result;}
+  STRING_LITERAL {result = Symbol.CreateString($STRING_LITERAL.text);}
+  | name {result = gprLoader.getVariable($name.result);}
+  | external_value
   ;
 
-string_list returns [ArrayList<String> result] // TODO : complete rule 
+string_list returns [Symbol result] // TODO : complete rule 
   :
-  '(' {result = new ArrayList<String>();}
-  first = string_expression {result.add($first.result);} 
-  ( ',' other = string_expression {result.add($other.result);}  )* 
+  '(' {result = Symbol.CreateStringList(new ArrayList<String>());}
+  first = string_expression? {if (first != null) {result = Symbol.Concat (result, $first.result);}} 
+  ( ',' other = string_expression {result = Symbol.Concat(result, $other.result);}  )* 
   ')'
   ;
 

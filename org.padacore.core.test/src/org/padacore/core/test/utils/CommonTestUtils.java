@@ -228,8 +228,8 @@ public class CommonTestUtils {
 		return launchConfig;
 	}
 
-	public static String GetPathToSampleProject() {
+	public static String GetPathToTestProject() {
 		return System.getProperty("user.dir")
-				+ "/src/org/padacore/core/test/sample_project.gpr";
+				+ "/src/org/padacore/core/gnat/test/";
 	}
 }

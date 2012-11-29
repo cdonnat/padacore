@@ -1,0 +1,8 @@
+project A is
+
+obj := "obj";
+
+for Exec_Dir use "exe";
+for Object_Dir use obj;
+
+end A;

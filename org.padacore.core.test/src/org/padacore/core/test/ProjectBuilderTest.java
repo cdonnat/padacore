@@ -8,14 +8,11 @@ import java.io.File;
 import java.io.IOException;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.Path;
 import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.padacore.core.ProjectBuilder;
 import org.padacore.core.IAdaProject;
-import org.padacore.core.gnat.GprProject;
+import org.padacore.core.ProjectBuilder;
 import org.padacore.core.test.stubs.AdaProjectAssociationManagerStub;
 import org.padacore.core.test.utils.CommonTestUtils;
 import org.padacore.core.test.utils.ProjectDescriptionUtils;

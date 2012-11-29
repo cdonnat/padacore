@@ -1,0 +1,8 @@
+with "a.gpr";
+
+project B is
+
+obj := a.obj;
+--exec := A'Exec_dir;
+
+end B;

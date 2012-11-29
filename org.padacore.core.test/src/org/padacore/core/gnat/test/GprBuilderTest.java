@@ -2,14 +2,10 @@ package org.padacore.core.gnat.test;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.IOException;
-
-import org.antlr.runtime.ANTLRFileStream;
-import org.antlr.runtime.CommonTokenStream;
-import org.antlr.runtime.RecognitionException;
+import org.eclipse.core.runtime.Path;
 import org.junit.Test;
-import org.padacore.core.gnat.GprLexer;
-import org.padacore.core.gnat.GprParser;
+import org.padacore.core.gnat.GprBuilder;
+import org.padacore.core.gnat.GprLoader;
 import org.padacore.core.gnat.GprProject;
 import org.padacore.core.test.utils.CommonTestUtils;
 
@@ -17,24 +13,21 @@ public class GprBuilderTest {
 
 	@Test
 	public void test() {
-		GprLexer lexer;
-		try {
-			lexer = new GprLexer(new ANTLRFileStream(CommonTestUtils.GetPathToSampleProject()));
-			GprParser parser = new GprParser(new CommonTokenStream(lexer));
 
-			GprProject gpr = parser.project();
+		GprLoader loader = new GprLoader(new Path(
+				CommonTestUtils.GetPathToTestProject() + "sample_project.gpr"));
+		loader.load();
 
-			assertEquals("Toto", gpr.getName());
-			assertEquals("new_exe", gpr.getExecutableDir());
-			assertEquals("objects", gpr.getObjectDir());
-			assertEquals(2, gpr.getSourcesDir().size());
-			assertEquals("src", gpr.getSourcesDir().get(0));
-			assertEquals("include", gpr.getSourcesDir().get(1));
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (RecognitionException e) {
-			e.printStackTrace();
-		}
+		GprBuilder sut = new GprBuilder(loader.getLoadedProject().get(0));
+		GprProject gpr = sut.build();
+
+		assertEquals("sample_project", gpr.getName());
+		assertEquals("new_exe", gpr.getExecutableDir());
+		assertEquals("objects", gpr.getObjectDir());
+		assertEquals(2, gpr.getSourcesDir().size());
+		assertEquals("src", gpr.getSourcesDir().get(0));
+		assertEquals("include", gpr.getSourcesDir().get(1));
+
 	}
 
 }
