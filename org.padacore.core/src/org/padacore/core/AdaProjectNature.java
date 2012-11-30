@@ -5,12 +5,13 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.*;
 
 public class AdaProjectNature implements IProjectNature {
 
 	public static final String NATURE_ID = "org.padacore.core.adaProjectNature";
 	public static final String ADA_BUILDER_ID = "org.padacore.core.builder.AdaProjectBuilder";
-		
+
 	private IProject project;
 
 	@Override
@@ -19,7 +20,8 @@ public class AdaProjectNature implements IProjectNature {
 	}
 
 	/**
-	 * Configures the Ada builder for the project (adds Ada builder to the project if it is not already present, does nothing otherwise).
+	 * Configures the Ada builder for the project (adds Ada builder to the
+	 * project if it is not already present, does nothing otherwise).
 	 * 
 	 * @throws CoreException
 	 *             if the builder cannot be configured for the project
@@ -43,11 +45,12 @@ public class AdaProjectNature implements IProjectNature {
 	 *            the project description to which Ada builder is added
 	 * @throws CoreException
 	 *             if the Ada builder cannot be added to project
+	 * @pre Ada builder is not already configured for this project.
 	 */
 	private void addAdaBuilderToProject(IProjectDescription projectDesc)
 			throws CoreException {
-		
-		assert(!this.isAdaBuilderConfiguredForProject(projectDesc));
+
+		Assert.isLegal(!this.isAdaBuilderConfiguredForProject(projectDesc));
 
 		ICommand adaBuilderCmd = createAdaBuilderCommand(projectDesc);
 
@@ -56,8 +59,8 @@ public class AdaProjectNature implements IProjectNature {
 						adaBuilderCmd);
 
 		this.updateListOfBuilderCmds(projectDesc, builderCmdsForProject);
-		
-		assert(this.isAdaBuilderConfiguredForProject(projectDesc));
+
+		Assert.isTrue(this.isAdaBuilderConfiguredForProject(projectDesc));
 	}
 
 	/**
@@ -85,7 +88,8 @@ public class AdaProjectNature implements IProjectNature {
 	 * @param adaBuildCmd
 	 *            the Ada builder command
 	 * @return the new list of builder commands for the project which contains
-	 *         all the current builder commands plus the Ada builder command in first place
+	 *         all the current builder commands plus the Ada builder command in
+	 *         first place
 	 */
 	private ICommand[] addAdaBuilderCmdToProjectBuilderCmds(
 			IProjectDescription projectDesc, ICommand adaBuildCmd) {
@@ -95,8 +99,8 @@ public class AdaProjectNature implements IProjectNature {
 		System.arraycopy(currentBuildCmds, 0, newBuildCmds, 1,
 				currentBuildCmds.length);
 		newBuildCmds[0] = adaBuildCmd;
-		
-		assert(newBuildCmds[0].getBuilderName().equals(ADA_BUILDER_ID));
+
+		Assert.isTrue(newBuildCmds[0].getBuilderName().equals(ADA_BUILDER_ID));
 
 		return newBuildCmds;
 	}
@@ -128,54 +132,64 @@ public class AdaProjectNature implements IProjectNature {
 		int currentCmd = 0;
 		boolean adaBuilderAlreadyConfigured = false;
 
-		
-		while(!adaBuilderAlreadyConfigured && currentCmd < buildCommands.length) {
-			adaBuilderAlreadyConfigured = buildCommands[currentCmd].getBuilderName().equals(ADA_BUILDER_ID);
-			currentCmd ++;
+		while (!adaBuilderAlreadyConfigured
+				&& currentCmd < buildCommands.length) {
+			adaBuilderAlreadyConfigured = buildCommands[currentCmd]
+					.getBuilderName().equals(ADA_BUILDER_ID);
+			currentCmd++;
 		}
 
 		return adaBuilderAlreadyConfigured;
 	}
-	
+
 	/**
-	 * Deconfigures the Ada builder for project (removes the Ada builder from project if it is already present, does nothing otherwise).
-	 * @throws CoreException if the Ada builder cannot be "deconfigured" for the project.
+	 * Deconfigures the Ada builder for project (removes the Ada builder from
+	 * project if it is already present, does nothing otherwise).
+	 * 
+	 * @throws CoreException
+	 *             if the Ada builder cannot be "deconfigured" for the project.
 	 */
 	private void deconfigureAdaBuilderFromProject() throws CoreException {
 		IProjectDescription projectDesc = this.getProjectDescription();
-		
+
 		boolean adaBuilderAlreadyConfigured = this
 				.isAdaBuilderConfiguredForProject(projectDesc);
-		
-		if(adaBuilderAlreadyConfigured) {
+
+		if (adaBuilderAlreadyConfigured) {
 			this.removeAdaBuilderFromProject(projectDesc);
 		}
 	}
-	
+
 	/**
-	 * Removes the Ada builder command from the list of builder commands of the project.
-	 *  
-	 * @param projectDesc the description of the project from which Ada builder command is removed.
-	 * @return the new list of builder commands for the project (from which Ada builder command has been removed).
+	 * Removes the Ada builder command from the list of builder commands of the
+	 * project.
+	 * 
+	 * @param projectDesc
+	 *            the description of the project from which Ada builder command
+	 *            is removed.
+	 * @return the new list of builder commands for the project (from which Ada
+	 *         builder command has been removed).
 	 */
-	private ICommand[] removeAdaBuilerCmdFromProjectBuilderCmds(IProjectDescription projectDesc) {
-		
+	private ICommand[] removeAdaBuilerCmdFromProjectBuilderCmds(
+			IProjectDescription projectDesc) {
+
 		ICommand[] currentBuildCmds = projectDesc.getBuildSpec();
 		ICommand[] newBuildCmds = new ICommand[currentBuildCmds.length - 1];
 		int adaBuilderIndex = currentBuildCmds.length;
-		
+
 		for (int currentCmd = 0; currentCmd < newBuildCmds.length; currentCmd++) {
-			if(currentBuildCmds[currentCmd].getBuilderName().equals(ADA_BUILDER_ID)) {
+			if (currentBuildCmds[currentCmd].getBuilderName().equals(
+					ADA_BUILDER_ID)) {
 				adaBuilderIndex = currentCmd;
 			}
-			
-			if(currentCmd > adaBuilderIndex) {
+
+			if (currentCmd > adaBuilderIndex) {
 				newBuildCmds[currentCmd - 1] = currentBuildCmds[currentCmd];
-			} else if(currentCmd < adaBuilderIndex) {
+			} else if (currentCmd < adaBuilderIndex) {
 				newBuildCmds[currentCmd] = currentBuildCmds[currentCmd];
 			}
 		}
-		
+
 		return newBuildCmds;
 	}
 
@@ -186,26 +200,34 @@ public class AdaProjectNature implements IProjectNature {
 	 *            the project description from which Ada builder is removed
 	 * @throws CoreException
 	 *             if the Ada builder cannot be removed from project
+	 * @pre Ada builder is indeed configured for this project.
 	 */
-	private void removeAdaBuilderFromProject(IProjectDescription projectDesc) throws CoreException {
+	private void removeAdaBuilderFromProject(IProjectDescription projectDesc)
+			throws CoreException {
 
-		assert(this.isAdaBuilderConfiguredForProject(projectDesc));
-		
-		ICommand[] builderCmdsForProject = this.removeAdaBuilerCmdFromProjectBuilderCmds(projectDesc);
+		Assert.isLegal(this.isAdaBuilderConfiguredForProject(projectDesc));
+
+		ICommand[] builderCmdsForProject = this
+				.removeAdaBuilerCmdFromProjectBuilderCmds(projectDesc);
 
 		this.updateListOfBuilderCmds(projectDesc, builderCmdsForProject);
-		
-		assert(!this.isAdaBuilderConfiguredForProject(projectDesc));
+
+		Assert.isTrue(!this.isAdaBuilderConfiguredForProject(projectDesc));
 	}
-	
+
 	/**
 	 * Updates the list of builder commands for the project.
 	 * 
-	 * @param projectDesc desription of the project for which builder commands are updated.
-	 * @param newListOfBuilderCmds the new list of builder commands for the project.
-	 * @throws CoreException if the list of builder commands cannot be updated.
+	 * @param projectDesc
+	 *            desription of the project for which builder commands are
+	 *            updated.
+	 * @param newListOfBuilderCmds
+	 *            the new list of builder commands for the project.
+	 * @throws CoreException
+	 *             if the list of builder commands cannot be updated.
 	 */
-	private void updateListOfBuilderCmds(IProjectDescription projectDesc, ICommand[] newListOfBuilderCmds) throws CoreException {
+	private void updateListOfBuilderCmds(IProjectDescription projectDesc,
+			ICommand[] newListOfBuilderCmds) throws CoreException {
 		projectDesc.setBuildSpec(newListOfBuilderCmds);
 		this.getProject().setDescription(projectDesc, null);
 	}
@@ -224,5 +246,4 @@ public class AdaProjectNature implements IProjectNature {
 	public void setProject(IProject project) {
 		this.project = project;
 	}
-
 }
