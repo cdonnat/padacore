@@ -1,7 +1,6 @@
 package org.padacore.core.test;
 
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
 
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IProject;
@@ -38,15 +37,16 @@ public class AdaProjectNatureTest {
 		}
 	}
 
-	private boolean doesAdaBuildCmdExistForProject() {
+	private int nbAdaBuildCmdsForProject() {
 		ICommand[] buildSpec = null;
+		int nbAdaBuildCmds = 0;
 
 		try {
 			buildSpec = this.project.getDescription().getBuildSpec();
 			for (int cmd = 0; cmd < buildSpec.length; cmd++) {
 				if (buildSpec[cmd].getBuilderName().equals(
 						AdaProjectNature.ADA_BUILDER_ID)) {
-					return true;
+					nbAdaBuildCmds++;
 				}
 			}
 
@@ -54,17 +54,17 @@ public class AdaProjectNatureTest {
 			e.printStackTrace();
 		}
 
-		return false;
+		return nbAdaBuildCmds;
 	}
 
-	private void checkAdaBuildCommandIsConfiguredForProject() {
-		assertTrue("Ada build command shall be configured for project",
-				this.doesAdaBuildCmdExistForProject());
+	private void checkAdaBuildCommandIsConfiguredOnlyOnceForProject() {
+		assertTrue("Ada build command shall be configured only once for project",
+				this.nbAdaBuildCmdsForProject() == 1);
 	}
 
 	private void checkAdaBuildCommandIsNotConfiguredForProject() {
-		assertFalse("Ada build command shall not be configured for project",
-				this.doesAdaBuildCmdExistForProject());
+		assertTrue("Ada build command shall not be configured for project",
+				this.nbAdaBuildCmdsForProject() == 0);
 	}
 
 	private void addDummyBuildCommandToProject() {
@@ -90,8 +90,10 @@ public class AdaProjectNatureTest {
 	public void testConfigureAndDeconfigure() {
 		try {
 			adaNature.configure();
-			this.checkAdaBuildCommandIsConfiguredForProject();
-
+			this.checkAdaBuildCommandIsConfiguredOnlyOnceForProject();
+			adaNature.configure();
+			this.checkAdaBuildCommandIsConfiguredOnlyOnceForProject();
+			
 			this.addDummyBuildCommandToProject();
 
 			adaNature.deconfigure();

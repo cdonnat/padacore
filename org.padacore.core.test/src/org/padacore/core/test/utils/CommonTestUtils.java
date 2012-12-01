@@ -95,6 +95,8 @@ public class CommonTestUtils {
 					.newProjectDescription(projectName);
 			
 			description.setLocation(null);
+			description
+			.setNatureIds(new String[] { AdaProjectNature.NATURE_ID });
 			adaProject.create(description, null);
 			
 			GprProject gpr = new GprProject(projectName);
@@ -104,10 +106,6 @@ public class CommonTestUtils {
 			filewriter.close();
 			
 			adaProject.open(null);
-
-			description
-					.setNatureIds(new String[] { AdaProjectNature.NATURE_ID });
-			adaProject.setDescription(description, null);
 
 			if (!openProject) {
 				adaProject.close(null);
