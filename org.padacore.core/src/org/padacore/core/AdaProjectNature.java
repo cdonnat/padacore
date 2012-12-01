@@ -167,28 +167,37 @@ public class AdaProjectNature implements IProjectNature {
 	 * @param projectDesc
 	 *            the description of the project from which Ada builder command
 	 *            is removed.
+	 * @pre Ada builder is indeed configured for project.
 	 * @return the new list of builder commands for the project (from which Ada
 	 *         builder command has been removed).
 	 */
 	private ICommand[] removeAdaBuilerCmdFromProjectBuilderCmds(
 			IProjectDescription projectDesc) {
 
+		try {
+			Assert.isLegal(this.isAdaBuilderConfiguredForProject(projectDesc));
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+
 		ICommand[] currentBuildCmds = projectDesc.getBuildSpec();
 		ICommand[] newBuildCmds = new ICommand[currentBuildCmds.length - 1];
 		int adaBuilderIndex = currentBuildCmds.length;
 
-		for (int currentCmd = 0; currentCmd < newBuildCmds.length; currentCmd++) {
+		for (int currentCmd = 0; currentCmd < currentBuildCmds.length; currentCmd++) {
 			if (currentBuildCmds[currentCmd].getBuilderName().equals(
 					ADA_BUILDER_ID)) {
 				adaBuilderIndex = currentCmd;
 			}
-
-			if (currentCmd > adaBuilderIndex) {
-				newBuildCmds[currentCmd - 1] = currentBuildCmds[currentCmd];
-			} else if (currentCmd < adaBuilderIndex) {
-				newBuildCmds[currentCmd] = currentBuildCmds[currentCmd];
-			}
 		}
+
+		Assert.isTrue(adaBuilderIndex < currentBuildCmds.length);
+
+		System.arraycopy(currentBuildCmds, 0, newBuildCmds, 0, adaBuilderIndex);
+		System.arraycopy(currentBuildCmds,
+				Math.min(adaBuilderIndex + 1, currentBuildCmds.length - 1),
+				newBuildCmds, Math.min(0, adaBuilderIndex - 1),
+				currentBuildCmds.length - adaBuilderIndex - 1);
 
 		return newBuildCmds;
 	}

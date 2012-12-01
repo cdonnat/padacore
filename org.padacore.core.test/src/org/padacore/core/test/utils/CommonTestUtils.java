@@ -93,20 +93,21 @@ public class CommonTestUtils {
 		try {
 			IProjectDescription description = ResourcesPlugin.getWorkspace()
 					.newProjectDescription(projectName);
-
+			
 			description.setLocation(null);
 			adaProject.create(description, null);
-			adaProject.open(null);
-
-			description
-					.setNatureIds(new String[] { AdaProjectNature.NATURE_ID });
-			adaProject.setDescription(description, null);
-
+			
 			GprProject gpr = new GprProject(projectName);
 			filewriter = new FileWriter(new File(adaProject.getLocation()
 					.toOSString() + IPath.SEPARATOR + projectName + ".gpr"));
 			filewriter.write(gpr.toString());
 			filewriter.close();
+			
+			adaProject.open(null);
+
+			description
+					.setNatureIds(new String[] { AdaProjectNature.NATURE_ID });
+			adaProject.setDescription(description, null);
 
 			if (!openProject) {
 				adaProject.close(null);
