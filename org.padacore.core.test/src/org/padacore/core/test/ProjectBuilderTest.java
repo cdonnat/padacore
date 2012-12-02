@@ -36,24 +36,6 @@ public class ProjectBuilderTest {
 		this.sut = new ProjectBuilder(this.associationManager);
 	}
 
-	private void deleteProjectIfItExists(IProject project) {
-		if (project != null) {
-			try {
-				project.delete(true, null);
-			} catch (CoreException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	@After
-	public void tearDown() {
-		this.deleteProjectIfItExists(this.projectWithDefautLocationWithoutMain);
-		this.deleteProjectIfItExists(this.projectWithDefaultLocationWithMain);
-		this.deleteProjectIfItExists(this.projectWithSpecificLocationWithoutMain);
-		this.deleteProjectIfItExists(this.projectWithSpecificLocationWithMain);
-	}
-
 	@Rule
 	public TemporaryFolder testFolder = new TemporaryFolder();
 
@@ -144,7 +126,7 @@ public class ProjectBuilderTest {
 		this.checkProject(this.projectWithSpecificLocationWithoutMain,
 				testFolder.getRoot().getAbsolutePath(), false);
 	}
-	
+
 	@Test
 	public void testCreateProjectWithSpecificLocationWithMain() {
 
@@ -152,7 +134,7 @@ public class ProjectBuilderTest {
 				.createProjectUsingProjectBuilder("SpecificLocWithMain",
 						new Path(testFolder.getRoot().getPath()), true);
 
-		this.checkProject(this.projectWithSpecificLocationWithMain,
-				testFolder.getRoot().getAbsolutePath(), true);
+		this.checkProject(this.projectWithSpecificLocationWithMain, testFolder
+				.getRoot().getAbsolutePath(), true);
 	}
 }
