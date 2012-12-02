@@ -128,23 +128,6 @@ public class CommonTestUtils {
 		return adaProject;
 	}
 
-	public static IProject CreateAndOpenNonAdaProject(String projectName) {
-		IProject project = ResourcesPlugin.getWorkspace().getRoot()
-				.getProject(projectName);
-
-		IProjectDescription description = ResourcesPlugin.getWorkspace()
-				.newProjectDescription(projectName);
-		try {
-			project.create(description, null);
-			project.open(null);
-		} catch (CoreException e) {
-			e.printStackTrace();
-		}
-
-		return project;
-
-	}
-
 	public static String GetWorkspaceAbsolutePath() {
 		return ResourcesPlugin.getWorkspace().getRoot().getLocationURI()
 				.getPath();
@@ -194,17 +177,17 @@ public class CommonTestUtils {
 
 	public static void CheckDefaultAdaProjectContents(IAdaProject adaProject,
 			boolean mainProcedureHasBeenGenerated) {
-		assertTrue("GprProject shall be executable: "
+		assertTrue("AdaProject shall be executable: "
 				+ mainProcedureHasBeenGenerated,
 				adaProject.isExecutable() == mainProcedureHasBeenGenerated);
 		assertTrue(
-				"GprProject shall have "
+				"AdaProject shall have "
 						+ (mainProcedureHasBeenGenerated ? "1" : "0")
 						+ " executable",
 				adaProject.getExecutableNames().size() == (mainProcedureHasBeenGenerated ? 1
 						: 0));
 		if (mainProcedureHasBeenGenerated) {
-			assertTrue("GprProject executable shall be called main.adb",
+			assertTrue("AdaProject executable shall be called main.adb",
 					adaProject.getExecutableNames().get(0).equals("main.adb"));
 		}
 

@@ -7,6 +7,7 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.padacore.core.utils.FileUtils;
 
 public class ProjectBuilder {
@@ -64,9 +65,9 @@ public class ProjectBuilder {
 		if (addMainProcedure) {
 			try {
 				FileUtils.CreateNewFileWithContents(
-						GetProjectPath(projectName, location)
-								+ System.getProperty("file.separator")
-								+ DEFAULT_EXECUTABLE_NAME,
+						GetProjectPath(projectName, location).append(
+								new Path(IPath.SEPARATOR
+										+ DEFAULT_EXECUTABLE_NAME)),
 						this.defaultMainContents());
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -97,12 +98,13 @@ public class ProjectBuilder {
 	 *            A location or null for the default project location.
 	 * @return The project full path.
 	 */
-	public static String GetProjectPath(String projectName, IPath location) {
+	public static IPath GetProjectPath(String projectName, IPath location) {
 		if (location == null) {
-			return ResourcesPlugin.getWorkspace().getRoot().getLocation()
-					+ System.getProperty("file.separator") + projectName;
+			return new Path(ResourcesPlugin.getWorkspace().getRoot()
+					.getLocation().toPortableString()
+					+ IPath.SEPARATOR + projectName);
 		} else {
-			return location.toOSString();
+			return location;
 		}
 	}
 
