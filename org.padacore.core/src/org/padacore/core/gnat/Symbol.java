@@ -46,6 +46,7 @@ public class Symbol {
 	}
 
 	public static Symbol Concat(Symbol left, Symbol right) {
+		Assert.isLegal((left != null) && (right != null));
 		Assert.isLegal((left.isAString() && right.isAString() || (!left.isAString())));
 
 		if (left.isAString()) {
