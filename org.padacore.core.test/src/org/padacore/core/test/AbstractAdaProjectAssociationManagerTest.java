@@ -16,18 +16,27 @@ import org.padacore.core.test.utils.CommonTestUtils;
 public class AbstractAdaProjectAssociationManagerTest {
 
 	private AdaProjectAssociationManagerStub sut;
-	private IProject firstAdaProject;
+	private IProject openedAdaProject;
+	private IProject closedAdaProject;
+	private IProject nonAdaProject;
 
 	@Before
 	public void createFixture() {
 		this.sut = new AdaProjectAssociationManagerStub();
-		this.firstAdaProject = CommonTestUtils.CreateAdaProject("adaProject");
+		this.openedAdaProject = CommonTestUtils.CreateAdaProject(
+				"openedAdaProject", true);
+		this.closedAdaProject = CommonTestUtils.CreateAdaProject(
+				"closedAdaProject", false);
+		this.nonAdaProject = CommonTestUtils.CreateNonAdaProject(
+				"nonAdaProject", true);
 	}
 
 	@After
 	public void tearDown() {
 		try {
-			this.firstAdaProject.delete(true, null);
+			this.openedAdaProject.delete(true, null);
+			this.nonAdaProject.delete(true, null);
+			this.closedAdaProject.delete(true, null);
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
@@ -38,13 +47,25 @@ public class AbstractAdaProjectAssociationManagerTest {
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 
 		assertFalse(
-				"No association to Ada project at init",
-				this.sut.isEclipseProjectAssociatedToAdaProject(this.firstAdaProject));
-		
+				"No association to opened Ada project at init",
+				this.sut.isEclipseProjectAssociatedToAdaProject(this.openedAdaProject));
+		assertFalse(
+				"No association to closed Ada project at init",
+				this.sut.isEclipseProjectAssociatedToAdaProject(this.closedAdaProject));
+		assertFalse(
+				"No association to non-Ada project at init",
+				this.sut.isEclipseProjectAssociatedToAdaProject(this.nonAdaProject));
+
 		this.sut.performAssociationToAdaProjectForAllProjectsWithAdaNatureOf(workspace);
 
 		assertTrue(
-				"Association to Ada project restored",
-				this.sut.isEclipseProjectAssociatedToAdaProject(this.firstAdaProject));
+				"Association to opened Ada project restored",
+				this.sut.isEclipseProjectAssociatedToAdaProject(this.openedAdaProject));
+		assertFalse(
+				"Association to closed Ada project not restored",
+				this.sut.isEclipseProjectAssociatedToAdaProject(this.closedAdaProject));
+		assertFalse(
+				"Association to non-Ada project not performed",
+				this.sut.isEclipseProjectAssociatedToAdaProject(this.nonAdaProject));
 	}
 }

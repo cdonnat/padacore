@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import org.eclipse.core.runtime.IPath;
+
 public class FileUtils {
 
 	/**
@@ -16,13 +18,14 @@ public class FileUtils {
 	 * @throws IOException
 	 *             if an error occurred during file creation.
 	 */
-	public static void CreateNewFileWithContents(String absoluteFilename,
+	public static void CreateNewFileWithContents(IPath absoluteFilename,
 			String fileContents) throws IOException {
 
 		FileWriter writer = null;
 
 		try {
-			File addedFile = new File(absoluteFilename);
+			String osAbsoluteFilepath = absoluteFilename.toOSString();
+			File addedFile = new File(osAbsoluteFilepath);
 			addedFile.createNewFile();
 			writer = new FileWriter(addedFile);
 			writer.write(fileContents);

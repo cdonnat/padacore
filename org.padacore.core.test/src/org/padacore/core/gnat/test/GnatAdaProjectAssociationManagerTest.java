@@ -1,8 +1,6 @@
 package org.padacore.core.gnat.test;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.junit.After;
 import org.junit.Before;
@@ -29,10 +27,9 @@ public class GnatAdaProjectAssociationManagerTest {
 			e.printStackTrace();
 		}
 	}
-	
-	private void runAssociationTest(IProject project) {
-		CommonTestUtils.CheckAdaProjectAssociationToProject(project, false);
 
+	private void runAssociationTest(IProject project) {
+		CommonTestUtils.RemoveAssociationToAdaProject(this.firstAdaProject);
 		this.sut.associateToAdaProject(project);
 		CommonTestUtils.CheckAdaProjectAssociationToProject(project, true);
 	}
@@ -40,17 +37,5 @@ public class GnatAdaProjectAssociationManagerTest {
 	@Test
 	public void testAssociationToAdaProject() {
 		this.runAssociationTest(this.firstAdaProject);
-	}
-
-	@Test
-	public void testAssociationIsRestoredForAllOpenedAdaProjectsInWorkspace() {
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-
-		CommonTestUtils.RemoveAssociationToAdaProject(this.firstAdaProject);
-		CommonTestUtils.CheckAdaProjectAssociationToProject(this.firstAdaProject, false);
-		
-		this.sut.performAssociationToAdaProjectForAllProjectsWithAdaNatureOf(workspace);
-
-		CommonTestUtils.CheckAdaProjectAssociationToProject(this.firstAdaProject, true);
 	}
 }

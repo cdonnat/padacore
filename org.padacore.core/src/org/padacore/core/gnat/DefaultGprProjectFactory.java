@@ -18,10 +18,10 @@ public class DefaultGprProjectFactory extends AbstractGprProjectFactory {
 
 	private boolean addMainProcedure;
 	private String projectName;
-	private String projectDirectory;
+	private IPath projectDirectory;
 
 	public DefaultGprProjectFactory(String projectName,
-			boolean addMainProcedure, String projectDirectory) {
+			boolean addMainProcedure, IPath projectDirectory) {
 		this.projectName = projectName;
 		this.addMainProcedure = addMainProcedure;
 		this.projectDirectory = projectDirectory;
@@ -63,8 +63,8 @@ public class DefaultGprProjectFactory extends AbstractGprProjectFactory {
 	 */
 	private void writeProjectFileToDisk(GprProject gprProject) {
 		try {
-			FileUtils.CreateNewFileWithContents(this.getGprAbsolutePath()
-					.toOSString(), gprProject.toString());
+			FileUtils.CreateNewFileWithContents(this.getGprAbsolutePath(),
+					gprProject.toString());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -74,7 +74,7 @@ public class DefaultGprProjectFactory extends AbstractGprProjectFactory {
 	 * Create the directory which will hold the GPR project file.
 	 */
 	private void createProjectDirectory() {
-		File projectFolder = new File(this.projectDirectory);
+		File projectFolder = new File(this.projectDirectory.toOSString());
 		projectFolder.mkdirs();
 	}
 
@@ -85,7 +85,7 @@ public class DefaultGprProjectFactory extends AbstractGprProjectFactory {
 	 */
 	private IPath getGprAbsolutePath() {
 
-		StringBuilder pathBuilder = new StringBuilder(this.projectDirectory);
+		StringBuilder pathBuilder = new StringBuilder(this.projectDirectory.toString());
 
 		pathBuilder.append(IPath.SEPARATOR);
 		pathBuilder.append(this.projectName);

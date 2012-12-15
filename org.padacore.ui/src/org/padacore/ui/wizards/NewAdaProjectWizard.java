@@ -57,7 +57,7 @@ public class NewAdaProjectWizard extends Wizard implements INewWizard {
 
 		IProject projectHandle = projectCreationPage.getProjectHandle();
 
-		String eclipseProjectPath = ProjectBuilder.GetProjectPath(
+		IPath eclipseProjectPath = ProjectBuilder.GetProjectPath(
 				projectHandle.getName(), projectLocation);
 
 		DefaultGprProjectFactory gprFactory = new DefaultGprProjectFactory(
