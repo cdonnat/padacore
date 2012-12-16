@@ -23,16 +23,16 @@ import org.padacore.core.IAdaProject;
  * @author RS
  * 
  */
-public class BuildProcessListener implements IJobChangeListener {
+public class DerivedResourcesIdentifier implements IJobChangeListener {
 
 	private IProject builtProject;
-	private ResourcesCollector projectResourcesBeforeBuild;
+	private NonDerivedResourcesCollector projectResourcesBeforeBuild;
 	private Job cleaningJob;
 
-	public BuildProcessListener(IProject builtProject, Job cleaningJob) {
+	public DerivedResourcesIdentifier(IProject builtProject, Job cleaningJob) {
 		this.cleaningJob = cleaningJob;
 		this.builtProject = builtProject;
-		this.projectResourcesBeforeBuild = new ResourcesCollector(builtProject);
+		this.projectResourcesBeforeBuild = new NonDerivedResourcesCollector(builtProject);
 	}
 
 	@Override
@@ -44,6 +44,7 @@ public class BuildProcessListener implements IJobChangeListener {
 				e.printStackTrace();
 			}
 		}
+		this.markExecAndObjectDirsAsDerived();
 		this.rememberResourcesOfProjectBeforeBuild();
 	}
 
@@ -53,7 +54,6 @@ public class BuildProcessListener implements IJobChangeListener {
 
 	@Override
 	public void done(IJobChangeEvent event) {
-		this.markExecAndObjectDirsAsDerived();
 		this.markResourcesGeneratedByBuildAsDerived();
 	}
 
@@ -69,8 +69,11 @@ public class BuildProcessListener implements IJobChangeListener {
 				.GetAssociatedAdaProject(this.builtProject);
 		List<String> execAndObjectDirs = new ArrayList<String>();
 
-		this.addCurrentDirectoryToListIfItsNotCurrentDirectory(
-				builtAdaProject.getExecutableDirectoryPath(), execAndObjectDirs);
+		if (builtAdaProject.isExecutable()) {
+			this.addCurrentDirectoryToListIfItsNotCurrentDirectory(
+					builtAdaProject.getExecutableDirectoryPath(),
+					execAndObjectDirs);
+		}
 		this.addCurrentDirectoryToListIfItsNotCurrentDirectory(
 				builtAdaProject.getObjectDirectoryPath(), execAndObjectDirs);
 
@@ -87,7 +90,7 @@ public class BuildProcessListener implements IJobChangeListener {
 			execAndObjectDirsAsResources.add(this.builtProject.getFolder(dirIt
 					.next()));
 		}
-		
+
 		this.setAllResourcesAsDerived(execAndObjectDirsAsResources);
 
 	}
@@ -136,12 +139,9 @@ public class BuildProcessListener implements IJobChangeListener {
 	 * @return a Collection of Resource that were generated during the build
 	 *         process.
 	 */
-	// TODO Identification of generated resources could be made more efficient
-	// by using information from GPR project: Object_Dir and Exec_Dir are by
-	// definition derived.
 	private Collection<IResource> identifyResourcesGeneratedByBuild()
 			throws CoreException {
-		ResourcesCollector projectResources = new ResourcesCollector(
+		NonDerivedResourcesCollector projectResources = new NonDerivedResourcesCollector(
 				this.builtProject);
 		projectResources.collectAllNonDerivedResources();
 		Set<IResource> projectResourcesAfterBuild = projectResources
