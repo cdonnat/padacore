@@ -1,0 +1,23 @@
+with "a.gpr";
+with "c/c";
+
+project B is
+
+type Mode_Type is ("distrib", "debug", "optimize", "profile", "coverage");
+Mode : Mode_Type := external ("MODE", "optimize");
+
+Processors := External ("PROCESSORS", "1");
+
+for Global_Configuration_Pragmas use "gnat_optimize.adc";
+
+type Library_Type_Type is ("relocatable", "static");
+Library_Type := external ("LIBRARY_TYPE", "static");
+
+from_external := Library_Type;
+
+for Object_Dir  use "obj/" & Project'Library_Kind;
+
+obj := a.obj;
+--exec := A'Exec_dir;
+
+end B;

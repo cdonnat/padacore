@@ -235,6 +235,6 @@ public class CommonTestUtils {
 
 	public static String GetPathToTestProject() {
 		return System.getProperty("user.dir")
-				+ "/src/org/padacore/core/gnat/test/";
+				+ "/src/org/padacore/core/gnat/test/gpr/";
 	}
 }

@@ -156,12 +156,23 @@ attribute_designator returns [String result]
   | att = simple_name ( '(' STRING_LITERAL ')' ) {$result = $att.text + "(" + $STRING_LITERAL.text + ")";}
   ; 
  
-external_value returns [String result] // FIXME : return an array?
+ attribute_reference returns [Symbol result]
+  :
+  attribute_prefix '\'' name { result = Symbol.CreateString(""); } // TODO
+  ;
+ 
+ attribute_prefix returns [Symbol result]
+  :
+  PROJECT { result = Symbol.CreateString(""); } // TODO
+  | name  { result = Symbol.CreateString(""); } // TODO
+  ;
+ 
+external_value returns [Symbol result]
   : 
-  EXTERNAL {result = $EXTERNAL.text;} 
-  '(' {result += "(";}
-  s1 = STRING_LITERAL { result += $s1.text;} 
-  (',' s2 = STRING_LITERAL { result += "," + $s2.text;})* 
+  EXTERNAL
+  '(' 
+  STRING_LITERAL 
+  ',' defaultValue = STRING_LITERAL { $result = Symbol.CreateString($defaultValue.text);} 
   ')'
   ; 
 
@@ -192,14 +203,15 @@ string_expression returns [Symbol result] // TODO : complete rule
   :
   STRING_LITERAL {result = Symbol.CreateString($STRING_LITERAL.text);}
   | name {result = gprLoader.getVariable($name.result);}
-  | external_value
+  | external_value {result = $external_value.result;}
+  | attribute_reference {result = $attribute_reference.result;}
   ;
 
 string_list returns [Symbol result] // TODO : complete rule 
   :
   '(' {result = Symbol.CreateStringList(new ArrayList<String>());}
-  first = string_expression? {if (first != null) {result = Symbol.Concat (result, $first.result);}} 
-  ( ',' other = string_expression {result = Symbol.Concat(result, $other.result);}  )* 
+  first = expression? {if (first != null) {result = Symbol.Concat (result, $first.result);}} 
+  ( ',' other = expression {result = Symbol.Concat(result, $other.result);}  )* 
   ')'
   ;
 
@@ -224,24 +236,24 @@ STRING_LITERAL
   (STRING_ELEMENT)* 
   '"';
   
-ALL     : 'all';
-AT      : 'at';
-CASE    : 'case';
-END     : 'end';
-FOR     : 'for';
-IS      : 'is';
-LIMITED : 'limited';
-NULL    : 'null';
-OTHERS  : 'others';
-PACKAGE : 'package';
-PROJECT : 'project';
-RENAMES : 'renames';
-TYPE    : 'type';
-USE     : 'use';
-WHEN    : 'when';
-WITH    : 'with';
-EXTENDS : 'extends';
-EXTERNAL: 'external';
+ALL     : A L L;
+AT      : A T;
+CASE    : C A S E;
+END     : E N D;
+FOR     : F O R;
+IS      : I S;
+LIMITED : L I M I T E D;
+NULL    : N U L L;
+OTHERS  : O T H E R S;
+PACKAGE : P A C K A G E;
+PROJECT : P R O J E C T;
+RENAMES : R E N A M E S;
+TYPE    : T Y P E;
+USE     : U S E;
+WHEN    : W H E N;
+WITH    : W I T H;
+EXTENDS : E X T E N D S;
+EXTERNAL: E X T E R N A L;
 
 IDENTIFIER : (UPPER_CASE_LETTER | LOWER_CASE_LETTER) 
               (('_')? (UPPER_CASE_LETTER | LOWER_CASE_LETTER | DIGIT))*;
@@ -263,3 +275,30 @@ WS  :
   |'\b'
   |'\n' 
   |'\f' )+ { $channel = HIDDEN; };
+  
+fragment A:('a'|'A');
+fragment B:('b'|'B');
+fragment C:('c'|'C');
+fragment D:('d'|'D');
+fragment E:('e'|'E');
+fragment F:('f'|'F');
+fragment G:('g'|'G');
+fragment H:('h'|'H');
+fragment I:('i'|'I');
+fragment J:('j'|'J');
+fragment K:('k'|'K');
+fragment L:('l'|'L');
+fragment M:('m'|'M');
+fragment N:('n'|'N');
+fragment O:('o'|'O');
+fragment P:('p'|'P');
+fragment Q:('q'|'Q');
+fragment R:('r'|'R');
+fragment S:('s'|'S');
+fragment T:('t'|'T');
+fragment U:('u'|'U');
+fragment V:('v'|'V');
+fragment W:('w'|'W');
+fragment X:('x'|'X');
+fragment Y:('y'|'Y');
+fragment Z:('z'|'Z');

@@ -3,50 +3,58 @@ package org.padacore.core.gnat;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 import org.antlr.runtime.ANTLRFileStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 
 public class GprLoader {
 
-	private IPath referencePath;
-	private Context current;
-	private List<Context> projects;
+	private static String GPR_EXTENSION = "gpr";
+	
+	private class Loadable {
+		private IPath path;
+		private Context context;
+
+		public Loadable(IPath path) {
+			this.path = path;
+			this.context = new Context(path.removeFileExtension().lastSegment());
+		}
+	}
+
+	private Stack<Loadable> toLoad;
+	private List<Context> loadedProjects;
 
 	public GprLoader() {
-		this.referencePath = new Path(".");
-		this.current = new Context("");
-		this.projects = new ArrayList<Context>();
+		this.toLoad = new Stack<Loadable>();
+		this.loadedProjects = new ArrayList<Context>();
 	}
-	
+
 	public GprLoader(IPath pathToGpr) {
-		this.referencePath = pathToGpr.removeLastSegments(1);
-		this.current = new Context(pathToGpr.removeFileExtension().lastSegment());
-		this.projects = new ArrayList<Context>();
-		this.projects.add(this.current);
+		this();
+		this.toLoad.push(new Loadable(pathToGpr));
 	}
 
 	public void addVariable(String name, Symbol value) {
-		this.current.addVar(name, value);
+		this.toLoad.peek().context.addVar(name, value);
 	}
 
 	public void addAttribute(String name, Symbol value) {
-		this.current.addAttribute(name, value);
+		this.toLoad.peek().context.addAttribute(name, value);
 	}
 
 	public boolean variableIsDefined(String name) {
-		return this.current.variableIsDefined(name);
+		return this.toLoad.peek().context.variableIsDefined(name);
 	}
 
 	public boolean attributeIsDefined(String name) {
-		return this.current.attributeIsDefined(name);
+		return this.toLoad.peek().context.attributeIsDefined(name);
 	}
 
 	public Symbol getVariable(String name) {
-		return this.current.getVariable(name);
+		return this.toLoad.peek().context.getVariable(name);
 	}
 
 	private void parseGpr(IPath path) {
@@ -62,24 +70,26 @@ public class GprLoader {
 	}
 
 	public void load() {
-		this.parseGpr(new Path(this.referencePath.toOSString() + "/" + this.current.getName()
-				+ ".gpr"));
+		this.parseGpr(this.toLoad.peek().path);
+		this.loadedProjects.add(0, this.toLoad.pop().context);
 	}
 
 	public void addProject(String relativeProjectPath) {
-		String projectName = new Path (relativeProjectPath).removeFileExtension().lastSegment();
-		Context newContext = new Context(projectName);
-		this.current.addReference(newContext);
-		this.projects.add(newContext);
+		IPath referencePath = this.toLoad.peek().path.removeLastSegments(1);
+		IPath path = referencePath.append(relativeProjectPath);
+		String extension = path.getFileExtension();
 
-		Context previousContext = this.current;
+		if (extension == null) {
+			path = path.addFileExtension(GPR_EXTENSION);
+		}
 
-		this.current = newContext;
+		Loadable projectToLoad = new Loadable(path);
+		this.toLoad.peek().context.addReference(projectToLoad.context);
+		this.toLoad.push(projectToLoad);
 		this.load();
-		this.current = previousContext;
 	}
 
 	public List<Context> getLoadedProject() {
-		return this.projects;
+		return this.loadedProjects;
 	}
 }
