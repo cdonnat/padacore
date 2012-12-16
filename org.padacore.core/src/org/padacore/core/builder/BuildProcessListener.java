@@ -1,6 +1,9 @@
 package org.padacore.core.builder;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
@@ -10,6 +13,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
+import org.padacore.core.AbstractAdaProjectAssociationManager;
+import org.padacore.core.IAdaProject;
 
 /**
  * This class implements a build process listener which purpose is to detect all
@@ -48,7 +53,43 @@ public class BuildProcessListener implements IJobChangeListener {
 
 	@Override
 	public void done(IJobChangeEvent event) {
+		this.markExecAndObjectDirsAsDerived();
 		this.markResourcesGeneratedByBuildAsDerived();
+	}
+
+	private void addCurrentDirectoryToListIfItsNotCurrentDirectory(
+			String directory, List<String> directories) {
+		if (!directory.equals(".")) {
+			directories.add(directory);
+		}
+	}
+
+	private void markExecAndObjectDirsAsDerived() {
+		IAdaProject builtAdaProject = AbstractAdaProjectAssociationManager
+				.GetAssociatedAdaProject(this.builtProject);
+		List<String> execAndObjectDirs = new ArrayList<String>();
+
+		this.addCurrentDirectoryToListIfItsNotCurrentDirectory(
+				builtAdaProject.getExecutableDirectoryPath(), execAndObjectDirs);
+		this.addCurrentDirectoryToListIfItsNotCurrentDirectory(
+				builtAdaProject.getObjectDirectoryPath(), execAndObjectDirs);
+
+		for (Iterator<String> sourceDirIt = builtAdaProject.getSourcesDir()
+				.iterator(); sourceDirIt.hasNext();) {
+			String sourceDir = sourceDirIt.next();
+			execAndObjectDirs.remove(sourceDir);
+		}
+
+		List<IResource> execAndObjectDirsAsResources = new ArrayList<IResource>(
+				execAndObjectDirs.size());
+		for (Iterator<String> dirIt = execAndObjectDirs.iterator(); dirIt
+				.hasNext();) {
+			execAndObjectDirsAsResources.add(this.builtProject.getFolder(dirIt
+					.next()));
+		}
+		
+		this.setAllResourcesAsDerived(execAndObjectDirsAsResources);
+
 	}
 
 	/**
@@ -56,6 +97,19 @@ public class BuildProcessListener implements IJobChangeListener {
 	 */
 	private void rememberResourcesOfProjectBeforeBuild() {
 		this.projectResourcesBeforeBuild.collectAllNonDerivedResources();
+	}
+
+	private void setAllResourcesAsDerived(Collection<IResource> resources) {
+		try {
+			for (Iterator<IResource> resourceIt = resources.iterator(); resourceIt
+					.hasNext();) {
+				IResource resource = resourceIt.next();
+
+				resource.setDerived(true, null);
+			}
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -67,9 +121,7 @@ public class BuildProcessListener implements IJobChangeListener {
 			Collection<IResource> resourcesGeneratedByBuild = this
 					.identifyResourcesGeneratedByBuild();
 
-			for (IResource generatedResource : resourcesGeneratedByBuild) {
-				generatedResource.setDerived(true, null);
-			}
+			this.setAllResourcesAsDerived(resourcesGeneratedByBuild);
 
 		} catch (CoreException e) {
 			e.printStackTrace();

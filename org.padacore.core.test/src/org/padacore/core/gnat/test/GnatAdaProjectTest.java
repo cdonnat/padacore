@@ -81,4 +81,17 @@ public class GnatAdaProjectTest {
 		assertTrue("Second executable name is correct", execNames.get(1)
 				.equals(secondExecNameExpected));
 	}
+
+	@Test
+	public void testObjectDirRetrievalWhenNoObjectDirIsSpecified() {
+		assertTrue("Object directory is current directory", this.sut
+				.getObjectDirectoryPath().equals("."));
+	}
+
+	@Test
+	public void testObjectDirRetrievalWhenObjectDirIsSpecified() {
+		this.gprProject.setObjectDir(TEST_OBJ_DIR_NAME);
+		assertTrue("Object directory is TEST_OBJ_DIRECTORY", this.sut
+				.getObjectDirectoryPath().equals(TEST_OBJ_DIR_NAME));
+	}
 }
