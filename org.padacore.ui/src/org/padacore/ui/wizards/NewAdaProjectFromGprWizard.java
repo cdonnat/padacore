@@ -9,8 +9,9 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 import org.padacore.core.ProjectBuilder;
-import org.padacore.core.gnat.FileGprProjectFactory;
 import org.padacore.core.gnat.GnatAdaProjectAssociationManager;
+import org.padacore.core.gnat.GprBuilder;
+import org.padacore.core.gnat.GprLoader;
 import org.padacore.core.gnat.GprProject;
 
 /**
@@ -27,8 +28,7 @@ public class NewAdaProjectFromGprWizard extends Wizard implements INewWizard {
 
 	public NewAdaProjectFromGprWizard() {
 		setWindowTitle("New Ada Project from a GPR Project");
-		this.eclipseAdaProjectBuilder = new ProjectBuilder(
-				new GnatAdaProjectAssociationManager());
+		this.eclipseAdaProjectBuilder = new ProjectBuilder(new GnatAdaProjectAssociationManager());
 	}
 
 	@Override
@@ -50,16 +50,15 @@ public class NewAdaProjectFromGprWizard extends Wizard implements INewWizard {
 	private void createProjectFromGprProjectFileWithAdaNature() {
 		IPath gprProjectAbsolutePath = new Path(this.page.getGprProjectPath());
 
-		FileGprProjectFactory gprFactory = new FileGprProjectFactory(
-				gprProjectAbsolutePath);
-
-		GprProject gprFromFile = gprFactory.createGprProject();
-
-		IPath projectLocation = new Path(new File(
-				gprProjectAbsolutePath.toOSString()).getParent());
-
-		eclipseAdaProjectBuilder.createProjectWithAdaNatureAt(
-				gprFromFile.getName(), projectLocation, false);
+		GprLoader loader = new GprLoader(gprProjectAbsolutePath);
+		loader.load();
+		for (GprLoader.Load load : loader.getLoadedProject()) {
+			GprBuilder builder = new GprBuilder(load.getProject());
+			GprProject gprFromFile = builder.build();
+			IPath projectLocation = new Path(new File(load.getPath().toOSString()).getParent());
+			eclipseAdaProjectBuilder.createProjectWithAdaNatureAt(gprFromFile.getName(),
+					projectLocation, false);
+		}
 	}
 
 	@Override

@@ -18,7 +18,7 @@ public class GprBuilderTest {
 				CommonTestUtils.GetPathToTestProject() + "sample_project.gpr"));
 		loader.load();
 
-		GprBuilder sut = new GprBuilder(loader.getLoadedProject().get(0));
+		GprBuilder sut = new GprBuilder(loader.getLoadedProject().get(0).getProject());
 		GprProject gpr = sut.build();
 
 		assertEquals("sample_project", gpr.getName());

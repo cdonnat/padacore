@@ -21,7 +21,7 @@ public class FileGprProjectFactory extends AbstractGprProjectFactory {
 		
 		GprLoader loader = new GprLoader (this.gprFilePath);
 		loader.load();
-		GprBuilder builder = new GprBuilder (loader.getLoadedProject().get(0));
+		GprBuilder builder = new GprBuilder (loader.getLoadedProject().get(0).getProject());
 		return builder.build();
 	}
 

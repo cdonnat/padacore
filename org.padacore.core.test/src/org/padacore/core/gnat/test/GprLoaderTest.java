@@ -17,7 +17,7 @@ public class GprLoaderTest {
 		sut.load();
 
 		assertEquals(1, sut.getLoadedProject().size());
-		assertEquals("My_Var.saved", sut.getLoadedProject().get(0).getVariable("Save_Name")
+		assertEquals("My_Var.saved", sut.getLoadedProject().get(0).getProject().getVariable("Save_Name")
 				.getAsString());
 	}
 
@@ -28,7 +28,7 @@ public class GprLoaderTest {
 		sut.load();
 
 		assertEquals(3, sut.getLoadedProject().size());
-		assertEquals("static", sut.getLoadedProject().get(0).getVariable("from_external")
+		assertEquals("static", sut.getLoadedProject().get(0).getProject().getVariable("from_external")
 				.getAsString());
 	}
 }
