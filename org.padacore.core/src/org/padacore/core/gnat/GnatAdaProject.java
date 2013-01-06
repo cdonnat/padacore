@@ -25,7 +25,7 @@ public class GnatAdaProject implements IAdaProject {
 				.getExecutableSourceNames();
 
 		for (String execSourceName : execSourceNames) {
- 
+
 			String execName = removeExtensionFromFilename(execSourceName);
 
 			// TODO we should take into account the Executable_Suffix GPR
@@ -87,6 +87,18 @@ public class GnatAdaProject implements IAdaProject {
 	@Override
 	public List<String> getSourcesDir() {
 		return this.gprProject.getSourcesDir();
+	}
+
+	@Override
+	public String getObjectDirectoryPath() {
+		String definedObjectDirectory = this.gprProject.getObjectDir();
+		String realObjectDirectory = definedObjectDirectory;
+
+		if (definedObjectDirectory == null) {
+			realObjectDirectory = ".";
+		}
+
+		return realObjectDirectory;
 	}
 
 }

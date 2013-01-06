@@ -95,7 +95,7 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 			}
 		};
 
-		buildJob.addJobChangeListener(new BuildProcessListener(this
+		buildJob.addJobChangeListener(new DerivedResourcesIdentifier(this
 				.getProject(), this.cleaningJob));
 		buildJob.schedule();
 	}

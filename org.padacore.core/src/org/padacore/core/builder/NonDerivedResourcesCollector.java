@@ -16,12 +16,12 @@ import org.eclipse.core.runtime.CoreException;
  * @author RS
  * 
  */
-public class ResourcesCollector {
+public class NonDerivedResourcesCollector {
 
 	private IContainer container;
 	private Set<IResource> containedResources;
 
-	public ResourcesCollector(IContainer container) {
+	public NonDerivedResourcesCollector(IContainer container) {
 		this.container = container;
 		this.containedResources = new HashSet<IResource>();
 	}

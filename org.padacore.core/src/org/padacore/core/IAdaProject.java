@@ -34,4 +34,10 @@ public interface IAdaProject {
 	 * @return a list of String corresponding to the names of sources directory.
 	 */
 	public abstract List<String> getSourcesDir();
+
+	/**
+	 * Return the path of the directory in which object files will reside.
+	 * @return the object directory path of the project relative to the project file directory.
+	 */
+	public abstract String getObjectDirectoryPath();
 }
