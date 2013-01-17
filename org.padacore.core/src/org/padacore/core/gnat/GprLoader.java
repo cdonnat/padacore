@@ -15,16 +15,16 @@ public class GprLoader {
 	private static String GPR_EXTENSION = "gpr";
 
 	public class Load {
-		private IPath path;
+		private IPath pathToGpr;
 		private Context context;
 
 		public Load(IPath path) {
-			this.path = path;
+			this.pathToGpr = path;
 			this.context = new Context(path.removeFileExtension().lastSegment());
 		}
 
 		public IPath getPath() {
-			return this.path;
+			return this.pathToGpr;
 		}
 
 		public Context getProject() {
@@ -78,16 +78,15 @@ public class GprLoader {
 	}
 
 	public void load() {
-		Load load = this.projectsToLoad.peek();
-		this.parseGpr(load.getPath());
-		this.projectsToLoad.pop();
-		if (!this.isLoadAlreadyAdded(load)) {
-			this.loadedProjects.add(0, load);
+		this.parseGpr(this.projectBeingParsed().getPath());
+		Load lastParsedProject = this.projectsToLoad.pop();
+		if (!this.isLoadAlreadyAdded(lastParsedProject)) {
+			this.loadedProjects.add(0, lastParsedProject);
 		}
 	}
 
 	public void addProject(String relativeProjectPath) {
-		IPath referencePath = this.projectsToLoad.peek().path.removeLastSegments(1);
+		IPath referencePath = this.projectsToLoad.peek().pathToGpr.removeLastSegments(1);
 		IPath path = referencePath.append(relativeProjectPath);
 		String extension = path.getFileExtension();
 
@@ -96,15 +95,19 @@ public class GprLoader {
 		}
 
 		Load projectToLoad = new Load(path);
-		this.projectsToLoad.peek().context.addReference(projectToLoad.context);
+		this.projectBeingParsed().context.addReference(projectToLoad.context);
 		this.projectsToLoad.push(projectToLoad);
 		this.load();
 	}
-
+	
 	public List<Load> getLoadedProject() {
 		return this.loadedProjects;
 	}
 
+	private Load projectBeingParsed() {
+		return this.projectsToLoad.peek();
+	}
+	
 	private boolean isLoadAlreadyAdded(Load load) {
 		boolean isAdded = false;
 		for (Load tmp : this.loadedProjects) {

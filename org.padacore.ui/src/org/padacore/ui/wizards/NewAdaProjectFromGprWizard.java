@@ -49,16 +49,49 @@ public class NewAdaProjectFromGprWizard extends Wizard implements INewWizard {
 	 */
 	private void createProjectFromGprProjectFileWithAdaNature() {
 		IPath gprProjectAbsolutePath = new Path(this.page.getGprProjectPath());
-
 		GprLoader loader = new GprLoader(gprProjectAbsolutePath);
 		loader.load();
+		
+		GprLoader.Load load = loader.getLoadedProject().get(0);
+		GprBuilder builder = new GprBuilder(load.getProject());
+		GprProject gprFromFile = builder.build();
+		
+		IPath projectLocation = new Path(new File(load.getPath().toOSString()).getParent());
+		eclipseAdaProjectBuilder.createProjectWithAdaNatureAt(gprFromFile.getName(),
+				projectLocation, false);
+		
+		/* Multiple projects creation attempt... 
+		 
 		for (GprLoader.Load load : loader.getLoadedProject()) {
 			GprBuilder builder = new GprBuilder(load.getProject());
 			GprProject gprFromFile = builder.build();
+			
 			IPath projectLocation = new Path(new File(load.getPath().toOSString()).getParent());
 			eclipseAdaProjectBuilder.createProjectWithAdaNatureAt(gprFromFile.getName(),
 					projectLocation, false);
 		}
+
+		for (GprLoader.Load load : loader.getLoadedProject()) {
+			Context current = load.getProject();
+			IWorkspaceRoot workspace = ResourcesPlugin.getWorkspace().getRoot();
+			IProject[] referencedProjects = new IProject[current.getReferences()
+			                         					.size()];
+			for (int i = 0; i < current.getReferences()
+					.size(); i++) {
+				referencedProjects[i] = workspace.getProject(current.getReferences().get(i).getName());
+			}
+
+			IProject eclipseProject = workspace.getProject(current.getName());
+			try {
+				IProjectDescription description = eclipseProject.getDescription();
+				description.setReferencedProjects(referencedProjects);
+				eclipseProject.setDescription(description, null);
+			} catch (CoreException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		*/
 	}
 
 	@Override
