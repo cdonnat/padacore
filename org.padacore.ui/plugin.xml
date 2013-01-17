@@ -22,11 +22,11 @@
    <extension
          point="org.eclipse.ui.newWizards">
       <category
-            id="org.padacore.wizards.ada"
+            id="org.padacore.wizards.new.ada"
             name="Ada">
       </category>
       <wizard
-            category="org.padacore.wizards.ada"
+            category="org.padacore.wizards.new.ada"
             class="org.padacore.ui.wizards.NewAdaProjectWizard"
             icon="icons/newadaprj_wiz.gif"
             id="org.padacore.wizards.NewGnatProjectWizard"
@@ -37,7 +37,7 @@
             </description>
       </wizard>
       <wizard
-            category="org.padacore.wizards.ada"
+            category="org.padacore.wizards.new.ada"
             class="org.padacore.ui.wizards.NewAdaSpecificationWizard"
             icon="icons/ada_new_spec_wiz.gif"
             id="org.padacore.wizards.NewAdaSpecificationWizard"
@@ -45,23 +45,12 @@
             project="false">
       </wizard>
       <wizard
-            category="org.padacore.wizards.ada"
+            category="org.padacore.wizards.new.ada"
             class="org.padacore.ui.wizards.NewAdaImplementationWizard"
             icon="icons/ada_new_body_wiz.gif"
             id="org.padacore.wizards.NewAdaImplementationWizard"
             name="Ada Implementation"
             project="false">
-      </wizard>
-      <wizard
-            category="org.padacore.wizards.ada"
-            class="org.padacore.ui.wizards.NewAdaProjectFromGprWizard"
-            icon="icons/gps.gif"
-            id="org.padacore.ui.wizards.NewAdaProjectFromGprWizard"
-            name="Ada Project from GPR Project"
-            project="true">
-            <description>
-            Create an Ada project from an existing GPR project
-            </description>
       </wizard>
    </extension>
    <extension
@@ -142,6 +131,24 @@
             properties="isAdaProject"
             type="org.eclipse.core.resources.IProject">
       </propertyTester>
+   </extension>
+   <extension
+         point="org.eclipse.ui.importWizards">
+      <category
+            id="org.padacore.wizards.import.ada"
+            name="Ada">
+      </category>
+      <wizard
+            category="org.padacore.wizards.import.ada"
+            class="org.padacore.ui.wizards.AdaProjectFromGprWizard"
+            icon="icons/gps.gif"
+            id="org.padacore.ui.wizards.AdaProjectFromGprWizard"
+            name="Existing GPR Project"
+            project="true">
+         <description>
+            Create an Ada project from an existing GPR project
+         </description>
+      </wizard>
    </extension>
 
 </plugin>
