@@ -2,13 +2,18 @@ package org.padacore.ui.wizards;
 
 import java.io.File;
 
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.wizards.datatransfer.ExternalProjectImportWizard;
 import org.padacore.core.ProjectBuilder;
 import org.padacore.core.gnat.FileGprProjectFactory;
 import org.padacore.core.gnat.GnatAdaProjectAssociationManager;
@@ -53,14 +58,40 @@ public class AdaProjectFromGprWizard extends Wizard implements IImportWizard {
 
 		FileGprProjectFactory gprFactory = new FileGprProjectFactory(
 				gprProjectAbsolutePath);
+		File gprProjectFile = new File(gprProjectAbsolutePath.toOSString());
+
+		File gprProjectParentFolder = new File(gprProjectFile.getParent());
+		IPath gprProjectParentFolderPath = new Path(
+				gprProjectParentFolder.getAbsolutePath());
 
 		GprProject gprFromFile = gprFactory.createGprProject();
 
-		IPath projectLocation = new Path(new File(
-				gprProjectAbsolutePath.toOSString()).getParent());
+		// IPath projectLocation = new Path(ResourcesPlugin.getWorkspace()
+		// .getRoot().getLocation().toOSString()
+		// + IPath.SEPARATOR + gprFromFile.getName());
 
-		eclipseAdaProjectBuilder.createProjectWithAdaNatureAt(
-				gprFromFile.getName(), projectLocation, false);
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IPath projectLocation = null;
+
+		IProject createdProject = eclipseAdaProjectBuilder
+				.createProjectWithAdaNatureAt(gprFromFile.getName(),
+						projectLocation, false);
+
+		IFolder linkedFolder = createdProject
+				.getFolder(gprProjectParentFolder.getName());
+
+		try {
+
+			if (workspace.validateLinkLocation(linkedFolder,
+					gprProjectParentFolderPath).isOK()) {
+				linkedFolder.createLink(gprProjectParentFolderPath,
+						IResource.NONE, null);
+			} else {
+				System.err.println("Invalid link");
+			}
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
