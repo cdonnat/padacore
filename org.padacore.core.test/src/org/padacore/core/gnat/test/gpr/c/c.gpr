@@ -1,3 +1,7 @@
+with "../a.gpr"
+
 project C is
+
+null;
 
 end C;

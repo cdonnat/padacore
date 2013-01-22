@@ -13,48 +13,56 @@ import org.eclipse.core.runtime.IPath;
 public class GprLoader {
 
 	private static String GPR_EXTENSION = "gpr";
-	
-	private class Loadable {
-		private IPath path;
+
+	public class Load {
+		private IPath pathToGpr;
 		private Context context;
 
-		public Loadable(IPath path) {
-			this.path = path;
+		public Load(IPath path) {
+			this.pathToGpr = path;
 			this.context = new Context(path.removeFileExtension().lastSegment());
+		}
+
+		public IPath getPath() {
+			return this.pathToGpr;
+		}
+
+		public Context getProject() {
+			return this.context;
 		}
 	}
 
-	private Stack<Loadable> toLoad;
-	private List<Context> loadedProjects;
+	private Stack<Load> projectsToLoad;
+	private List<Load> loadedProjects;
 
 	public GprLoader() {
-		this.toLoad = new Stack<Loadable>();
-		this.loadedProjects = new ArrayList<Context>();
+		this.projectsToLoad = new Stack<Load>();
+		this.loadedProjects = new ArrayList<Load>();
 	}
 
 	public GprLoader(IPath pathToGpr) {
 		this();
-		this.toLoad.push(new Loadable(pathToGpr));
+		this.projectsToLoad.push(new Load(pathToGpr));
 	}
 
 	public void addVariable(String name, Symbol value) {
-		this.toLoad.peek().context.addVar(name, value);
+		this.projectsToLoad.peek().context.addVar(name, value);
 	}
 
 	public void addAttribute(String name, Symbol value) {
-		this.toLoad.peek().context.addAttribute(name, value);
+		this.projectsToLoad.peek().context.addAttribute(name, value);
 	}
 
 	public boolean variableIsDefined(String name) {
-		return this.toLoad.peek().context.variableIsDefined(name);
+		return this.projectsToLoad.peek().context.variableIsDefined(name);
 	}
 
 	public boolean attributeIsDefined(String name) {
-		return this.toLoad.peek().context.attributeIsDefined(name);
+		return this.projectsToLoad.peek().context.attributeIsDefined(name);
 	}
 
 	public Symbol getVariable(String name) {
-		return this.toLoad.peek().context.getVariable(name);
+		return this.projectsToLoad.peek().context.getVariable(name);
 	}
 
 	private void parseGpr(IPath path) {
@@ -70,12 +78,15 @@ public class GprLoader {
 	}
 
 	public void load() {
-		this.parseGpr(this.toLoad.peek().path);
-		this.loadedProjects.add(0, this.toLoad.pop().context);
+		this.parseGpr(this.projectBeingParsed().getPath());
+		Load lastParsedProject = this.projectsToLoad.pop();
+		if (!this.isLoadAlreadyAdded(lastParsedProject)) {
+			this.loadedProjects.add(0, lastParsedProject);
+		}
 	}
 
 	public void addProject(String relativeProjectPath) {
-		IPath referencePath = this.toLoad.peek().path.removeLastSegments(1);
+		IPath referencePath = this.projectsToLoad.peek().pathToGpr.removeLastSegments(1);
 		IPath path = referencePath.append(relativeProjectPath);
 		String extension = path.getFileExtension();
 
@@ -83,13 +94,28 @@ public class GprLoader {
 			path = path.addFileExtension(GPR_EXTENSION);
 		}
 
-		Loadable projectToLoad = new Loadable(path);
-		this.toLoad.peek().context.addReference(projectToLoad.context);
-		this.toLoad.push(projectToLoad);
+		Load projectToLoad = new Load(path);
+		this.projectBeingParsed().context.addReference(projectToLoad.context);
+		this.projectsToLoad.push(projectToLoad);
 		this.load();
 	}
-
-	public List<Context> getLoadedProject() {
+	
+	public List<Load> getLoadedProject() {
 		return this.loadedProjects;
+	}
+
+	private Load projectBeingParsed() {
+		return this.projectsToLoad.peek();
+	}
+	
+	private boolean isLoadAlreadyAdded(Load load) {
+		boolean isAdded = false;
+		for (Load tmp : this.loadedProjects) {
+			if (tmp.getPath().equals(load.getPath())) {
+				isAdded = true;
+				break;
+			}
+		}
+		return isAdded;
 	}
 }
