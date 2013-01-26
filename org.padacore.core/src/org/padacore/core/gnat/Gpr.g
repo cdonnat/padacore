@@ -29,7 +29,7 @@ context_clause : with_clause*;
 with_clause 
   : WITH 
     first_path=path_name {gprLoader.addProject($first_path.result);}
-    (',' other_path=path_name)* 
+    (',' other_path=path_name {gprLoader.addProject($other_path.result);})*  
     ';';
 
 path_name returns [String result] 
