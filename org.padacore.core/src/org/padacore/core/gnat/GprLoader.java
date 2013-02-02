@@ -2,6 +2,7 @@ package org.padacore.core.gnat;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
 
@@ -9,6 +10,7 @@ import org.antlr.runtime.ANTLRFileStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Assert;
 
 public class GprLoader {
 
@@ -65,9 +67,14 @@ public class GprLoader {
 		return this.projectsToLoad.peek().context.getVariable(name);
 	}
 
+	public Symbol getAttribute(String name) {
+		return this.projectsToLoad.peek().context.getAttribute(name);
+	}
+
 	private void parseGpr(IPath path) {
 		try {
-			GprLexer lexer = new GprLexer(new ANTLRFileStream(path.toOSString()));
+			GprLexer lexer = new GprLexer(
+					new ANTLRFileStream(path.toOSString()));
 			GprParser parser = new GprParser(this, new CommonTokenStream(lexer));
 			parser.project();
 		} catch (IOException e) {
@@ -86,7 +93,8 @@ public class GprLoader {
 	}
 
 	public void addProject(String relativeProjectPath) {
-		IPath referencePath = this.projectsToLoad.peek().pathToGpr.removeLastSegments(1);
+		IPath referencePath = this.projectsToLoad.peek().pathToGpr
+				.removeLastSegments(1);
 		IPath path = referencePath.append(relativeProjectPath);
 		String extension = path.getFileExtension();
 
@@ -99,15 +107,39 @@ public class GprLoader {
 		this.projectsToLoad.push(projectToLoad);
 		this.load();
 	}
-	
-	public List<Load> getLoadedProject() {
+
+	public List<Load> getLoadedProjects() {
 		return this.loadedProjects;
 	}
 
+	public Context getContextByName(String contextName) {
+		boolean projectContextFound = false;
+		List<Load> projectsToLoad = this.projectsToLoad;
+		Iterator<Load> it = projectsToLoad.iterator();
+		Load currentLoad = null;
+
+		while (!projectContextFound && it.hasNext()) {
+			currentLoad = it.next();
+			
+			projectContextFound = currentLoad.getProject().getName()
+					.equals(contextName);
+		}
+
+		Assert.isTrue(projectContextFound);
+
+		return currentLoad.getProject();
+
+	}
+	
+
+	public String getCurrentProjectName() {
+		return this.projectBeingParsed().getProject().getName();
+	}
+	
 	private Load projectBeingParsed() {
 		return this.projectsToLoad.peek();
 	}
-	
+
 	private boolean isLoadAlreadyAdded(Load load) {
 		boolean isAdded = false;
 		for (Load tmp : this.loadedProjects) {

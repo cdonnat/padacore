@@ -80,43 +80,6 @@ EXTERNAL :
 PROJECT : 
 "project" OK
 
-name:
-<<simple_identifier>> OK
-"one_level.identifier" OK
-"two.levels.identifier" OK
-"two__nextToEachOther" FAIL
-
-empty_declaration :
-"null;" OK
-"null" FAIL // missing semicolon
-
-expression :
-<<"simple_string">> OK
-<<"string" & "string">> OK
-<<"string" & ("first", "second")>> OK
-
-variable_declaration :
-<<That_OS := "GNU/Linux";>> OK
-<<Name      := "readme.txt";>> OK
-<<Save_Name := "name" & ".saved";>> OK
-
-<<variable = "missing_colon";>> FAIL
-<<variable = "missing_semicolon">> FAIL
-<<typed_variable : type := "GNU/Linux";>> FAIL
-
-typed_variable_declaration :
-<<That_OS : OS := "GNU/Linux";>> OK
-<<That_OS : OS := "Missing_Semicolon">> FAIL
-
-<<Untyped_variable := "GNU/Linux";>> FAIL
-<<This_OS : OS := external ("OS");>> OK
-
-string_list :
-<<("One_Element")>> OK
-<<("First", "Second", "Third")>> OK
-
-<<("First" "Second")>> FAIL
-
 COMMENT:
 "--Ada comment" OK
 "//Java comment" FAIL
@@ -129,6 +92,18 @@ attribute_declaration :
 //indexed attributes
 <<for Body ("main") use "Main.ada";>> OK
 <<for Switches ("main.ada") use ("-v", "-gnatv");>> OK
+<<for Switches ("main.ada") use Builder'Switches ("main.ada") & "-g";>> OK
+
+// indexed attributes copy
+<<for Default_Switches use Default.Builder'Default_Switches;>> OK
+
+attribute_reference :
+<<project'Object_Dir>> OK
+<<Naming'Dot_Replacement>> OK
+<<Imported_Project'Source_Dirs>> OK
+<<Imported_Project.Naming'Casing>> OK
+<<Builder'Default_Switches ("Ada")>> OK
+
 
 external_value : 
 <<external ("Variable")>> OK

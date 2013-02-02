@@ -29,7 +29,7 @@ public class GnatAdaProjectAssociationManager extends
 			if (AbstractAdaProjectAssociationManager
 					.GetAssociatedAdaProject(eclipseProject) == null) {
 				this.performAssociationToGnatAdaProject(eclipseProject,
-						this.GetGprAbsolutePath(eclipseProject));
+						this.getGprAbsolutePath(eclipseProject));
 			}
 
 			Assert.isTrue(AbstractAdaProjectAssociationManager
@@ -79,9 +79,7 @@ public class GnatAdaProjectAssociationManager extends
 	 * @return the file system absolute path for the GPR file associated to
 	 *         given project.
 	 */
-	private IPath GetGprAbsolutePath(IProject project) {
-
+	private IPath getGprAbsolutePath(IProject project) {
 		return project.getFile(project.getName() + GNAT_PROJECT_EXTENSION).getLocation();
-		
 	}
 }

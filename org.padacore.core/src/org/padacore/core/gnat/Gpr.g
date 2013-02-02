@@ -7,11 +7,35 @@ import java.util.ArrayList;
 }
 
 @lexer::header {
+
 package org.padacore.core.gnat;
+}
+
+@lexer::members {
+  private List<RecognitionException> exceptions = new ArrayList<RecognitionException>();
+ 
+    public List<RecognitionException> getExceptions() {
+        return exceptions;
+    }
+ 
+    @Override
+    public void reportError(RecognitionException e) {
+        exceptions.add(e);
+    }
 } 
 
 @parser::members {
  private GprLoader gprLoader = new GprLoader();
+  private List<RecognitionException> exceptions = new ArrayList<RecognitionException>();
+ 
+    public List<RecognitionException> getExceptions() {
+        return exceptions;
+    }
+ 
+    @Override
+    public void reportError(RecognitionException e) {
+        exceptions.add(e);
+    }
  
  public GprParser(GprLoader gprLoader, TokenStream input) {
         this(input, new RecognizerSharedState());
@@ -113,19 +137,22 @@ package_declaration
   
 package_spec
   :
-  PACKAGE simple_name IS (simple_declarative_item)* END simple_name ';'
+  PACKAGE begin_pkg_name = simple_name IS (simple_declarative_item)* END end_package_name = simple_name ';'
+  {$begin_pkg_name.text.equals($end_package_name.text)}?
+  {gprLoader.getContextByName(gprLoader.getCurrentProjectName()).addReference(new Context($begin_pkg_name.text));}
   ;
    
 package_renaming
   :
-  PACKAGE simple_name RENAMES simple_name '.' simple_name ';'
+  PACKAGE simple_name RENAMES simple_name '.' simple_name ';'//TODO
   ;
      
 package_extension
   :
-  PACKAGE simple_name EXTENDS simple_name '.' simple_name IS 
+  PACKAGE begin_package_name = simple_name EXTENDS simple_name '.' simple_name IS //TODO
   (simple_declarative_item)*
-  END simple_name ';'
+  END end_package_name = simple_name ';'
+  {$begin_package_name.text.equals($end_package_name.text)}?
   ;
 
 typed_variable_declaration 
@@ -158,13 +185,20 @@ attribute_designator returns [String result]
  
  attribute_reference returns [Symbol result]
   :
-  attribute_prefix '\'' name { result = Symbol.CreateString(""); } // TODO
+  attribute_prefix '\'' simple_name ('(' STRING_LITERAL ')' )? {
+  
+   String contextName = $attribute_prefix.result;
+   String attributeName = $simple_name.text;
+   if($STRING_LITERAL.text !=null) {
+      attributeName += "(" + $STRING_LITERAL.text + ")";
+   }
+   result = gprLoader.getContextByName(contextName).getAttribute(attributeName); }
   ;
  
- attribute_prefix returns [Symbol result]
+ attribute_prefix returns [String result] //TODO
   :
-  PROJECT { result = Symbol.CreateString(""); } // TODO
-  | name  { result = Symbol.CreateString(""); } // TODO
+  PROJECT { result = gprLoader.getCurrentProjectName(); }
+  | projectName = simple_name ('.' packageId = simple_name)? {result = $projectName.text + "." + $packageId.text;}  
   ;
  
 external_value returns [Symbol result]

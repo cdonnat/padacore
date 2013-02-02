@@ -45,8 +45,8 @@ public class DerivedResourcesIdentifier implements IJobChangeListener {
 				e.printStackTrace();
 			}
 		}
-		this.markExecAndObjectDirsAsDerived();
-		this.rememberResourcesOfProjectBeforeBuild();
+//		this.markExecAndObjectDirsAsDerived();
+//		this.rememberResourcesOfProjectBeforeBuild();
 	}
 
 	@Override
@@ -55,7 +55,7 @@ public class DerivedResourcesIdentifier implements IJobChangeListener {
 
 	@Override
 	public void done(IJobChangeEvent event) {
-		this.markResourcesGeneratedByBuildAsDerived();
+//		this.markResourcesGeneratedByBuildAsDerived();
 	}
 
 	/**
@@ -86,8 +86,7 @@ public class DerivedResourcesIdentifier implements IJobChangeListener {
 		List<IResource> execAndObjectDirsAsResources = new ArrayList<IResource>(
 				directoryList.size());
 		for (Iterator<String> dirIt = directoryList.iterator(); dirIt.hasNext();) {
-			execAndObjectDirsAsResources.add(this.builtProject.getFolder(dirIt
-					.next()));
+			execAndObjectDirsAsResources.add(this.builtProject.getFolder(dirIt.next()));
 		}
 
 		return execAndObjectDirsAsResources;

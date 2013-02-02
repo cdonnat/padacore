@@ -44,22 +44,42 @@ public class Symbol {
 	public List<String> getAsStringList() {
 		return value;
 	}
+	
+	private static Symbol ConcatStringLists(Symbol left, Symbol right) {
+		Assert.isLegal(!left.isAString() && !right.isAString());
+		
+		List<String> concatenatedList = new ArrayList<String>(left.getAsStringList());
+		concatenatedList.addAll(right.getAsStringList());
+		
+		return CreateStringList(concatenatedList);
+	}
+	
+	private static Symbol ConcatStrings(Symbol left, Symbol right) {
+		Assert.isLegal(left.isAString() && right.isAString());
+		
+		return CreateString(left.getAsString() + right.getAsString());
+	}
 
 	public static Symbol Concat(Symbol left, Symbol right) {
 		Assert.isLegal((left != null) && (right != null));
-		Assert.isLegal((left.isAString() && right.isAString() || (!left.isAString())));
+		Assert.isLegal((left.isAString() && right.isAString()) || !left.isAString());
+		
+		Symbol concatenatedSymbol;
 
 		if (left.isAString()) {
-			return CreateString(left.getAsString() + right.getAsString());
+				concatenatedSymbol = ConcatStrings(left, right);
 		} else {
-			List<String> newList = new ArrayList<String>(left.getAsStringList());
 			if (right.isAString()) {
-				newList.add(right.getAsString());
+				List<String> concatenatedList = new ArrayList<String>(left.getAsStringList());
+				concatenatedList.add(right.getAsString());
+				
+				concatenatedSymbol = CreateStringList(concatenatedList);
 			} else {
-				newList.addAll(right.getAsStringList());
+				concatenatedSymbol = ConcatStringLists(left, right);
 			}
-			return CreateStringList(newList);
 		}
+		
+		return concatenatedSymbol;
 	}
 
 	private static String RemoveQuotes(String input) {
