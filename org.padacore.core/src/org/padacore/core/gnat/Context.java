@@ -140,6 +140,14 @@ public class Context {
 	public List<Context> getReferences() {
 		return new ArrayList<Context>(this.references.values());
 	}
+	
+	/**
+	 * Return the referenced context corresponding to given name.
+	 * @return the referenced context
+	 */
+	public Context getReferencedContextByName(String ctxtName) {
+		return this.references.get(ctxtName);
+	}
 
 	/**
 	 * Join the string element of an array

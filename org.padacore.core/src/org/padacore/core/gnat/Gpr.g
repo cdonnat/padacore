@@ -139,7 +139,7 @@ package_spec
   :
   PACKAGE begin_pkg_name = simple_name IS (simple_declarative_item)* END end_package_name = simple_name ';'
   {$begin_pkg_name.text.equals($end_package_name.text)}?
-  {gprLoader.getContextByName(gprLoader.getCurrentProjectName()).addReference(new Context($begin_pkg_name.text));}
+  {gprLoader.getCurrentContext().addReference(new Context($begin_pkg_name.text));}
   ;
    
 package_renaming
@@ -187,18 +187,23 @@ attribute_designator returns [String result]
   :
   attribute_prefix '\'' simple_name ('(' STRING_LITERAL ')' )? {
   
-   String contextName = $attribute_prefix.result;
+   Context context = $attribute_prefix.result;
    String attributeName = $simple_name.text;
    if($STRING_LITERAL.text !=null) {
       attributeName += "(" + $STRING_LITERAL.text + ")";
    }
-   result = gprLoader.getContextByName(contextName).getAttribute(attributeName); }
+   result = context.getAttribute(attributeName); }
   ;
  
- attribute_prefix returns [String result] //TODO
+ attribute_prefix returns [Context result] //TODO
   :
-  PROJECT { result = gprLoader.getCurrentProjectName(); }
-  | projectName = simple_name ('.' packageId = simple_name)? {result = $projectName.text + "." + $packageId.text;}  
+  PROJECT { result = gprLoader.getCurrentContext(); }
+  | project_name = simple_name ('.' package_name = simple_name)? 
+  {String ctxtName = $project_name.text;
+  if($package_name.text != null) {
+    ctxtName += "." + $package_name.text;
+  }
+  result = gprLoader.getContextByName(ctxtName);}  
   ;
  
 external_value returns [Symbol result]
@@ -226,7 +231,7 @@ expression returns [Symbol result]
   ;
 
 term returns [Symbol result]
-  :
+  : 
   string_expression 
     {$result = $string_expression.result;}
   | string_list 

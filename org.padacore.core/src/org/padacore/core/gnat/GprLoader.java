@@ -112,30 +112,61 @@ public class GprLoader {
 		return this.loadedProjects;
 	}
 
-	public Context getContextByName(String contextName) {
+	/**
+	 * Returns the Context of the project whose name is given.
+	 * 
+	 * @param projectName
+	 *            the name of the project for which Context is looked for.
+	 * @return the Context of the project.
+	 */
+	private Context getContextOfProject(String projectName) {
 		boolean projectContextFound = false;
-		List<Load> projectsToLoad = this.projectsToLoad;
-		Iterator<Load> it = projectsToLoad.iterator();
+		List<Load> loadedProjects = this.loadedProjects;
+		Iterator<Load> it = loadedProjects.iterator();
 		Load currentLoad = null;
 
 		while (!projectContextFound && it.hasNext()) {
 			currentLoad = it.next();
-			
+
 			projectContextFound = currentLoad.getProject().getName()
-					.equals(contextName);
+					.equals(projectName);
 		}
 
 		Assert.isTrue(projectContextFound);
 
 		return currentLoad.getProject();
-
 	}
-	
 
-	public String getCurrentProjectName() {
-		return this.projectBeingParsed().getProject().getName();
+	/**
+	 * Returns a Context based on its "qualified" name. "Qualified" name is of
+	 * the form <project_name>[.<pkg_name>].
+	 * 
+	 * @param qualifiedContextName
+	 *            the "qualified" name of the context to look for.
+	 * @return the found Context
+	 */
+	public Context getContextByName(String qualifiedContextName) {
+		Assert.isLegal(!qualifiedContextName.contains(".")
+				|| qualifiedContextName.split("\\.").length == 2);
+
+		qualifiedContextName = qualifiedContextName.toLowerCase();
+		Context resultContext = null;
+
+		if(!qualifiedContextName.contains(".")) {
+			resultContext = this.getContextOfProject(qualifiedContextName);
+		} else {
+			String[] contextsNames = qualifiedContextName.split("\\.");
+			Context projectContext = this.getContextOfProject(contextsNames[0]);
+			resultContext = projectContext.getReferencedContextByName(contextsNames[1]);
+		}
+
+		return resultContext;
 	}
-	
+
+	public Context getCurrentContext() {
+		return this.projectBeingParsed().getProject();
+	}
+
 	private Load projectBeingParsed() {
 		return this.projectsToLoad.peek();
 	}
