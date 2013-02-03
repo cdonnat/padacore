@@ -3,15 +3,16 @@ package org.padacore.ui.launch;
 import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
+import org.padacore.core.AbstractAdaProjectAssociationManager;
 import org.padacore.core.AdaProjectNature;
+import org.padacore.core.IAdaProject;
 
 public class AdaProjectPropertyTester extends PropertyTester {
 
 	private final static String BELONGS_TO_ADA_PROJECT = "belongsToAdaProject";
 	private final static String IS_ADA_PROJECT = "isAdaProject";
-	
-	//TODO check that project is indeed executable and open
 
 	@Override
 	public boolean test(Object receiver, String property, Object[] args,
@@ -20,12 +21,13 @@ public class AdaProjectPropertyTester extends PropertyTester {
 		boolean testPassed = false;
 
 		if (property.equals(BELONGS_TO_ADA_PROJECT)) {
-			assert(receiver instanceof IFile);
-			testPassed = this.checkFileBelongstoAdaProject((IFile) receiver);
-		} else if (property.equals(IS_ADA_PROJECT)) {
-			assert(receiver instanceof IProject);
+			Assert.isLegal(receiver instanceof IFile);
 			testPassed = this
-					.checkProjectIsAnAdaProject((IProject) receiver);
+					.checkFileBelongstoAnExecutableAdaProject((IFile) receiver);
+		} else if (property.equals(IS_ADA_PROJECT)) {
+			Assert.isLegal(receiver instanceof IProject);
+			testPassed = this
+					.checkProjectIsAnExecutableAdaProject((IProject) receiver);
 		}
 
 		return testPassed;
@@ -33,41 +35,48 @@ public class AdaProjectPropertyTester extends PropertyTester {
 	}
 
 	/**
-	 * Checks if the given project has an Ada nature.
-	 * @param selectedProject the selected project for which nature is tested.
-	 * @return True if the given project has an Ada nature, False otherwise.
+	 * Checks if the given project: + has an Ada nature. + is open. + is
+	 * executable.
+	 * 
+	 * @param selectedProject
+	 *            the selected project which is tested.
+	 * @return True if the given project is open, has an Ada nature and is
+	 *         executable, False otherwise.
 	 */
-	private boolean checkProjectIsAnAdaProject(
+	private boolean checkProjectIsAnExecutableAdaProject(
 			IProject selectedProject) {
-		boolean hasAdaNature;
+		boolean hasAdaNatureAndIsOpen = false;
+		boolean isAnExecutableProject = false;
+
+		IAdaProject associatedAdaProject;
 
 		try {
-			hasAdaNature = selectedProject
-					.hasNature(AdaProjectNature.NATURE_ID);
+			hasAdaNatureAndIsOpen = selectedProject.isOpen()
+					&& selectedProject.hasNature(AdaProjectNature.NATURE_ID);
+
+			if (hasAdaNatureAndIsOpen) {
+				associatedAdaProject = AbstractAdaProjectAssociationManager
+						.GetAssociatedAdaProject(selectedProject);
+				isAnExecutableProject = associatedAdaProject.isExecutable();
+			}
 		} catch (CoreException e) {
-			hasAdaNature = false;
 		}
 
-		return hasAdaNature;
+		return hasAdaNatureAndIsOpen && isAnExecutableProject;
 	}
 
 	/**
 	 * Checks if the given file belongs to a project which has an Ada nature.
-	 * @param selectedFile the selected file to check.
-	 * @return True if the given file belongs to a project with Ada nature, False otherwise.
+	 * 
+	 * @param selectedFile
+	 *            the selected file to check.
+	 * @return True if the given file belongs to a project with Ada nature,
+	 *         False otherwise.
 	 */
-	private boolean checkFileBelongstoAdaProject(IFile selectedFile) {
+	private boolean checkFileBelongstoAnExecutableAdaProject(IFile selectedFile) {
 
-		boolean belongsToAdaProject;
-
-		try {
-			belongsToAdaProject = selectedFile.getProject().hasNature(
-					AdaProjectNature.NATURE_ID);
-		} catch (CoreException e) {
-			belongsToAdaProject = false;
-		}
-
-		return belongsToAdaProject;
+		return this.checkProjectIsAnExecutableAdaProject(selectedFile
+				.getProject());
 	}
 
 }
