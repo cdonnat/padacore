@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.padacore.core.utils.ErrorLogger;
 import org.padacore.core.utils.FileUtils;
 
 public class ProjectBuilder {
@@ -140,12 +141,12 @@ public class ProjectBuilder {
 				shortcutToGprFile.createLink(gprFileAbsolutePath,
 						IResource.NONE, null);
 			} else {
-				// TODO replace by Error Log message
-				System.err.println("Invalid link for GPR file of "
-						+ project.getName() + " project");
+				ErrorLogger.appendMessageToErrorLog(
+						"Invalid link for GPR file of " + project.getName()
+								+ " project", IStatus.ERROR);
 			}
 		} catch (CoreException e) {
-			e.printStackTrace();
+			ErrorLogger.appendExceptionToErrorLog(e);
 		}
 	}
 
@@ -178,9 +179,9 @@ public class ProjectBuilder {
 				linkedFolder.createLink(gprFileParentFolderAbsolutePath,
 						IResource.NONE, null);
 			} else {
-				// TODO replace by Error Log message
-				System.err.println("Invalid link for folder of "
-						+ project.getName() + " project");
+				ErrorLogger.appendMessageToErrorLog(
+						"Invalid link for folder of " + project.getName()
+								+ " project", IStatus.ERROR);
 			}
 		} catch (CoreException e) {
 			e.printStackTrace();

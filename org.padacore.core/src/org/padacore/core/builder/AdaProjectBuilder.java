@@ -38,8 +38,9 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 	 * @return the absolute path of GPR file.
 	 */
 	private String getGprFullPath() {
-		return this.getProject().getLocation() + "/"
-				+ this.getProject().getName() + ".gpr";
+		String gprProjectFullPath = this.getProject().getFile(this.getProject().getName() + ".gpr").getRawLocation().toOSString();
+		
+		return gprProjectFullPath;
 	}
 
 	/**

@@ -1,10 +1,12 @@
 package org.padacore.ui.launch;
 
 import org.eclipse.core.resources.IFile;
+import org.padacore.core.utils.*;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
@@ -84,9 +86,10 @@ public class AdaLaunchConfigurationShortcut implements ILaunchShortcut {
 				this.launchFromFile(execFile);
 
 			} else {
-				// TODO replace by Error Log message
-				System.err
-						.println("Launching a project with multiple executables is not implemented yet");
+				ErrorLogger
+						.appendMessageToErrorLog(
+								"Launching a project with multiple executables is not implemented yet",
+								IStatus.WARNING);
 			}
 
 		} catch (CoreException e) {
