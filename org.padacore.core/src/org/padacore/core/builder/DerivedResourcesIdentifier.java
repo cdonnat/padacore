@@ -10,6 +10,8 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
@@ -36,8 +38,10 @@ public class DerivedResourcesIdentifier implements IJobChangeListener {
 				builtProject);
 	}
 
-	@Override
-	public void aboutToRun(IJobChangeEvent event) {
+	/**
+	 * If a cleaning job is in progress, wait until it's finished.
+	 */
+	private void waitForCleaningJobToFinish() {
 		if (this.cleaningJob != null) {
 			try {
 				this.cleaningJob.join();
@@ -45,6 +49,26 @@ public class DerivedResourcesIdentifier implements IJobChangeListener {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	private IPath convertGprProjectPathToEclipseProjectPath(
+			IPath gprProjectRelativePath) {
+		IPath eclipseProjectPath;
+
+		if (this.isProjectAnImportedProject()) {
+			// TODO use the same name as GPR parent folder for linked folder
+			eclipseProjectPath = new Path("toto")
+					.append(gprProjectRelativePath);
+		} else {
+			eclipseProjectPath = gprProjectRelativePath;
+		}
+
+		return eclipseProjectPath;
+	}
+
+	@Override
+	public void aboutToRun(IJobChangeEvent event) {
+		this.waitForCleaningJobToFinish();
 		this.markExecAndObjectDirsAsDerived();
 		this.rememberResourcesOfProjectBeforeBuild();
 	}
@@ -74,6 +98,17 @@ public class DerivedResourcesIdentifier implements IJobChangeListener {
 	}
 
 	/**
+	 * Returns True if the project corresponds to an imported GNAT project,
+	 * False otherwise.
+	 * 
+	 * @return
+	 */
+	private boolean isProjectAnImportedProject() {
+		return this.builtProject.getFile(this.builtProject.getName() + ".gpr")
+				.isLinked();
+	}
+
+	/**
 	 * Converts the given directory list (which contains name of directories) to
 	 * a project resource list.
 	 * 
@@ -83,10 +118,17 @@ public class DerivedResourcesIdentifier implements IJobChangeListener {
 	 */
 	private List<IResource> convertDirectoryListToResourceList(
 			List<String> directoryList) {
+
 		List<IResource> execAndObjectDirsAsResources = new ArrayList<IResource>(
 				directoryList.size());
+		IResource currentResource;
+
 		for (Iterator<String> dirIt = directoryList.iterator(); dirIt.hasNext();) {
-			execAndObjectDirsAsResources.add(this.builtProject.getFolder(dirIt.next()));
+			currentResource = this.builtProject
+					.getFolder(convertGprProjectPathToEclipseProjectPath(new Path(
+							dirIt.next())));
+
+			execAndObjectDirsAsResources.add(currentResource);
 		}
 
 		return execAndObjectDirsAsResources;

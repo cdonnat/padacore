@@ -80,7 +80,7 @@ public class GnatAdaProject implements IAdaProject {
 	 */
 	private static String removeExtensionFromFilename(String filename) {
 		final int EXTENSION_LENGTH = 3;
-
+		
 		return filename.substring(0, filename.length() - EXTENSION_LENGTH - 1);
 	}
 
