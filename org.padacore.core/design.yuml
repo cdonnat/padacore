@@ -1,0 +1,10 @@
+[SymbolTable|+add;+get;+isDefined]++-0..*>[Symbol|+getAsString;+getAsStringList] 
+[Context|+addReference;+addAttribute;+addVariable;+getReferences;+getAttribute;+getVariable]++->[SymbolTable]
+[Context]<>references-0..*>[Context]
+[Load|+getPath;+getProject]++-1>[Context]
+[Load]++-1>[IPath]
+[GprLoader|+load;+getLoadedProject]++-0..*[Load]
+[GprBuilder|+build]->[Context]
+[GprBuilder]->[GprProject]
+
+http://yuml.me/edit/09831528
