@@ -19,5 +19,7 @@ Export-Package: org.padacore.core;uses:="org.eclipse.core.runtime,org.eclipse.co
   uses:="org.eclipse.debug.core,
    org.eclipse.core.runtime,
    org.eclipse.core.resources,
-   org.eclipse.debug.core.model"
+   org.eclipse.debug.core.model",
+ org.padacore.core.utils
 Bundle-ClassPath: bin/
+Import-Package: org.eclipse.ui.statushandlers

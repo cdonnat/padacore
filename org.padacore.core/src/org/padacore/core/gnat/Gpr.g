@@ -195,7 +195,7 @@ attribute_designator returns [String result]
    result = context.getAttribute(attributeName); }
   ;
  
- attribute_prefix returns [Context result] //TODO
+ attribute_prefix returns [Context result]
   :
   PROJECT { result = gprLoader.getCurrentContext(); }
   | project_name = simple_name ('.' package_name = simple_name)? 
