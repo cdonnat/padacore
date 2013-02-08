@@ -137,9 +137,11 @@ package_declaration
   
 package_spec
   :
-  PACKAGE begin_pkg_name = simple_name IS (simple_declarative_item)* END end_package_name = simple_name ';'
+  PACKAGE begin_pkg_name = simple_name {gprLoader.beginPackage($begin_pkg_name.text);}
+  IS 
+  (simple_declarative_item)* 
+  END end_package_name = simple_name ';' {gprLoader.endPackage();}
   {$begin_pkg_name.text.equals($end_package_name.text)}?
-  {gprLoader.getCurrentContext().addReference(new Context($begin_pkg_name.text));}
   ;
    
 package_renaming
@@ -185,25 +187,25 @@ attribute_designator returns [String result]
  
  attribute_reference returns [Symbol result]
   :
-  attribute_prefix '\'' simple_name ('(' STRING_LITERAL ')' )? {
-  
-   Context context = $attribute_prefix.result;
-   String attributeName = $simple_name.text;
-   if($STRING_LITERAL.text !=null) {
-      attributeName += "(" + $STRING_LITERAL.text + ")";
-   }
-   result = context.getAttribute(attributeName); }
+  attribute_prefix '\'' simple_name 
+    { String attributeName;
+      if ($attribute_prefix.result.isEmpty()) { 
+         attributeName = $simple_name.text;
+      }
+      else {
+        attributeName = $attribute_prefix.result + "\'" + $simple_name.text;
+      } 
+    }
+    ('(' STRING_LITERAL ')' { attributeName += "(" + $STRING_LITERAL.text + ")";})? 
+
+   { result = gprLoader.getAttribute(attributeName); }
   ;
  
- attribute_prefix returns [Context result]
+ attribute_prefix returns [String result]
   :
-  PROJECT { result = gprLoader.getCurrentContext(); }
-  | project_name = simple_name ('.' package_name = simple_name)? 
-  {String ctxtName = $project_name.text;
-  if($package_name.text != null) {
-    ctxtName += "." + $package_name.text;
-  }
-  result = gprLoader.getContextByName(ctxtName);}  
+  PROJECT  { result = ""; } 
+  | project_name = simple_name  { result = $project_name.text; }
+    ('.' package_name = simple_name {result += "." + $package_name.text;})? 
   ;
  
 external_value returns [Symbol result]

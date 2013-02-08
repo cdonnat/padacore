@@ -14,16 +14,15 @@ public class GprBuilderTest {
 	@Test
 	public void test() {
 
-		GprLoader loader = new GprLoader(new Path(
-				CommonTestUtils.GetPathToTestProject() + "sample_project.gpr"));
-		loader.load();
+		GprLoader loader = new GprLoader();
+		loader.load(new Path(CommonTestUtils.GetPathToTestProject() + "sample_project.gpr"));
 
-		GprBuilder sut = new GprBuilder(loader.getLoadedProjects().get(0).getProject());
+		GprBuilder sut = new GprBuilder(loader.getLoadedProjects().get(0));
 		GprProject gpr = sut.build();
 
 		assertEquals("sample_project", gpr.getName());
 		assertEquals("new_exe", gpr.getExecutableDir());
-		assertEquals("objects", gpr.getObjectDir());
+		assertEquals("new_exe", gpr.getObjectDir());
 		assertEquals(2, gpr.getSourcesDir().size());
 		assertEquals("src", gpr.getSourcesDir().get(0));
 		assertEquals("include", gpr.getSourcesDir().get(1));
