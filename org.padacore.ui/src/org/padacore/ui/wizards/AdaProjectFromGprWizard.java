@@ -12,11 +12,11 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
 import org.padacore.core.ProjectBuilder;
-import org.padacore.core.gnat.Context;
 import org.padacore.core.gnat.GnatAdaProjectAssociationManager;
 import org.padacore.core.gnat.GprBuilder;
 import org.padacore.core.gnat.GprLoader;
 import org.padacore.core.gnat.GprProject;
+import org.padacore.core.gnat.Project;
 
 /**
  * This class defines a wizard which enables user to import an existing GPR
@@ -32,8 +32,7 @@ public class AdaProjectFromGprWizard extends Wizard implements IImportWizard {
 
 	public AdaProjectFromGprWizard() {
 		setWindowTitle("Import existing GPR Project");
-		this.eclipseAdaProjectBuilder = new ProjectBuilder(
-				new GnatAdaProjectAssociationManager());
+		this.eclipseAdaProjectBuilder = new ProjectBuilder(new GnatAdaProjectAssociationManager());
 	}
 
 	@Override
@@ -54,8 +53,8 @@ public class AdaProjectFromGprWizard extends Wizard implements IImportWizard {
 	 */
 	private void createProjectFromGprProjectFileWithAdaNature() {
 		IPath gprProjectAbsolutePath = new Path(this.page.getGprProjectPath());
-		GprLoader loader = new GprLoader(gprProjectAbsolutePath);
-		loader.load();
+		GprLoader loader = new GprLoader();
+		loader.load(gprProjectAbsolutePath);
 		IProject createdProject;
 		//
 		// GprLoader.Load load = loader.getLoadedProject().get(0);
@@ -69,28 +68,25 @@ public class AdaProjectFromGprWizard extends Wizard implements IImportWizard {
 
 		/* Multiple projects creation attempt... */
 
-		for (GprLoader.Load load : loader.getLoadedProjects()) {
-			GprBuilder builder = new GprBuilder(load.getProject());
+		for (Project project : loader.getLoadedProjects()) {
+			GprBuilder builder = new GprBuilder(project);
 			GprProject gprFromFile = builder.build();
 
 			createdProject = eclipseAdaProjectBuilder.createProjectWithAdaNatureAt(
-					gprFromFile.getName(), null, false, load.getPath());
+					gprFromFile.getName(), null, false, project.getPath());
 		}
 
-		for (GprLoader.Load load : loader.getLoadedProjects()) {
-			Context current = load.getProject();
+		for (Project project : loader.getLoadedProjects()) {
 			IWorkspaceRoot workspace = ResourcesPlugin.getWorkspace().getRoot();
-			IProject[] referencedProjects = new IProject[current
-					.getReferences().size()];
-			for (int i = 0; i < current.getReferences().size(); i++) {
-				referencedProjects[i] = workspace.getProject(current
-						.getReferences().get(i).getName());
+			IProject[] referencedProjects = new IProject[project.getReferenceProjects().size()];
+			for (int i = 0; i < project.getReferenceProjects().size(); i++) {
+				referencedProjects[i] = workspace.getProject(project.getReferenceProjects().get(i)
+						.getName());
 			}
 
-			IProject eclipseProject = workspace.getProject(current.getName());
+			IProject eclipseProject = workspace.getProject(project.getName());
 			try {
-				IProjectDescription description = eclipseProject
-						.getDescription();
+				IProjectDescription description = eclipseProject.getDescription();
 				description.setReferencedProjects(referencedProjects);
 				eclipseProject.setDescription(description, null);
 			} catch (CoreException e) {

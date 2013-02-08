@@ -5,4 +5,10 @@ obj := "obj";
 for Exec_Dir use "exe";
 for Object_Dir use obj;
 
+package Compiler is
+    Warnings := ("-gnatwua", "-gnaty", "-gnatQ");
+    for Switches ("Ada") use warnings;
+    
+end Compiler;
+
 end A;

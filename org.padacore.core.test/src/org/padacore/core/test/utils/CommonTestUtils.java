@@ -19,10 +19,13 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.padacore.core.AdaProjectNature;
 import org.padacore.core.IAdaProject;
+import org.padacore.core.gnat.GnatAdaProject;
 import org.padacore.core.gnat.GprProject;
 import org.padacore.core.launch.AdaLaunchConstants;
 
 public class CommonTestUtils {
+
+	private static String SESSION_PROPERTY_QUALIFIED_NAME_PREFIX = "org.padacore";
 
 	private static int cpt = 0;
 
@@ -52,6 +55,11 @@ public class CommonTestUtils {
 		}
 
 	}
+	
+	public static IProject CreateNonAdaProject(boolean openProject) {
+		cpt++;
+		return CreateNonAdaProject("TestProject" + cpt, openProject);
+	}
 
 	public static IProject CreateNonAdaProject(String projectName,
 			boolean openProject) {
@@ -69,13 +77,39 @@ public class CommonTestUtils {
 				e.printStackTrace();
 			}
 		}
-		
+
 		return project;
 	}
 
 	public static IProject CreateAdaProject() {
 		cpt++;
 		return CreateAdaProject("TestProject" + cpt);
+	}
+
+	private static GprProject CreateGprProject(String name, boolean isExecutable) {
+		GprProject result = new GprProject(name);
+
+		result.setExecutable(isExecutable);
+
+		return result;
+	}
+
+	public static IProject CreateExecutableAdaProject() {
+		IProject project = CreateAdaProject();
+
+		IAdaProject adaProject = new GnatAdaProject(CreateGprProject(
+				project.getName(), true));
+
+		try {
+			project.setSessionProperty(new QualifiedName(
+					SESSION_PROPERTY_QUALIFIED_NAME_PREFIX, project.getName()),
+					adaProject);
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+		
+		return project;
+
 	}
 
 	public static IProject CreateAdaProject(String projectName) {
@@ -93,18 +127,18 @@ public class CommonTestUtils {
 		try {
 			IProjectDescription description = ResourcesPlugin.getWorkspace()
 					.newProjectDescription(projectName);
-			
+
 			description.setLocation(null);
 			description
-			.setNatureIds(new String[] { AdaProjectNature.NATURE_ID });
+					.setNatureIds(new String[] { AdaProjectNature.NATURE_ID });
 			adaProject.create(description, null);
-			
+
 			GprProject gpr = new GprProject(projectName);
 			filewriter = new FileWriter(new File(adaProject.getLocation()
 					.toOSString() + IPath.SEPARATOR + projectName + ".gpr"));
 			filewriter.write(gpr.toString());
 			filewriter.close();
-			
+
 			adaProject.open(null);
 
 			if (!openProject) {
@@ -155,21 +189,25 @@ public class CommonTestUtils {
 
 		Object sessionProperty = null;
 		try {
-			 sessionProperty = createdProject.getSessionProperty(new QualifiedName("org.padacore", createdProject.getName()));
+			sessionProperty = createdProject
+					.getSessionProperty(new QualifiedName(
+							SESSION_PROPERTY_QUALIFIED_NAME_PREFIX,
+							createdProject.getName()));
 		} catch (CoreException e) {
 			e.printStackTrace();
-		} 
-				
+		}
+
 		assertTrue("GprProject shall be associated",
 				sessionProperty != null == shallBeAssociated);
 
-		return (IAdaProject)sessionProperty;
+		return (IAdaProject) sessionProperty;
 	}
 
 	public static void RemoveAssociationToAdaProject(IProject project) {
 		try {
-			project.setSessionProperty(new QualifiedName("org.padacore",
-					project.getName()), null);
+			project.setSessionProperty(new QualifiedName(
+					SESSION_PROPERTY_QUALIFIED_NAME_PREFIX, project.getName()),
+					null);
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}

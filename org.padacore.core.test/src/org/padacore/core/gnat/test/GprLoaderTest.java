@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.junit.Test;
 import org.padacore.core.gnat.GprLoader;
@@ -12,24 +13,29 @@ import org.padacore.core.test.utils.CommonTestUtils;
 public class GprLoaderTest {
 
 	private GprLoader sut;
+	private IPath pathToProjectToLoad;
 
 	private void createFixture(String gprProjectName) {
-		sut = new GprLoader(new Path(CommonTestUtils.GetPathToTestProject() + gprProjectName));
+		sut = new GprLoader();
+		pathToProjectToLoad = new Path(CommonTestUtils.GetPathToTestProject() + gprProjectName);
+	}
+
+	private void exercize() {
+		this.sut.load(this.pathToProjectToLoad);
 	}
 
 	@Test
 	public void testSingleGpr() {
-		createFixture("sample_project.gpr");
+		this.createFixture("sample_project.gpr");
 
-		sut.load();
+		this.exercize();
 
-		checkNbOfLoadedProjects(1);
+		checkNbOfLoadedProjects(2);
 
 		checkAttribute("Exec_Dir", "new_exe");
-		checkAttribute("Object_Dir", "objects");
 		checkAttribute("Source_Dirs", new String[] { "src", "include" });
-		checkAttribute("Main", new String[] { "proc1.adb" });
-		checkAttribute("Switches (\"main.ada\")", new String[] { "-v", "-gnatv" });
+		checkAttribute("Switches(\"main.ada\")", new String[] { "-v", "-gnatv" });
+		checkAttribute("Object_Dir", "new_exe");
 
 		checkVariable("my_var", "My_Var");
 		checkVariable("my_var2", "My_Var2");
@@ -40,13 +46,18 @@ public class GprLoaderTest {
 		checkVariable("List_With_Two_Elements", new String[] { "-gnaty", "-gnatg" });
 		checkVariable("Long_List", new String[] { "main.ada", "pack1_.ada", "pack1.ada",
 				"pack2_.ada" });
+
+		checkVariable("a_exec_dir", "exe");
+		checkVariable("a_compiler_warnings", new String[]{"-gnatwua", "-gnaty", "-gnatQ"});
+		checkVariable("a_compiler_switches", new String[]{"-gnatwua", "-gnaty", "-gnatQ"});
+		
 	}
 
 	// @Test
 	public void testMultipleGpr() {
-		createFixture("b.gpr");
+		this.createFixture("b.gpr");
 
-		sut.load();
+		this.exercize();
 
 		checkNbOfLoadedProjects(1);
 		checkVariable("from_external", "static");
@@ -58,29 +69,29 @@ public class GprLoaderTest {
 	}
 
 	private void checkVariable(String variableName, String expectedValue) {
-		assertEquals("Variable value", expectedValue, sut.getLoadedProjects().get(0).getProject()
-				.getVariable(variableName).getAsString());
+		assertEquals("Variable value " + variableName, expectedValue,
+				sut.getLoadedProjects().get(0).getVariable(variableName).getAsString());
 	}
 
 	private void checkVariable(String variableName, String[] expectedValues) {
-		List<String> computed = sut.getLoadedProjects().get(0).getProject()
-				.getVariable(variableName).getAsStringList();
-		assertEquals("Variable size", expectedValues.length, computed.size());
-		for (int i = 0; i < computed.size(); i++) {
+		List<String> computed = sut.getLoadedProjects().get(0).getVariable(variableName)
+				.getAsStringList();
+		assertEquals("Variable size " + variableName, expectedValues.length, computed.size());
+		for (int i = 0; i < expectedValues.length; i++) {
 			assertEquals("Variable n¡" + i, expectedValues[i], computed.get(i));
 		}
 	}
 
 	private void checkAttribute(String attributeName, String expectedValue) {
-		assertEquals("Attribute value", expectedValue, sut.getLoadedProjects().get(0).getProject()
-				.getAttribute(attributeName).getAsString());
+		assertEquals("Attribute value", expectedValue,
+				sut.getLoadedProjects().get(0).getAttribute(attributeName).getAsString());
 	}
 
 	private void checkAttribute(String attributeName, String[] expectedValues) {
-		List<String> computed = sut.getLoadedProjects().get(0).getProject()
-				.getAttribute(attributeName).getAsStringList();
+		List<String> computed = sut.getLoadedProjects().get(0).getAttribute(attributeName)
+				.getAsStringList();
 		assertEquals("Attribute size", expectedValues.length, computed.size());
-		for (int i = 0; i < computed.size(); i++) {
+		for (int i = 0; i < expectedValues.length; i++) {
 			assertEquals("Attribute n¡" + i, expectedValues[i], computed.get(i));
 		}
 	}

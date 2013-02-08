@@ -10,7 +10,7 @@ import org.eclipse.core.runtime.Assert;
  * @author Charles
  *
  */
-public class SymbolTable {
+public class SymbolTable implements ISymbolProvider {
 
 	private Map<String, Symbol> properties;
 
@@ -26,6 +26,7 @@ public class SymbolTable {
 	 * @param name Name of the symbol.
 	 * @return True if the symbol is defined.
 	 */
+	@Override
 	public boolean isDefined(String name) {
 		return this.properties.containsKey(FormatName(name));
 	}
@@ -44,6 +45,7 @@ public class SymbolTable {
 	 * @param name Name of the symbol.
 	 * @return Symbol value.
 	 */
+	@Override
 	public Symbol get(String name) {
 		Assert.isLegal(this.isDefined(name));
 		return this.properties.get(FormatName(name));
