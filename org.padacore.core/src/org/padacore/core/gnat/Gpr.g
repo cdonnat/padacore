@@ -213,7 +213,7 @@ external_value returns [Symbol result]
   EXTERNAL
   '(' 
   STRING_LITERAL 
-  ',' defaultValue = STRING_LITERAL { $result = Symbol.CreateString($defaultValue.text);} 
+  (',' defaultValue = STRING_LITERAL { $result = Symbol.CreateString($defaultValue.text);})? 
   ')'
   ; 
 

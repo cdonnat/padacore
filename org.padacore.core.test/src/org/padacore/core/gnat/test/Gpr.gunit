@@ -29,91 +29,76 @@ STRING_LITERAL:
   
 ALL:
 "all" OK
+"ALL" OK
 
 AT  :  
 "at" OK
+"AT" OK
 
 CASE :
 "case" OK
+"CASE" OK
 
 END   :
 "end" OK
+"END" OK
 
 FOR   :  
 "for" OK
+"FOR" OK
 
 IS  :
 "is" OK
+"IS" OK
 
 LIMITED : 
 "limited" OK
+"LIMITED" OK
+
 NULL  :  
 "null" OK
+"NULL" OK
 
 OTHERS  :  
 "others" OK
+"OTHERS" OK
 
 PACKAGE :
 "package" OK
+"PACKAGE" OK
 
 RENAMES :  
 "renames" OK
+"RENAMES" OK
 
 TYPE  :  
 "type" OK
+"TYPE" OK
 
 USE   :
 "use" OK
+"USE" OK
 
 WHEN  :  
 "when" OK
+"WHEN" OK
 
 WITH  :  
 "with" OK
+"WITH" OK
 
 EXTENDS :  
 "extends" OK
+"EXTENDS" OK
 
 EXTERNAL : 
 "external" OK
+"EXTERNAL" OK
 
 PROJECT : 
 "project" OK
+"PROJECT" OK
 
 COMMENT:
 "--Ada comment" OK
 "//Java comment" FAIL
-
-with_clause :
-<<with "../../my_project.gpr";>> OK
-<<with "..\..\my_project_windows.gpr", "../my_project_linux.gpr";>> OK
-
-<<with "../../missing_semicolon.gpr">> FAIL
-
-context_clause :
-"" OK
-<<with "../../my_project.gpr";
-with "..\..\my_project_windows.gpr";>> OK
-
-package_declaration:
-<<package Compiler renames Logging.Compiler;>> OK
-
-typed_string_declaration:
-<<type OS is ("NT", "nt", "Unix", "GNU/Linux", "other OS");>> OK
-
-case_statement:
-<<case OS is
-when "GNU/Linux" | "Unix" =>
-  for Switches ("Ada") use ("-gnath");
-when "NT" =>
-  for Switches ("Ada") use ("-gnatP");
-when others =>
-  null;
-end case;>> OK
-          
-project :
-<<with "../../included.gpr";
-project My_Project is
-end My_Project;>> OK
-sample_project.gpr OK
-test1.gpr OK

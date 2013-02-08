@@ -9,19 +9,13 @@ import java.util.List;
 
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
-import org.padacore.core.gnat.GprLexer;
-import org.padacore.core.gnat.GprLoader;
 import org.padacore.core.gnat.GprParser;
 import org.padacore.core.gnat.Symbol;
 import org.padacore.core.test.stubs.GprLoaderStub;
 
 public class GprGrammarTest {
 
-	private class Fixture {
-		public GprLexer lexer;
-		public GprParser parser;
-		public GprLoader loader;
-	}
+	private GprGrammarFixture fixture;
 
 	private boolean doesInputComplyWithParserRuleChecker(String input,
 			SimpleParserRuleChecker ruleChecker) {
@@ -40,7 +34,7 @@ public class GprGrammarTest {
 
 	private abstract class SimpleParserRuleChecker {
 
-		private boolean isInputRecognizedByParserRule(Fixture fixture) {
+		private boolean isInputRecognizedByParserRule(GprGrammarFixture fixture) {
 			try {
 				this.executeParserRule(fixture);
 			} catch (RecognitionException e) {
@@ -51,7 +45,7 @@ public class GprGrammarTest {
 					fixture.parser, fixture.lexer);
 		}
 
-		protected abstract void executeParserRule(Fixture fixture)
+		protected abstract void executeParserRule(GprGrammarFixture fixture)
 				throws RecognitionException;
 	}
 
@@ -72,8 +66,8 @@ public class GprGrammarTest {
 			return areEqual;
 		}
 
-		private boolean isInputRecognizedByParserRule(Fixture fixture,
-				Symbol expectedSymbol) {
+		private boolean isInputRecognizedByParserRule(
+				GprGrammarFixture fixture, Symbol expectedSymbol) {
 			Symbol result = null;
 
 			try {
@@ -87,17 +81,19 @@ public class GprGrammarTest {
 					&& this.areSymbolsIdentical(result, expectedSymbol);
 		}
 
-		protected abstract Symbol executeParserRule(Fixture fixture)
+		protected abstract Symbol executeParserRule(GprGrammarFixture fixture)
 				throws RecognitionException;
 	}
 
-	private Fixture fixture;
+	private void commonCreateFixture() {
+		this.fixture = new GprGrammarFixture();
+		this.fixture.loader = new GprLoaderStub();
+	}
 
 	private void createFixture(String testString) {
 		try {
-			this.fixture = new Fixture();
+			this.commonCreateFixture();
 			this.fixture.lexer = GprGrammarTestUtils.CreateLexer(testString);
-			this.fixture.loader = new GprLoaderStub();
 			this.fixture.parser = GprGrammarTestUtils.CreateParser(
 					this.fixture.lexer, this.fixture.loader);
 		} catch (IOException e) {
@@ -133,7 +129,7 @@ public class GprGrammarTest {
 		SimpleParserRuleChecker emptyDecChecker = new SimpleParserRuleChecker() {
 
 			@Override
-			protected void executeParserRule(Fixture fixture)
+			protected void executeParserRule(GprGrammarFixture fixture)
 					throws RecognitionException {
 				fixture.parser.empty_declaration();
 			}
@@ -150,12 +146,11 @@ public class GprGrammarTest {
 		assertFalse("Missing semicolon", isEmptyDeclaration("null"));
 	}
 
-	private boolean isExpressionIdentified(String input,
-			Symbol expectedSymbol) {
+	private boolean isExpressionIdentified(String input, Symbol expectedSymbol) {
 		SymbolParserRuleChecker expressionChecker = new SymbolParserRuleChecker() {
 
 			@Override
-			protected Symbol executeParserRule(Fixture fixture)
+			protected Symbol executeParserRule(GprGrammarFixture fixture)
 					throws RecognitionException {
 				return fixture.parser.expression();
 			}
@@ -196,7 +191,7 @@ public class GprGrammarTest {
 		SimpleParserRuleChecker varDec = new SimpleParserRuleChecker() {
 
 			@Override
-			public void executeParserRule(Fixture fixture)
+			public void executeParserRule(GprGrammarFixture fixture)
 					throws RecognitionException {
 				fixture.parser.variable_declaration();
 
@@ -215,10 +210,10 @@ public class GprGrammarTest {
 		assertTrue(isVariableDeclaration("Save_Name := \"name\" & \".saved\";"));
 
 		assertFalse(this.isVariableDeclaration("variable = \"missing_colon\";"));
-		assertFalse(this.isVariableDeclaration(
-				"variable := \"missing_semicolon\""));
-		assertFalse(this.isVariableDeclaration(
-				"typed_variable : type := \"GNU/Linux\";"));
+		assertFalse(this
+				.isVariableDeclaration("variable := \"missing_semicolon\""));
+		assertFalse(this
+				.isVariableDeclaration("typed_variable : type := \"GNU/Linux\";"));
 	}
 
 	private boolean isTypedVariableDeclarationIdentified(String input) {
@@ -226,41 +221,38 @@ public class GprGrammarTest {
 		SimpleParserRuleChecker typedVariableDec = new SimpleParserRuleChecker() {
 
 			@Override
-			protected void executeParserRule(Fixture fixture)
+			protected void executeParserRule(GprGrammarFixture fixture)
 					throws RecognitionException {
 				fixture.parser.typed_variable_declaration();
 			}
 		};
 
-		return this.doesInputComplyWithParserRuleChecker(input, typedVariableDec);
+		return this.doesInputComplyWithParserRuleChecker(input,
+				typedVariableDec);
 	}
 
 	@Test
 	public void testTypedVariableDeclaration() {
-		assertTrue(isTypedVariableDeclarationIdentified(
-				"That_OS : OS := \"GNU/Linux\";"));
+		assertTrue(isTypedVariableDeclarationIdentified("That_OS : OS := \"GNU/Linux\";"));
 
-		assertTrue(isTypedVariableDeclarationIdentified(
-				"This_OS : OS := external (\"OS\");"));
+		assertTrue(isTypedVariableDeclarationIdentified("This_OS : OS := external (\"OS\");"));
 
-		assertFalse(isTypedVariableDeclarationIdentified(
-				"That_OS : OS := \"Missing_Semicolon\""));
-		assertFalse(isTypedVariableDeclarationIdentified(
-				"Untyped_variable := \"GNU/Linux\";"));
+		assertFalse(isTypedVariableDeclarationIdentified("That_OS : OS := \"Missing_Semicolon\""));
+		assertFalse(isTypedVariableDeclarationIdentified("Untyped_variable := \"GNU/Linux\";"));
 	}
 
-	private boolean isStringListIdentified(String input,
-			Symbol expectedSymbol) {
+	private boolean isStringListIdentified(String input, Symbol expectedSymbol) {
 		SymbolParserRuleChecker stringListChecker = new SymbolParserRuleChecker() {
 
 			@Override
-			protected Symbol executeParserRule(Fixture fixture)
+			protected Symbol executeParserRule(GprGrammarFixture fixture)
 					throws RecognitionException {
 				return fixture.parser.string_list();
 			}
 		};
 
-		return this.doesInputComplyWithParserRuleChecker(input, stringListChecker, expectedSymbol);
+		return this.doesInputComplyWithParserRuleChecker(input,
+				stringListChecker, expectedSymbol);
 	}
 
 	@Test
@@ -279,22 +271,23 @@ public class GprGrammarTest {
 				"(\"First\", \"Second\", \"Third\"))",
 				Symbol.CreateStringList(expStringList)));
 
-		assertFalse(this.isStringListIdentified(
-				"(\"Missing\" \"comma\")", Symbol.CreateString("")));
+		assertFalse(this.isStringListIdentified("(\"Missing\" \"comma\")",
+				Symbol.CreateString("")));
 	}
 
 	private boolean isAttributeDeclaration(String input) {
 		SimpleParserRuleChecker attributeDecChecker = new SimpleParserRuleChecker() {
 
 			@Override
-			public void executeParserRule(Fixture fixture)
+			public void executeParserRule(GprGrammarFixture fixture)
 					throws RecognitionException {
 				fixture.parser.attribute_declaration();
 
 			}
 		};
 
-		return this.doesInputComplyWithParserRuleChecker(input, attributeDecChecker);
+		return this.doesInputComplyWithParserRuleChecker(input,
+				attributeDecChecker);
 	}
 
 	@Test
@@ -316,14 +309,15 @@ public class GprGrammarTest {
 		SimpleParserRuleChecker attributeRefChecker = new SimpleParserRuleChecker() {
 
 			@Override
-			public void executeParserRule(Fixture fixture)
+			public void executeParserRule(GprGrammarFixture fixture)
 					throws RecognitionException {
 				fixture.parser.attribute_reference();
 
 			}
 		};
 
-		return this.doesInputComplyWithParserRuleChecker(input, attributeRefChecker);
+		return this.doesInputComplyWithParserRuleChecker(input,
+				attributeRefChecker);
 	}
 
 	@Test
@@ -340,14 +334,15 @@ public class GprGrammarTest {
 		SimpleParserRuleChecker projectDecChecker = new SimpleParserRuleChecker() {
 
 			@Override
-			public void executeParserRule(Fixture fixture)
+			public void executeParserRule(GprGrammarFixture fixture)
 					throws RecognitionException {
 				fixture.parser.project_declaration();
 
 			}
 		};
 
-		return this.doesInputComplyWithParserRuleChecker(input, projectDecChecker);
+		return this.doesInputComplyWithParserRuleChecker(input,
+				projectDecChecker);
 	}
 
 	@Test
@@ -360,24 +355,153 @@ public class GprGrammarTest {
 		assertFalse(isProjectDeclaration("project My_Proj is	my_var : my_type := \"Value\"; my_var : my_type := \"New_Value\"; end My_Proj;"));
 	}
 
-	// @Test
-	// public void testExternalValue() {
-	// assertTrue(this.isExternalValue("external (\"Variable\")",
-	// Symbol.CreateString("Variable"));
-	// assertTrue(this.isExternalValue("external (\"Variable\", \"Default_Value\")",
-	// Symbol.CreateString("Variable"));
-	// }
+	@Test
+	public void testExternalValue() {
+		assertTrue(this.isExternalValue("external (\"Variable\")"));
 
-	// private boolean isExternalValue(String string, Symbol expectedSymbol) {
-	// Symbol ruleReturn;
-	// ParserRuleRunner externalValue = new ParserRuleRunner() {
-	//
-	// @Override
-	// protected void executeParserRule(Fixture fixture)
-	// throws RecognitionException {
-	// fixture.parser.external_value();
-	//
-	// }
-	// };
-	// }
+		assertTrue(this
+				.isExternalValue("external (\"Variable\", \"Default_Value\")"));
+	}
+
+	private boolean isExternalValue(String input) {
+		SimpleParserRuleChecker externalValueChecker = new SimpleParserRuleChecker() {
+
+			@Override
+			protected void executeParserRule(GprGrammarFixture fixture)
+					throws RecognitionException {
+				fixture.parser.external_value();
+			}
+		};
+
+		return this.doesInputComplyWithParserRuleChecker(input,
+				externalValueChecker);
+	}
+
+	@Test
+	public void testWithClause() {
+		assertTrue(this.isWithClause("with \"../../my_project.gpr\";"));
+		assertTrue(this
+				.isWithClause("with \"..\\..\\my_project_windows.gpr\", \"../my_project_linux.gpr\";"));
+
+		assertFalse(this.isWithClause("with \"../../missing_semicolon.gpr\""));
+	}
+
+	private boolean isWithClause(String input) {
+		SimpleParserRuleChecker withClauseChecker = new SimpleParserRuleChecker() {
+
+			@Override
+			protected void executeParserRule(GprGrammarFixture fixture)
+					throws RecognitionException {
+				fixture.parser.with_clause();
+			}
+		};
+
+		return this.doesInputComplyWithParserRuleChecker(input,
+				withClauseChecker);
+	}
+
+	@Test
+	public void testContextClause() {
+		assertTrue(this.isContextClause("\"\""));
+		assertTrue(this
+				.isContextClause("with \"../../my_project.gpr\"; with \"..\\..\\my_project_windows.gpr\";"));
+	}
+
+	private boolean isContextClause(String input) {
+		SimpleParserRuleChecker ctxtClauseChecker = new SimpleParserRuleChecker() {
+
+			@Override
+			protected void executeParserRule(GprGrammarFixture fixture)
+					throws RecognitionException {
+				fixture.parser.context_clause();
+			}
+		};
+
+		return this.doesInputComplyWithParserRuleChecker(input,
+				ctxtClauseChecker);
+	}
+
+	@Test
+	public void testCaseStatement() {
+		assertTrue(isCaseStatement("case OS is "
+				+ "when \"GNU/Linux\" | \"Unix\" => for Switches (\"Ada\") use (\"-gnath\"); "
+				+ "when \"NT\" => for Switches (\"Ada\") use (\"-gnatP\"); "
+				+ "when others => null; " + "end case;"));
+
+		assertFalse(isCaseStatement("case OS is"
+				+ " when \"GNU/Linux\" | \"Unix\" => for Switches (\"Ada\") use (\"-gnath\");"
+				+ "when \"NT\" => for Switches (\"Ada\") use (\"-gnatP\"); "
+				+ "when others => null; " + "end;"));
+	}
+
+	private boolean isCaseStatement(String input) {
+		SimpleParserRuleChecker caseStmtChecker = new SimpleParserRuleChecker() {
+
+			@Override
+			protected void executeParserRule(GprGrammarFixture fixture)
+					throws RecognitionException {
+				fixture.parser.case_statement();
+			}
+		};
+
+		return this
+				.doesInputComplyWithParserRuleChecker(input, caseStmtChecker);
+	}
+
+	@Test
+	public void testTypedStringDeclaration() {
+		assertTrue(isTypedStringDeclaration("type OS is (\"NT\", \"nt\", \"Unix\", \"GNU/Linux\", \"other OS\");"));
+	}
+
+	private boolean isTypedStringDeclaration(String input) {
+		SimpleParserRuleChecker typedStringDecChecker = new SimpleParserRuleChecker() {
+
+			@Override
+			protected void executeParserRule(GprGrammarFixture fixture)
+					throws RecognitionException {
+				fixture.parser.typed_string_declaration();
+			}
+		};
+
+		return this.doesInputComplyWithParserRuleChecker(input,
+				typedStringDecChecker);
+	}
+
+	@Test
+	public void testPackageDeclaration() {
+		assertTrue(isPackageDeclaration("package Compiler renames Logging.Compiler;"));
+	}
+
+	private boolean isPackageDeclaration(String input) {
+		SimpleParserRuleChecker packageDecChecker = new SimpleParserRuleChecker() {
+
+			@Override
+			protected void executeParserRule(GprGrammarFixture fixture)
+					throws RecognitionException {
+				fixture.parser.package_declaration();
+			}
+		};
+
+		return this.doesInputComplyWithParserRuleChecker(input,
+				packageDecChecker);
+	}
+
+	@Test
+	public void testProject() {
+		assertTrue(isProject("with \"../../included.gpr\"; project My_Project is end My_Project;"));
+	}
+
+	private boolean isProject(String input) {
+		SimpleParserRuleChecker projectChecker = new SimpleParserRuleChecker() {
+
+			@Override
+			protected void executeParserRule(GprGrammarFixture fixture)
+					throws RecognitionException {
+				fixture.parser.project();
+
+			}
+		};
+
+		return this.doesInputComplyWithParserRuleChecker(input, projectChecker);
+	}
 }
