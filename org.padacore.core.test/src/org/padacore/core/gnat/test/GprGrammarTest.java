@@ -7,16 +7,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.antlr.runtime.ANTLRStringStream;
-import org.antlr.runtime.CharStream;
-import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
-import org.eclipse.core.runtime.Path;
 import org.junit.Test;
 import org.padacore.core.gnat.GprLexer;
 import org.padacore.core.gnat.GprLoader;
 import org.padacore.core.gnat.GprParser;
 import org.padacore.core.gnat.Symbol;
+import org.padacore.core.test.stubs.GprLoaderStub;
 
 public class GprGrammarTest {
 
@@ -26,148 +23,163 @@ public class GprGrammarTest {
 		public GprLoader loader;
 	}
 
+	private boolean doesInputComplyWithParserRuleChecker(String input,
+			SimpleParserRuleChecker ruleChecker) {
+		this.createFixture(input);
+
+		return ruleChecker.isInputRecognizedByParserRule(this.fixture);
+	}
+
+	private boolean doesInputComplyWithParserRuleChecker(String input,
+			SymbolParserRuleChecker ruleChecker, Symbol expectedSymbol) {
+		this.createFixture(input);
+
+		return ruleChecker.isInputRecognizedByParserRule(this.fixture,
+				expectedSymbol);
+	}
+
+	private abstract class SimpleParserRuleChecker {
+
+		private boolean isInputRecognizedByParserRule(Fixture fixture) {
+			try {
+				this.executeParserRule(fixture);
+			} catch (RecognitionException e) {
+				e.printStackTrace();
+			}
+
+			return GprGrammarTestUtils.NoRecognitionExceptionOccurred(
+					fixture.parser, fixture.lexer);
+		}
+
+		protected abstract void executeParserRule(Fixture fixture)
+				throws RecognitionException;
+	}
+
+	private abstract class SymbolParserRuleChecker {
+
+		private boolean areSymbolsIdentical(Symbol left, Symbol right) {
+			boolean areEqual;
+
+			if (left.isAString() && right.isAString()) {
+				areEqual = left.getAsString().equals(right.getAsString());
+			} else {
+				areEqual = !left.isAString()
+						&& !right.isAString()
+						&& left.getAsStringList().equals(
+								right.getAsStringList());
+			}
+
+			return areEqual;
+		}
+
+		private boolean isInputRecognizedByParserRule(Fixture fixture,
+				Symbol expectedSymbol) {
+			Symbol result = null;
+
+			try {
+				result = this.executeParserRule(fixture);
+			} catch (RecognitionException e) {
+				e.printStackTrace();
+			}
+
+			return GprGrammarTestUtils.NoRecognitionExceptionOccurred(
+					fixture.parser, fixture.lexer)
+					&& this.areSymbolsIdentical(result, expectedSymbol);
+		}
+
+		protected abstract Symbol executeParserRule(Fixture fixture)
+				throws RecognitionException;
+	}
+
 	private Fixture fixture;
 
-	public void createFixture(String testString) {
+	private void createFixture(String testString) {
 		try {
 			this.fixture = new Fixture();
-			this.fixture.lexer = this.createLexer(testString);
-			this.fixture.loader = new GprLoader(new Path("toto.gpr"));
-			this.fixture.parser = this.createParser(this.fixture.lexer,
-					this.fixture.loader);
+			this.fixture.lexer = GprGrammarTestUtils.CreateLexer(testString);
+			this.fixture.loader = new GprLoaderStub();
+			this.fixture.parser = GprGrammarTestUtils.CreateParser(
+					this.fixture.lexer, this.fixture.loader);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	private interface ParserRuleRunner {
-		public void executeParserRule(Fixture fixture) throws RecognitionException;
-	}
-
-	private GprParser createParser(GprLexer lexer, GprLoader loader)
-			throws IOException {
-		CommonTokenStream tokens = new CommonTokenStream(lexer);
-		GprParser parser = new GprParser(loader, tokens);
-
-		return parser;
-	}
-
-	private GprLexer createLexer(String testString) throws IOException {
-		CharStream stream = new ANTLRStringStream(testString);
-		GprLexer lexer = new GprLexer(stream);
-
-		return lexer;
-	}
-
-	private boolean noRecognitionExceptionOccurred(GprParser parser,
-			GprLexer lexer) {
-		return parser.getExceptions().isEmpty()
-				&& lexer.getExceptions().isEmpty();
-	}
-
-	private boolean isNameCorrectlyIdentified(String inputName) {
+	private boolean isNameIdentified(String inputName) {
 		GprParser.name_return ruleReturn = new GprParser.name_return();
 		this.createFixture(inputName);
 
 		try {
 			ruleReturn = this.fixture.parser.name();
-
 		} catch (RecognitionException e) {
 
 		}
 
-		return this.noRecognitionExceptionOccurred(this.fixture.parser,
-				this.fixture.lexer) && ruleReturn.result.equals(inputName);
-	}
-
-	private boolean isInputRecognizedByParserRule(String input,
-			ParserRuleRunner rule) {
-		this.createFixture(input);
-		try {
-			rule.executeParserRule(this.fixture);
-		} catch (RecognitionException e) {
-			e.printStackTrace();
-		}
-
-		return this.noRecognitionExceptionOccurred(this.fixture.parser,
-				this.fixture.lexer);
+		return GprGrammarTestUtils.NoRecognitionExceptionOccurred(
+				this.fixture.parser, this.fixture.lexer)
+				&& ruleReturn.result.equals(inputName);
 	}
 
 	@Test
 	public void testName() {
-		assertTrue(isNameCorrectlyIdentified("simple_identifier"));
-		assertTrue(isNameCorrectlyIdentified("one_level.identifier"));
-		assertTrue(isNameCorrectlyIdentified("two.levels.identifier"));
+		assertTrue(isNameIdentified("simple_identifier"));
+		assertTrue(isNameIdentified("one_level.identifier"));
+		assertTrue(isNameIdentified("two.levels.identifier"));
 
-		assertFalse(isNameCorrectlyIdentified("two__nextToEachOther"));
+		assertFalse(isNameIdentified("two__nextToEachOther"));
 	}
 
-	private boolean isEmptyDeclarationCorrectlyIdentified(String inputEmptyDec) {
-		return this.isInputRecognizedByParserRule(inputEmptyDec,
-				new ParserRuleRunner() {
+	private boolean isEmptyDeclaration(String input) {
+		SimpleParserRuleChecker emptyDecChecker = new SimpleParserRuleChecker() {
 
-					@Override
-					public void executeParserRule(Fixture fixture)
-							throws RecognitionException {
-						fixture.parser.empty_declaration();
-					}
-				});
-	}
+			@Override
+			protected void executeParserRule(Fixture fixture)
+					throws RecognitionException {
+				fixture.parser.empty_declaration();
+			}
+		};
 
-	private boolean areSymbolsIdentical(Symbol left, Symbol right) {
-		boolean areEqual;
+		return this
+				.doesInputComplyWithParserRuleChecker(input, emptyDecChecker);
 
-		if (left.isAString() && right.isAString()) {
-			areEqual = left.getAsString().equals(right.getAsString());
-		} else {
-			areEqual = !left.isAString() && !right.isAString()
-					&& left.getAsStringList().equals(right.getAsStringList());
-		}
-
-		return areEqual;
 	}
 
 	@Test
 	public void testEmptyDeclaration() {
-		assertTrue(isEmptyDeclarationCorrectlyIdentified("null;"));
-		assertFalse("Missing semicolon",
-				isEmptyDeclarationCorrectlyIdentified("null"));
+		assertTrue(isEmptyDeclaration("null;"));
+		assertFalse("Missing semicolon", isEmptyDeclaration("null"));
 	}
 
-	private boolean isExpressionCorrectlyIdentified(String inputExpr,
+	private boolean isExpressionIdentified(String input,
 			Symbol expectedSymbol) {
-		this.createFixture(inputExpr);
+		SymbolParserRuleChecker expressionChecker = new SymbolParserRuleChecker() {
 
-		Symbol ruleResult = null;
-		boolean exprIsCorrect = false;
+			@Override
+			protected Symbol executeParserRule(Fixture fixture)
+					throws RecognitionException {
+				return fixture.parser.expression();
+			}
+		};
 
-		try {
-			ruleResult = this.fixture.parser.expression();
-
-			exprIsCorrect = this.noRecognitionExceptionOccurred(
-					this.fixture.parser, this.fixture.lexer)
-					&& this.areSymbolsIdentical(ruleResult, expectedSymbol);
-		} catch (RecognitionException e) {
-			e.printStackTrace();
-		}
-		return exprIsCorrect;
+		return this.doesInputComplyWithParserRuleChecker(input,
+				expressionChecker, expectedSymbol);
 	}
 
 	@Test
 	public void testExpression() {
-		assertTrue(isExpressionCorrectlyIdentified("\"simple_string\"",
+		assertTrue(isExpressionIdentified("\"simple_string\"",
 				Symbol.CreateString("simple_string")));
 
 		assertTrue(
 				"String & string",
-				isExpressionCorrectlyIdentified("\"string\" & \"string\"",
+				isExpressionIdentified("\"string\" & \"string\"",
 						Symbol.CreateString("stringstring")));
 
 		List<String> expStringList = new ArrayList<String>();
 		expStringList.add("File_Name");
 		assertTrue(
 				"List & string",
-				isExpressionCorrectlyIdentified("() & \"File_Name\"",
+				isExpressionIdentified("() & \"File_Name\"",
 						Symbol.CreateStringList(expStringList)));
 
 		expStringList.clear();
@@ -175,126 +187,87 @@ public class GprGrammarTest {
 		expStringList.add("File_Name.orig");
 		assertTrue(
 				"List & list",
-				isExpressionCorrectlyIdentified(
+				isExpressionIdentified(
 						"() & \"File_Name\" & (\"File_Name\" & \".orig\")",
 						Symbol.CreateStringList(expStringList)));
 	}
 
-	private boolean isVariableDeclarationCorrectlyIdentified(
-			String inputVarDec, String expectedVarName, Symbol expectedSymbol) {
-		this.createFixture(inputVarDec);
-
-		try {
-			this.fixture.parser.variable_declaration();
-
-		} catch (RecognitionException e) {
-			e.printStackTrace();
-		}
-
-		return this.noRecognitionExceptionOccurred(this.fixture.parser,
-				this.fixture.lexer)
-				&& this.areSymbolsIdentical(
-						this.fixture.loader.getVariable(expectedVarName),
-						expectedSymbol);
-	}
-
-	@Test
-	public void testVariableDeclaration() {
-		assertTrue(isVariableDeclarationCorrectlyIdentified(
-				"That_Os := \"GNU/Linux\";", "That_Os",
-				Symbol.CreateString("GNU/Linux")));
-
-		assertTrue(isVariableDeclarationCorrectlyIdentified(
-				"Name := \"readme.txt\";", "Name",
-				Symbol.CreateString("readme.txt")));
-
-		assertTrue(isVariableDeclarationCorrectlyIdentified(
-				"Save_Name := \"name\" & \".saved\";", "Save_Name",
-				Symbol.CreateString("name.saved")));
-
-		ParserRuleRunner varDec = new ParserRuleRunner() {
+	private boolean isVariableDeclaration(String input) {
+		SimpleParserRuleChecker varDec = new SimpleParserRuleChecker() {
 
 			@Override
 			public void executeParserRule(Fixture fixture)
 					throws RecognitionException {
 				fixture.parser.variable_declaration();
+
 			}
 		};
 
-		assertFalse(this.isInputRecognizedByParserRule(
-				"variable = \"missing_colon\";", varDec));
-		assertFalse(this.isInputRecognizedByParserRule(
-				"variable := \"missing_semicolon\"", varDec));
-		assertFalse(this.isInputRecognizedByParserRule(
-				"typed_variable : type := \"GNU/Linux\";", varDec));
-	}
-
-	private boolean isTypedVariableDeclarationCorrectlyIdentified(
-			String inputTypedVarDec, String expectedVarName,
-			Symbol expectedSymbol) {
-		this.createFixture(inputTypedVarDec);
-
-		try {
-			this.fixture.parser.typed_variable_declaration();
-
-		} catch (RecognitionException e) {
-			e.printStackTrace();
-		}
-
-		return this.noRecognitionExceptionOccurred(this.fixture.parser,
-				this.fixture.lexer)
-				&& this.areSymbolsIdentical(
-						this.fixture.loader.getVariable(expectedVarName),
-						expectedSymbol);
+		return this.doesInputComplyWithParserRuleChecker(input, varDec);
 	}
 
 	@Test
-	public void testTypedVariableDeclaration() {
-		assertTrue(isTypedVariableDeclarationCorrectlyIdentified(
-				"That_OS : OS := \"GNU/Linux\";", "That_OS",
-				Symbol.CreateString("GNU/Linux")));
+	public void testVariableDeclaration() {
+		assertTrue(isVariableDeclaration("That_Os := \"GNU/Linux\";"));
 
-		assertTrue(isTypedVariableDeclarationCorrectlyIdentified(
-				"This_OS : OS := external (\"OS\");", "This_OS",
-				Symbol.CreateString("OS")));
+		assertTrue(isVariableDeclaration("Name := \"readme.txt\";"));
 
-		ParserRuleRunner typedVariableDec = new ParserRuleRunner() {
+		assertTrue(isVariableDeclaration("Save_Name := \"name\" & \".saved\";"));
+
+		assertFalse(this.isVariableDeclaration("variable = \"missing_colon\";"));
+		assertFalse(this.isVariableDeclaration(
+				"variable := \"missing_semicolon\""));
+		assertFalse(this.isVariableDeclaration(
+				"typed_variable : type := \"GNU/Linux\";"));
+	}
+
+	private boolean isTypedVariableDeclarationIdentified(String input) {
+
+		SimpleParserRuleChecker typedVariableDec = new SimpleParserRuleChecker() {
 
 			@Override
-			public void executeParserRule(Fixture fixture)
+			protected void executeParserRule(Fixture fixture)
 					throws RecognitionException {
 				fixture.parser.typed_variable_declaration();
 			}
 		};
 
-		assertFalse(this.isInputRecognizedByParserRule(
-				"That_OS : OS := \"Missing_Semicolon\"", typedVariableDec));
-		assertFalse(this.isInputRecognizedByParserRule(
-				"Untyped_variable := \"GNU/Linux\";", typedVariableDec));
+		return this.doesInputComplyWithParserRuleChecker(input, typedVariableDec);
 	}
 
-	private boolean isStringListCorrectlyIdentified(String inputStringList,
+	@Test
+	public void testTypedVariableDeclaration() {
+		assertTrue(isTypedVariableDeclarationIdentified(
+				"That_OS : OS := \"GNU/Linux\";"));
+
+		assertTrue(isTypedVariableDeclarationIdentified(
+				"This_OS : OS := external (\"OS\");"));
+
+		assertFalse(isTypedVariableDeclarationIdentified(
+				"That_OS : OS := \"Missing_Semicolon\""));
+		assertFalse(isTypedVariableDeclarationIdentified(
+				"Untyped_variable := \"GNU/Linux\";"));
+	}
+
+	private boolean isStringListIdentified(String input,
 			Symbol expectedSymbol) {
-		this.createFixture(inputStringList);
-		Symbol ruleReturn = null;
+		SymbolParserRuleChecker stringListChecker = new SymbolParserRuleChecker() {
 
-		try {
-			ruleReturn = this.fixture.parser.string_list();
+			@Override
+			protected Symbol executeParserRule(Fixture fixture)
+					throws RecognitionException {
+				return fixture.parser.string_list();
+			}
+		};
 
-		} catch (RecognitionException e) {
-			e.printStackTrace();
-		}
-
-		return this.noRecognitionExceptionOccurred(this.fixture.parser,
-				this.fixture.lexer)
-				&& this.areSymbolsIdentical(ruleReturn, expectedSymbol);
+		return this.doesInputComplyWithParserRuleChecker(input, stringListChecker, expectedSymbol);
 	}
 
 	@Test
 	public void testStringList() {
 		List<String> expStringList = new ArrayList<String>();
 		expStringList.add("One_Element");
-		assertTrue(this.isStringListCorrectlyIdentified("(\"One_Element\")",
+		assertTrue(this.isStringListIdentified("(\"One_Element\")",
 				Symbol.CreateStringList(expStringList)));
 
 		expStringList.clear();
@@ -302,20 +275,109 @@ public class GprGrammarTest {
 		expStringList.add("Second");
 		expStringList.add("Third");
 
-		assertTrue(this.isStringListCorrectlyIdentified(
+		assertTrue(this.isStringListIdentified(
 				"(\"First\", \"Second\", \"Third\"))",
 				Symbol.CreateStringList(expStringList)));
 
-		ParserRuleRunner string_List = new ParserRuleRunner() {
+		assertFalse(this.isStringListIdentified(
+				"(\"Missing\" \"comma\")", Symbol.CreateString("")));
+	}
+
+	private boolean isAttributeDeclaration(String input) {
+		SimpleParserRuleChecker attributeDecChecker = new SimpleParserRuleChecker() {
 
 			@Override
 			public void executeParserRule(Fixture fixture)
 					throws RecognitionException {
-				fixture.parser.string_list();
+				fixture.parser.attribute_declaration();
+
 			}
 		};
 
-		assertFalse(isInputRecognizedByParserRule("(\"Missing\" \"comma\")",
-				string_List));
+		return this.doesInputComplyWithParserRuleChecker(input, attributeDecChecker);
 	}
+
+	@Test
+	public void testAttributeDeclarationWithSimpleAttributes() {
+
+		assertTrue(isAttributeDeclaration("for Object_Dir use \"objects\";"));
+		assertTrue(isAttributeDeclaration("for Source_Dirs use (\"units\", \"test/drivers\");)"));
+	}
+
+	@Test
+	public void testAttributeDeclarationWithIndexedAttributes() {
+		assertTrue(isAttributeDeclaration("for Body (\"main\") use \"Main.ada\";"));
+		assertTrue(isAttributeDeclaration("for Switches (\"main.ada\") use (\"-v\", \"-gnatv\");"));
+		assertTrue(isAttributeDeclaration("for Switches (\"main.ada\") use Builder'Switches (\"main.ada\") & \"-g\";"));
+		assertTrue(isAttributeDeclaration("for Default_Switches use Default.Builder'Default_Switches;"));
+	}
+
+	private boolean isAttributeReference(String input) {
+		SimpleParserRuleChecker attributeRefChecker = new SimpleParserRuleChecker() {
+
+			@Override
+			public void executeParserRule(Fixture fixture)
+					throws RecognitionException {
+				fixture.parser.attribute_reference();
+
+			}
+		};
+
+		return this.doesInputComplyWithParserRuleChecker(input, attributeRefChecker);
+	}
+
+	@Test
+	public void testAttributeReference() {
+		assertTrue(this.isAttributeReference("project'Object_Dir"));
+		assertTrue(this.isAttributeReference("Naming'Dot_Replacement"));
+		assertTrue(this.isAttributeReference("Imported_Project'Source_Dirs"));
+		assertTrue(this.isAttributeReference("Imported_Project.Naming'Casing"));
+		assertTrue(this
+				.isAttributeReference("Builder'Default_Switches (\"Ada\")"));
+	}
+
+	private boolean isProjectDeclaration(String input) {
+		SimpleParserRuleChecker projectDecChecker = new SimpleParserRuleChecker() {
+
+			@Override
+			public void executeParserRule(Fixture fixture)
+					throws RecognitionException {
+				fixture.parser.project_declaration();
+
+			}
+		};
+
+		return this.doesInputComplyWithParserRuleChecker(input, projectDecChecker);
+	}
+
+	@Test
+	public void testProjectDeclaration() {
+		assertTrue(isProjectDeclaration("project Empty is    \n\r  end Empty;"));
+
+		assertFalse(isProjectDeclaration("project Missing_Semicolon is end Missing_Semicolon"));
+		assertFalse(isProjectDeclaration("project Missing_End is Missing_End;"));
+		assertFalse(isProjectDeclaration("project First_Name is	end Second_Name;"));
+		assertFalse(isProjectDeclaration("project My_Proj is	my_var : my_type := \"Value\"; my_var : my_type := \"New_Value\"; end My_Proj;"));
+	}
+
+	// @Test
+	// public void testExternalValue() {
+	// assertTrue(this.isExternalValue("external (\"Variable\")",
+	// Symbol.CreateString("Variable"));
+	// assertTrue(this.isExternalValue("external (\"Variable\", \"Default_Value\")",
+	// Symbol.CreateString("Variable"));
+	// }
+
+	// private boolean isExternalValue(String string, Symbol expectedSymbol) {
+	// Symbol ruleReturn;
+	// ParserRuleRunner externalValue = new ParserRuleRunner() {
+	//
+	// @Override
+	// protected void executeParserRule(Fixture fixture)
+	// throws RecognitionException {
+	// fixture.parser.external_value();
+	//
+	// }
+	// };
+	// }
 }

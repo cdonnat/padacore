@@ -152,12 +152,13 @@ public class GprLoader {
 		qualifiedContextName = qualifiedContextName.toLowerCase();
 		Context resultContext = null;
 
-		if(!qualifiedContextName.contains(".")) {
+		if (!qualifiedContextName.contains(".")) {
 			resultContext = this.getContextOfProject(qualifiedContextName);
 		} else {
 			String[] contextsNames = qualifiedContextName.split("\\.");
 			Context projectContext = this.getContextOfProject(contextsNames[0]);
-			resultContext = projectContext.getReferencedContextByName(contextsNames[1]);
+			resultContext = projectContext
+					.getReferencedContextByName(contextsNames[1]);
 		}
 
 		return resultContext;

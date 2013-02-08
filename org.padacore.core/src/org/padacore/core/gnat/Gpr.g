@@ -185,14 +185,8 @@ attribute_designator returns [String result]
  
  attribute_reference returns [Symbol result]
   :
-  attribute_prefix '\'' simple_name ('(' STRING_LITERAL ')' )? {
-  
-   Context context = $attribute_prefix.result;
-   String attributeName = $simple_name.text;
-   if($STRING_LITERAL.text !=null) {
-      attributeName += "(" + $STRING_LITERAL.text + ")";
-   }
-   result = context.getAttribute(attributeName); }
+  attribute_prefix '\'' simple_name ('(' STRING_LITERAL ')' )? 
+  { result = gprLoader.getAttribute($attribute_prefix.result + $simple_name.text); }
   ;
  
  attribute_prefix returns [Context result]

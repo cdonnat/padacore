@@ -84,43 +84,6 @@ COMMENT:
 "--Ada comment" OK
 "//Java comment" FAIL
 
-attribute_declaration :
-//simple attributes
-<<for Object_Dir use "objects";>> OK
-<<for Source_Dirs use ("units", "test/drivers");>> OK
-
-//indexed attributes
-<<for Body ("main") use "Main.ada";>> OK
-<<for Switches ("main.ada") use ("-v", "-gnatv");>> OK
-<<for Switches ("main.ada") use Builder'Switches ("main.ada") & "-g";>> OK
-
-// indexed attributes copy
-<<for Default_Switches use Default.Builder'Default_Switches;>> OK
-
-attribute_reference :
-<<project'Object_Dir>> OK
-<<Naming'Dot_Replacement>> OK
-<<Imported_Project'Source_Dirs>> OK
-<<Imported_Project.Naming'Casing>> OK
-<<Builder'Default_Switches ("Ada")>> OK
-
-
-external_value : 
-<<external ("Variable")>> OK
-<<external ("Variable", "Default_Value")>> OK
-
-project_declaration :
-"project Empty is    \n\r  end Empty;" OK
-
-"project Missing_Semicolon is end Missing_Semicolon" FAIL 
-"project Missing_End is Missing_End;" FAIL
-<<project First_Name is 
-end Second_Name;>> FAIL
-<<project My_Proj is
-my_var : my_type := "Value";
-my_var : my_type := "New_Value";
-end My_Proj;>> FAIL // multiple definitions for typed variable
-
 with_clause :
 <<with "../../my_project.gpr";>> OK
 <<with "..\..\my_project_windows.gpr", "../my_project_linux.gpr";>> OK
