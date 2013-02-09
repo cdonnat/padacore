@@ -63,7 +63,7 @@ public class GprLoaderStub extends GprLoader {
 	}
 
 	@Override
-	public Project getCurrentProjectInProgress() {
+	public Project getCurrentProject() {
 		return new Project(new Path("toto"));
 	}
 }
