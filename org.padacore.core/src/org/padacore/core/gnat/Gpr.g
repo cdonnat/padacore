@@ -44,7 +44,7 @@ package org.padacore.core.gnat;
 }
   
 project
-  : 
+  :  
   context_clause project_declaration EOF
   ;
 

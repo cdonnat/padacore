@@ -5,4 +5,3 @@ antlr-generated
 org.padacore.core/src/org/padacore/core/gnat/Gpr.tokens
 org.padacore.core/src/org/padacore/core/gnat/GprLexer.java
 org.padacore.core/src/org/padacore/core/gnat/GprParser.java
-org.padacore.antlr/.classpath
