@@ -2,6 +2,8 @@ package org.padacore.core;
 
 import java.util.List;
 
+import org.eclipse.core.runtime.IPath;
+
 public interface IAdaProject {
 
 	/**
@@ -21,23 +23,34 @@ public interface IAdaProject {
 	public abstract boolean isExecutable();
 
 	/**
-	 * Returns the absolute path of the directory in which executables will reside.
+	 * Returns the absolute path of the directory in which executables will
+	 * reside.
 	 * 
 	 * @return the absolute executable directory path of the project
 	 * 
 	 */
-	public abstract String getExecutableDirectoryPath();
-	
+	public abstract IPath getExecutableDirectoryPath();
+
 	/**
 	 * Returns the list of sources directory.
+	 * 
 	 * @return a list of String corresponding to the names of sources directory.
 	 */
 	public abstract List<String> getSourcesDir();
 
 	/**
-	 * Returns the absolute path of the directory in which object files will reside.
+	 * Returns the absolute path of the directory in which object files will
+	 * reside.
+	 * 
 	 * @return the absolute object directory path of the project.
 	 */
-	public abstract String getObjectDirectoryPath();
-	
+	public abstract IPath getObjectDirectoryPath();
+
+	/**
+	 * Returns the absolute path of the project root.
+	 * 
+	 * @return the absolute path of the project root.
+	 */
+	public abstract IPath getRootPath();
+
 }

@@ -27,17 +27,21 @@ import org.padacore.core.utils.ErrorLogger;
  * @author RS
  * 
  */
+//TODO refactor me!
 public class DerivedResourcesIdentifier implements IJobChangeListener {
 
 	private IProject builtProject;
 	private NonDerivedResourcesCollector projectResourcesBeforeBuild;
 	private Job cleaningJob;
+	private IAdaProject adaProjectForBuiltProject;
 
 	public DerivedResourcesIdentifier(IProject builtProject, Job cleaningJob) {
 		this.cleaningJob = cleaningJob;
 		this.builtProject = builtProject;
 		this.projectResourcesBeforeBuild = new NonDerivedResourcesCollector(
 				builtProject);
+		this.adaProjectForBuiltProject = AbstractAdaProjectAssociationManager
+				.GetAssociatedAdaProject(builtProject);
 	}
 
 	/**
@@ -55,16 +59,16 @@ public class DerivedResourcesIdentifier implements IJobChangeListener {
 		}
 	}
 
-	private IPath convertGprProjectPathToEclipseProjectPath(
-			IPath gprProjectRelativePath) {
+	private IPath convertAdaProjectPathToEclipseProjectPath(
+			IPath adaProjectRelativePath) {
 		IPath eclipseProjectPath;
 
 		if (this.isProjectAnImportedProject()) {
 			// TODO use the same name as GPR parent folder for linked folder
 			eclipseProjectPath = new Path("toto")
-					.append(gprProjectRelativePath);
+					.append(adaProjectRelativePath);
 		} else {
-			eclipseProjectPath = gprProjectRelativePath;
+			eclipseProjectPath = adaProjectRelativePath;
 		}
 
 		return eclipseProjectPath;
@@ -87,23 +91,29 @@ public class DerivedResourcesIdentifier implements IJobChangeListener {
 	}
 
 	/**
-	 * Adds the current directory to list if it not the current directory.
+	 * Adds the given directory to list if it not the current directory.
 	 * 
-	 * @param directory
-	 *            the directory to add in list.
+	 * @param absoluteDirectoryPath
+	 *            the absolute path of the directory to add in list.
 	 * @param directories
-	 *            the current list of directories.
+	 *            the list of directories in which element shall be added (as a
+	 *            path relative to the project root).
 	 */
-	private void addCurrentDirectoryToListIfItsNotCurrentDirectory(
-			String directory, List<String> directories) {
-		if (!directory.equals(".")) {
-			directories.add(directory);
+	private void addDirectoryPathToList(IPath absoluteDirectoryPath,
+			List<IPath> directories) {
+		IPath projectRoot = this.adaProjectForBuiltProject.getRootPath();
+		IPath relativeDirPath = absoluteDirectoryPath
+				.makeRelativeTo(projectRoot);
+
+		if (!relativeDirPath.isEmpty()) {
+			directories.add(relativeDirPath);
 		}
 	}
 
 	/**
-	 * Returns True if the project corresponds to an imported GNAT project,
-	 * False otherwise.
+	 * Returns True if the project corresponds to an imported project (i.e. a
+	 * project which does not reside in workspace but is linked to existing
+	 * folder), False otherwise.
 	 * 
 	 * @return
 	 */
@@ -121,16 +131,16 @@ public class DerivedResourcesIdentifier implements IJobChangeListener {
 	 * @return the converted project resource list.
 	 */
 	private List<IResource> convertDirectoryListToResourceList(
-			List<String> directoryList) {
+			List<IPath> directoryList) {
 
 		List<IResource> execAndObjectDirsAsResources = new ArrayList<IResource>(
 				directoryList.size());
 		IResource currentResource;
 
-		for (Iterator<String> dirIt = directoryList.iterator(); dirIt.hasNext();) {
+		for (Iterator<IPath> dirIt = directoryList.iterator(); dirIt.hasNext();) {
 			currentResource = this.builtProject
-					.getFolder(convertGprProjectPathToEclipseProjectPath(new Path(
-							dirIt.next())));
+					.getFolder(convertAdaProjectPathToEclipseProjectPath(dirIt
+							.next()));
 
 			execAndObjectDirsAsResources.add(currentResource);
 		}
@@ -145,21 +155,20 @@ public class DerivedResourcesIdentifier implements IJobChangeListener {
 	 * @return the list of executable and object directories which do not
 	 *         overlap with source directories.
 	 */
-	private List<String> buildListOfExecAndObjectDirsNotOverlappingWithSourceDirs() {
-		IAdaProject builtAdaProject = AbstractAdaProjectAssociationManager
-				.GetAssociatedAdaProject(this.builtProject);
-		List<String> execAndObjectDirs = new ArrayList<String>();
+	private List<IPath> buildListOfExecAndObjectDirsExcludingSourceDirs() {
+		List<IPath> execAndObjectDirs = new ArrayList<IPath>();
 
-		if (builtAdaProject.isExecutable()) {
-			this.addCurrentDirectoryToListIfItsNotCurrentDirectory(
-					builtAdaProject.getExecutableDirectoryPath(),
+		if (this.adaProjectForBuiltProject.isExecutable()) {
+			this.addDirectoryPathToList(
+					this.adaProjectForBuiltProject.getExecutableDirectoryPath(),
 					execAndObjectDirs);
 		}
-		this.addCurrentDirectoryToListIfItsNotCurrentDirectory(
-				builtAdaProject.getObjectDirectoryPath(), execAndObjectDirs);
+		this.addDirectoryPathToList(
+				this.adaProjectForBuiltProject.getObjectDirectoryPath(),
+				execAndObjectDirs);
 
-		for (Iterator<String> sourceDirIt = builtAdaProject.getSourcesDir()
-				.iterator(); sourceDirIt.hasNext();) {
+		for (Iterator<String> sourceDirIt = this.adaProjectForBuiltProject
+				.getSourcesDir().iterator(); sourceDirIt.hasNext();) {
 			String sourceDir = sourceDirIt.next();
 			execAndObjectDirs.remove(sourceDir);
 		}
@@ -172,8 +181,8 @@ public class DerivedResourcesIdentifier implements IJobChangeListener {
 	 */
 	private void markExecAndObjectDirsAsDerived() {
 
-		List<String> execAndObjectDirs = this
-				.buildListOfExecAndObjectDirsNotOverlappingWithSourceDirs();
+		List<IPath> execAndObjectDirs = this
+				.buildListOfExecAndObjectDirsExcludingSourceDirs();
 		List<IResource> execAndObjectDirsAsResources = this
 				.convertDirectoryListToResourceList(execAndObjectDirs);
 

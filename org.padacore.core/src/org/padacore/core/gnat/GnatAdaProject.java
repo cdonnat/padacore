@@ -16,7 +16,7 @@ public class GnatAdaProject implements IAdaProject {
 
 	@Override
 	public List<String> getExecutableNames() {
-		Assert.isTrue(this.isExecutable());
+		Assert.isLegal(this.isExecutable());
 
 		List<String> execNames = new ArrayList<String>(this.gprProject
 				.getExecutableSourceNames().size());
@@ -41,7 +41,7 @@ public class GnatAdaProject implements IAdaProject {
 	}
 
 	@Override
-	public String getExecutableDirectoryPath() {
+	public IPath getExecutableDirectoryPath() {
 		Assert.isTrue(this.isExecutable());
 
 		String relativeExecDir = ".";
@@ -51,10 +51,10 @@ public class GnatAdaProject implements IAdaProject {
 		} else if (this.gprProject.getObjectDir() != null) {
 			relativeExecDir = this.gprProject.getObjectDir();
 		}
-		
+
 		IPath absoluteExecDir = this.convertToAbsolutePath(relativeExecDir);
 
-		return absoluteExecDir.toOSString();
+		return absoluteExecDir;
 	}
 
 	@Override
@@ -98,18 +98,31 @@ public class GnatAdaProject implements IAdaProject {
 	}
 
 	@Override
-	public String getObjectDirectoryPath() {
+	public IPath getObjectDirectoryPath() {
 		String relativeObjectDirectory = this.gprProject.getObjectDir();
-		
-		if(relativeObjectDirectory == null) {
+
+		if (relativeObjectDirectory == null) {
 			relativeObjectDirectory = ".";
 		}
-		IPath absoluteObjectDirectory = this.convertToAbsolutePath(relativeObjectDirectory);
+		IPath absoluteObjectDirectory = this
+				.convertToAbsolutePath(relativeObjectDirectory);
 
-		return absoluteObjectDirectory.toOSString();
+		return absoluteObjectDirectory;
 	}
-	
+
+	/**
+	 * Converts the given path relative to the project root to an absolute path.
+	 * 
+	 * @param projectRelativePath
+	 *            a path relative to the project root
+	 * @return an absolute path equivalent to given relative path.
+	 */
 	private IPath convertToAbsolutePath(String projectRelativePath) {
 		return this.gprProject.getRootDirPath().append(projectRelativePath);
+	}
+
+	@Override
+	public IPath getRootPath() {
+		return this.gprProject.getRootDirPath();
 	}
 }

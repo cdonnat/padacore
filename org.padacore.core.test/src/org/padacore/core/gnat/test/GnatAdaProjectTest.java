@@ -26,9 +26,10 @@ public class GnatAdaProjectTest {
 		this.gprProject = CommonTestUtils.CreateGprProject("test", true);
 		this.sut = new GnatAdaProject(this.gprProject);
 	}
-	
+
 	private static IPath GetAbsolutePathFor(String relativePath) {
-		return ResourcesPlugin.getWorkspace().getRoot().getLocation().append(relativePath);				
+		return ResourcesPlugin.getWorkspace().getRoot().getLocation()
+				.append(relativePath);
 	}
 
 	@Test
@@ -36,22 +37,28 @@ public class GnatAdaProjectTest {
 
 		this.gprProject.setExecutableDir(TEST_EXEC_DIR_NAME);
 
-		assertTrue("GPR project with exec dir", this.sut
-				.getExecutableDirectoryPath().equals(GetAbsolutePathFor(TEST_EXEC_DIR_NAME).toOSString()));
+		assertTrue(
+				"GPR project with exec dir",
+				this.sut.getExecutableDirectoryPath().equals(
+						GetAbsolutePathFor(TEST_EXEC_DIR_NAME).toOSString()));
 	}
 
 	@Test
 	public void testExeDirRetrievalWhenOnlyObjectDirIsSpecified() {
 		this.gprProject.setObjectDir(TEST_OBJ_DIR_NAME);
 
-		assertTrue("GPR project with object dir", this.sut
-				.getExecutableDirectoryPath().equals(GetAbsolutePathFor(TEST_OBJ_DIR_NAME).toOSString()));
+		assertTrue(
+				"GPR project with object dir",
+				this.sut.getExecutableDirectoryPath().equals(
+						GetAbsolutePathFor(TEST_OBJ_DIR_NAME).toOSString()));
 	}
 
 	@Test
 	public void testExecDirRetrievalWhenNeitherExecDirNorObjectDirAreSpecified() {
-		assertTrue("GPR project with neither exec nor object dir", this.sut
-				.getExecutableDirectoryPath().equals(GetAbsolutePathFor(".").toOSString()));
+		assertTrue(
+				"GPR project with neither exec nor object dir",
+				this.sut.getExecutableDirectoryPath().equals(
+						GetAbsolutePathFor(".").toOSString()));
 	}
 
 	@Test
@@ -87,22 +94,32 @@ public class GnatAdaProjectTest {
 				: "procedure");
 		assertTrue("Second executable name is correct", execNames.get(1)
 				.equals(secondExecNameExpected));
-		
-		String thirdExecNameExpected = (osIsWindows ? "no_extension.exe" : "no_extension");
-		assertTrue("Third executable name is correct", execNames.get(2)
-				.equals(thirdExecNameExpected));
+
+		String thirdExecNameExpected = (osIsWindows ? "no_extension.exe"
+				: "no_extension");
+		assertTrue("Third executable name is correct",
+				execNames.get(2).equals(thirdExecNameExpected));
 	}
 
 	@Test
 	public void testObjectDirRetrievalWhenNoObjectDirIsSpecified() {
-		assertTrue("Object directory is current directory", this.sut
-				.getObjectDirectoryPath().equals(GetAbsolutePathFor(".").toOSString()));
+		assertTrue(
+				"Object directory is current directory",
+				this.sut.getObjectDirectoryPath().equals(
+						GetAbsolutePathFor(".").toOSString()));
 	}
 
 	@Test
 	public void testObjectDirRetrievalWhenObjectDirIsSpecified() {
 		this.gprProject.setObjectDir(TEST_OBJ_DIR_NAME);
-		assertTrue("Object directory is TEST_OBJ_DIRECTORY", this.sut
-				.getObjectDirectoryPath().equals(GetAbsolutePathFor(TEST_OBJ_DIR_NAME).toOSString()));
+		assertTrue(
+				"Object directory is TEST_OBJ_DIRECTORY",
+				this.sut.getObjectDirectoryPath().equals(
+						GetAbsolutePathFor(TEST_OBJ_DIR_NAME).toOSString()));
+	}
+
+	@Test
+	public void testRootDirRetrieval() {
+		assertTrue(this.sut.getRootPath().equals(GetAbsolutePathFor(".")));
 	}
 }
