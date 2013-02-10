@@ -90,7 +90,7 @@ public class ProjectBuilder {
 			this.addAdaNature(project);
 			this.adaProjectAssociationManager.associateToAdaProject(project);
 		} catch (CoreException e) {
-			e.printStackTrace();
+			ErrorLogger.appendExceptionToErrorLog(e);
 		}
 
 		return project;
@@ -184,7 +184,7 @@ public class ProjectBuilder {
 								+ " project", IStatus.ERROR);
 			}
 		} catch (CoreException e) {
-			e.printStackTrace();
+			ErrorLogger.appendExceptionToErrorLog(e);
 		}
 	}
 
@@ -203,15 +203,17 @@ public class ProjectBuilder {
 	private void addMainProcedureIfRequired(String projectName, IPath location,
 			boolean addMainProcedure) {
 
+		IPath filePath = GetProjectPath(projectName, location).append(
+				new Path(IPath.SEPARATOR + DEFAULT_EXECUTABLE_NAME));
+
 		if (addMainProcedure) {
 			try {
-				FileUtils.CreateNewFileWithContents(
-						GetProjectPath(projectName, location).append(
-								new Path(IPath.SEPARATOR
-										+ DEFAULT_EXECUTABLE_NAME)),
+				FileUtils.CreateNewFileWithContents(filePath,
 						this.defaultMainContents());
 			} catch (IOException e) {
-				e.printStackTrace();
+				ErrorLogger.appendMessageToErrorLog(
+						"Error while creating main procedure in "
+								+ filePath.toOSString(), IStatus.ERROR);
 			}
 		}
 	}

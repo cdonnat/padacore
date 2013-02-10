@@ -7,9 +7,11 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
 import org.padacore.core.AbstractAdaProjectAssociationManager;
 import org.padacore.core.AdaProjectNature;
 import org.padacore.core.IAdaProjectFactory;
+import org.padacore.core.utils.ErrorLogger;
 
 public class GnatAdaProjectAssociationManager extends
 		AbstractAdaProjectAssociationManager {
@@ -22,24 +24,29 @@ public class GnatAdaProjectAssociationManager extends
 			Assert.isLegal(eclipseProject.hasNature(AdaProjectNature.NATURE_ID)
 					&& eclipseProject.isOpen());
 		} catch (CoreException e) {
-			e.printStackTrace();
+			ErrorLogger.appendExceptionToErrorLog(e);
 		}
+
+		IPath gprAbsolutePath = this.getGprAbsolutePath(eclipseProject);
 
 		try {
 			if (AbstractAdaProjectAssociationManager
 					.GetAssociatedAdaProject(eclipseProject) == null) {
 				this.performAssociationToGnatAdaProject(eclipseProject,
-						this.getGprAbsolutePath(eclipseProject));
+						gprAbsolutePath);
 			}
 
 			Assert.isTrue(AbstractAdaProjectAssociationManager
 					.GetAssociatedAdaProject(eclipseProject) != null);
 		} catch (CoreException e) {
-			e.printStackTrace();
+			ErrorLogger.appendExceptionToErrorLog(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			ErrorLogger.appendMessageToErrorLog("Error while opening GPR file:"
+					+ gprAbsolutePath.toOSString(), IStatus.ERROR);
 		} catch (RecognitionException e) {
-			e.printStackTrace();
+			ErrorLogger.appendMessageToErrorLog(
+					"GPR file " + gprAbsolutePath.toOSString()
+							+ "format is incorrect", IStatus.ERROR);
 		}
 	}
 
@@ -80,6 +87,7 @@ public class GnatAdaProjectAssociationManager extends
 	 *         given project.
 	 */
 	private IPath getGprAbsolutePath(IProject project) {
-		return project.getFile(project.getName() + GNAT_PROJECT_EXTENSION).getLocation();
+		return project.getFile(project.getName() + GNAT_PROJECT_EXTENSION)
+				.getLocation();
 	}
 }

@@ -9,7 +9,9 @@ import org.antlr.runtime.ANTLRFileStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.padacore.core.utils.ErrorLogger;
 
 public class GprLoader {
 
@@ -21,13 +23,17 @@ public class GprLoader {
 	public GprLoader() {
 		this.projectsToLoad = new Stack<Project>();
 		this.loadedProjects = new ArrayList<Project>();
-		this.projectsToLoad.push(new Project(new Path("FIXME"))); //for test purpose
+		this.projectsToLoad.push(new Project(new Path("FIXME"))); // for test
+																	// purpose
 	}
 
 	/**
 	 * Add a variable to the current project.
-	 * @param name Name of the variable.
-	 * @param value Value of the variable.
+	 * 
+	 * @param name
+	 *            Name of the variable.
+	 * @param value
+	 *            Value of the variable.
 	 */
 	public void addVariable(String name, Symbol value) {
 		this.getCurrentProject().addVariable(name, value);
@@ -35,8 +41,11 @@ public class GprLoader {
 
 	/**
 	 * Add an attribute to the current project.
-	 * @param name Name of the attribute.
-	 * @param value Value of the attribute.
+	 * 
+	 * @param name
+	 *            Name of the attribute.
+	 * @param value
+	 *            Value of the attribute.
 	 */
 	public void addAttribute(String name, Symbol value) {
 		this.getCurrentProject().addAttribute(name, value);
@@ -44,8 +53,11 @@ public class GprLoader {
 
 	/**
 	 * Return whether the variable is defined in the current project.
-	 * @param name Name of the variable.
-	 * @return True is returned if variable is defined in the current project. False otherwise.
+	 * 
+	 * @param name
+	 *            Name of the variable.
+	 * @return True is returned if variable is defined in the current project.
+	 *         False otherwise.
 	 */
 	public boolean variableIsDefined(String name) {
 		return this.getCurrentProject().variableIsDefined(name);
@@ -53,26 +65,34 @@ public class GprLoader {
 
 	/**
 	 * Return whether the attribute is defined in the current project.
-	 * @param name Name of the attribute.
-	 * @return True is returned if attribute is defined in the current project. False otherwise.
+	 * 
+	 * @param name
+	 *            Name of the attribute.
+	 * @return True is returned if attribute is defined in the current project.
+	 *         False otherwise.
 	 */
 	public boolean attributeIsDefined(String name) {
 		return this.getCurrentProject().attributeIsDefined(name);
 	}
 
 	/**
-	 * Return variable symbol corresponding to given name in the current project.
-	 * @param name Qualified name of the variable.
+	 * Return variable symbol corresponding to given name in the current
+	 * project.
+	 * 
+	 * @param name
+	 *            Qualified name of the variable.
 	 * @return Symbol associated to given name.
 	 */
 	public Symbol getVariable(String name) {
 		return this.getCurrentProject().getVariable(name);
 	}
 
-
 	/**
-	 * Return attribute symbol corresponding to given name in the current project.
-	 * @param name Qualified name of the attribute.
+	 * Return attribute symbol corresponding to given name in the current
+	 * project.
+	 * 
+	 * @param name
+	 *            Qualified name of the attribute.
 	 * @return Symbol associated to given name.
 	 */
 	public Symbol getAttribute(String name) {
@@ -81,28 +101,35 @@ public class GprLoader {
 
 	/**
 	 * Run the parser on Gpr file located at given path.
-	 * @param path Path to the Gpr file.
+	 * 
+	 * @param path
+	 *            Path to the Gpr file.
 	 */
 	private void parseGpr(IPath path) {
 		try {
-			GprLexer lexer = new GprLexer(new ANTLRFileStream(path.toOSString()));
+			GprLexer lexer = new GprLexer(
+					new ANTLRFileStream(path.toOSString()));
 			GprParser parser = new GprParser(this, new CommonTokenStream(lexer));
 			parser.project();
 		} catch (IOException e) {
-			e.printStackTrace();
+			ErrorLogger.appendMessageToErrorLog("Error while opening GPR file "
+					+ path.toOSString(), IStatus.ERROR);
 		} catch (RecognitionException e) {
-			e.printStackTrace();
+			ErrorLogger.appendMessageToErrorLog("GPR file " + path.toOSString()
+					+ " format is incorrect", IStatus.ERROR);
 		}
 	}
 
 	/**
-	 * Evaluate the path of a Gpr file according to its relativeProjectPath. Evaluation is based
-	 * on the path of the project in progress.
+	 * Evaluate the path of a Gpr file according to its relativeProjectPath.
+	 * Evaluation is based on the path of the project in progress.
+	 * 
 	 * @param relativeProjectPath
 	 * @return
 	 */
 	private IPath evaluatePath(String relativeProjectPath) {
-		IPath referencePath = this.getCurrentProject().getPath().removeLastSegments(1);
+		IPath referencePath = this.getCurrentProject().getPath()
+				.removeLastSegments(1);
 		IPath path = referencePath.append(relativeProjectPath);
 		String extension = path.getFileExtension();
 
@@ -114,7 +141,9 @@ public class GprLoader {
 
 	/**
 	 * Load the project located at pathToGpr and add it the loaded project list.
-	 * @param pathToGpr Path to a Gpr file.
+	 * 
+	 * @param pathToGpr
+	 *            Path to a Gpr file.
 	 */
 	public void load(IPath pathToGpr) {
 		Project projectToAdd = new Project(pathToGpr);
@@ -128,9 +157,11 @@ public class GprLoader {
 	}
 
 	/**
-	 * Add a project to current project. If the project is already loaded, the parsing is not 
-	 * performed.
-	 * @param relativeProjectPath Relative path to the Gpr file of the project to add.
+	 * Add a project to current project. If the project is already loaded, the
+	 * parsing is not performed.
+	 * 
+	 * @param relativeProjectPath
+	 *            Relative path to the Gpr file of the project to add.
 	 */
 	public void addProject(String relativeProjectPath) {
 		IPath projectToAddPath = evaluatePath(relativeProjectPath);
@@ -153,19 +184,21 @@ public class GprLoader {
 
 	/**
 	 * Notify current project that a begin package has been found.
-	 * @param packageName Name of the package.
+	 * 
+	 * @param packageName
+	 *            Name of the package.
 	 */
-	public void beginPackage (String packageName) {
+	public void beginPackage(String packageName) {
 		this.getCurrentProject().beginPackage(packageName);
 	}
-	
+
 	/**
 	 * Notify current project that an end package has been found.
 	 */
 	public void endPackage() {
 		this.getCurrentProject().endPackage();
 	}
-	
+
 	/**
 	 * @return The project in progress.
 	 */
@@ -174,10 +207,13 @@ public class GprLoader {
 	}
 
 	/**
-	 * Return the project associated to given path in the list of the loaded project.
-	 * @param pathToGpr Path to Gpr file.
-	 * @return Project associated to given path in the list of the loaded project or null if not 
-	 * found.
+	 * Return the project associated to given path in the list of the loaded
+	 * project.
+	 * 
+	 * @param pathToGpr
+	 *            Path to Gpr file.
+	 * @return Project associated to given path in the list of the loaded
+	 *         project or null if not found.
 	 */
 	private Project getProject(IPath pathToGpr) {
 		Project project = null;
@@ -191,8 +227,10 @@ public class GprLoader {
 	}
 
 	/**
-	 * @param pathToGpr Path to Gpr project file.
-	 * @return True if project located at given path has already been loaded. False otherwise.
+	 * @param pathToGpr
+	 *            Path to Gpr project file.
+	 * @return True if project located at given path has already been loaded.
+	 *         False otherwise.
 	 */
 	private boolean projectIsAlreadyLoaded(IPath pathToGpr) {
 		return getProject(pathToGpr) != null;

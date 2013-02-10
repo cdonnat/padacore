@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.padacore.core.utils.ErrorLogger;
 import org.padacore.core.utils.ExternalProcess;
 import org.padacore.core.utils.ExternalProcessOutput;
 
@@ -38,8 +39,10 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 	 * @return the absolute path of GPR file.
 	 */
 	private String getGprFullPath() {
-		String gprProjectFullPath = this.getProject().getFile(this.getProject().getName() + ".gpr").getRawLocation().toOSString();
-		
+		String gprProjectFullPath = this.getProject()
+				.getFile(this.getProject().getName() + ".gpr").getRawLocation()
+				.toOSString();
+
 		return gprProjectFullPath;
 	}
 
@@ -82,12 +85,11 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 
-				ExternalProcess process = new ExternalProcess(
-						message,
-						new Observer[] { new GprbuildObserver(monitor) ,
-								         new ExternalProcessOutput() },
-						new Observer[] { new GprbuildErrObserver(getProject()),
-						                 new ExternalProcessOutput() });
+				ExternalProcess process = new ExternalProcess(message,
+						new Observer[] { new GprbuildObserver(monitor),
+								new ExternalProcessOutput() }, new Observer[] {
+								new GprbuildErrObserver(getProject()),
+								new ExternalProcessOutput() });
 
 				process.run(buildCommand(), monitor);
 				refreshBuiltProject();
@@ -185,7 +187,7 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 		try {
 			delta.accept(derivedResourcesFinder);
 		} catch (CoreException e) {
-			e.printStackTrace();
+			ErrorLogger.appendExceptionToErrorLog(e);
 		}
 		return derivedResourcesFinder.hasNonDerivedFileBeenFound();
 	}
@@ -217,7 +219,7 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 			getProject().refreshLocal(IResource.DEPTH_INFINITE,
 					new NullProgressMonitor());
 		} catch (CoreException e) {
-			e.printStackTrace();
+			ErrorLogger.appendExceptionToErrorLog(e);
 		}
 	}
 }

@@ -35,7 +35,6 @@ public class FileUtils {
 					writer.close();
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
 			}
 		}
 	}

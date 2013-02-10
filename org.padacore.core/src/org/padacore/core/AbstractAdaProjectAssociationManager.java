@@ -5,6 +5,7 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.QualifiedName;
+import org.padacore.core.utils.ErrorLogger;
 
 public abstract class AbstractAdaProjectAssociationManager {
 
@@ -38,7 +39,7 @@ public abstract class AbstractAdaProjectAssociationManager {
 			Assert.isLegal(eclipseProject.isOpen()
 					&& eclipseProject.hasNature(AdaProjectNature.NATURE_ID));
 		} catch (CoreException e) {
-			e.printStackTrace();
+			ErrorLogger.appendExceptionToErrorLog(e);
 		}
 
 		QualifiedName qualifiedName = GetQualifiedNameForAdaProjectSessionProperty(eclipseProject);
@@ -46,7 +47,7 @@ public abstract class AbstractAdaProjectAssociationManager {
 		try {
 			eclipseProject.setSessionProperty(qualifiedName, adaProject);
 		} catch (CoreException e) {
-			e.printStackTrace();
+			ErrorLogger.appendExceptionToErrorLog(e);
 		}
 
 	}
@@ -66,7 +67,7 @@ public abstract class AbstractAdaProjectAssociationManager {
 			Assert.isLegal(eclipseProject.isOpen()
 					&& eclipseProject.hasNature(AdaProjectNature.NATURE_ID));
 		} catch (CoreException e) {
-			e.printStackTrace();
+			ErrorLogger.appendExceptionToErrorLog(e);
 		}
 
 		QualifiedName qualifiedName = GetQualifiedNameForAdaProjectSessionProperty(eclipseProject);
@@ -77,7 +78,7 @@ public abstract class AbstractAdaProjectAssociationManager {
 			associatedAdaProject = (IAdaProject) (eclipseProject
 					.getSessionProperty(qualifiedName));
 		} catch (CoreException e) {
-			e.printStackTrace();
+			ErrorLogger.appendExceptionToErrorLog(e);
 		}
 
 		return associatedAdaProject;
@@ -107,7 +108,7 @@ public abstract class AbstractAdaProjectAssociationManager {
 					this.associateToAdaProject(currentProject);
 				}
 			} catch (CoreException e) {
-				e.printStackTrace();
+				ErrorLogger.appendExceptionToErrorLog(e);
 			}
 		}
 	}

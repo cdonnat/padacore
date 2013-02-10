@@ -17,6 +17,7 @@ import org.padacore.core.gnat.GprBuilder;
 import org.padacore.core.gnat.GprLoader;
 import org.padacore.core.gnat.GprProject;
 import org.padacore.core.gnat.Project;
+import org.padacore.core.utils.ErrorLogger;
 
 /**
  * This class defines a wizard which enables user to import an existing GPR
@@ -90,8 +91,7 @@ public class AdaProjectFromGprWizard extends Wizard implements IImportWizard {
 				description.setReferencedProjects(referencedProjects);
 				eclipseProject.setDescription(description, null);
 			} catch (CoreException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				ErrorLogger.appendExceptionToErrorLog(e);
 			}
 		}
 	}

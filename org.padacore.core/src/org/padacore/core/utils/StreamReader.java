@@ -7,16 +7,17 @@ import java.io.InputStreamReader;
 import java.util.Observable;
 import java.util.Observer;
 
+import org.eclipse.core.runtime.IStatus;
 
 class StreamReader extends Observable implements Runnable {
-	
+
 	private BufferedReader input;
 
 	public StreamReader(InputStream input, Observer[] observers) {
 		this.input = new BufferedReader(new InputStreamReader(input));
 		for (int i = 0; i < observers.length; i++) {
 			this.addObserver(observers[i]);
-		}		
+		}
 	}
 
 	@Override
@@ -29,12 +30,12 @@ class StreamReader extends Observable implements Runnable {
 				this.notifyObservers(new String(line));
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			ErrorLogger.appendMessageToErrorLog("Error while reading input",
+					IStatus.ERROR);
 		} finally {
 			try {
 				this.input.close();
 			} catch (IOException e) {
-				e.printStackTrace();
 			}
 		}
 	}

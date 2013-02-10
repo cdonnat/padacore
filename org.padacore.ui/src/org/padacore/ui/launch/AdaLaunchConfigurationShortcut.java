@@ -93,7 +93,7 @@ public class AdaLaunchConfigurationShortcut implements ILaunchShortcut {
 			}
 
 		} catch (CoreException e) {
-			e.printStackTrace();
+			ErrorLogger.appendExceptionToErrorLog(e);
 		}
 	}
 
@@ -116,7 +116,7 @@ public class AdaLaunchConfigurationShortcut implements ILaunchShortcut {
 			configForFile.launch(ILaunchManager.RUN_MODE, null);
 
 		} catch (CoreException e) {
-			e.printStackTrace();
+			ErrorLogger.appendExceptionToErrorLog(e);
 		}
 	}
 

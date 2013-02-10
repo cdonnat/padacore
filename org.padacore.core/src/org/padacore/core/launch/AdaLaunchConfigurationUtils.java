@@ -7,6 +7,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
+import org.padacore.core.utils.ErrorLogger;
 
 public class AdaLaunchConfigurationUtils {
 	
@@ -173,7 +174,7 @@ public class AdaLaunchConfigurationUtils {
 			try {
 				launchConfigForFile = createNewLaunchConfigurationFor(selectedFile);
 			} catch (CoreException e) {
-				e.printStackTrace();
+				ErrorLogger.appendExceptionToErrorLog(e);
 			}
 		}
 		

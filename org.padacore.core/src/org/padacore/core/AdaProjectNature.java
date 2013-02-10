@@ -4,8 +4,8 @@ import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IProjectNature;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.*;
+import org.padacore.core.utils.ErrorLogger;
 
 public class AdaProjectNature implements IProjectNature {
 
@@ -177,7 +177,7 @@ public class AdaProjectNature implements IProjectNature {
 		try {
 			Assert.isLegal(this.isAdaBuilderConfiguredForProject(projectDesc));
 		} catch (CoreException e) {
-			e.printStackTrace();
+			ErrorLogger.appendExceptionToErrorLog(e);
 		}
 
 		ICommand[] currentBuildCmds = projectDesc.getBuildSpec();

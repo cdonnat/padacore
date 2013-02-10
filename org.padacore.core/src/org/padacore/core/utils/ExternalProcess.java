@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.util.Observer;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 
 public class ExternalProcess implements IExternalProcess {
-
 
 	private Process process;
 	private Thread outReader;
@@ -58,15 +58,21 @@ public class ExternalProcess implements IExternalProcess {
 			runCmd(monitor, processBuilder);
 			info.finish(isSuccessful());
 		} catch (IOException e) {
-			e.printStackTrace();
+			ErrorLogger
+					.appendMessageToErrorLog(
+							"Error while launching external command: "
+									+ cmdWithArgs[0], IStatus.ERROR);
 		}
 	}
 
-	private void runCmd(IProgressMonitor monitor, ProcessBuilder processBuilder) throws IOException {
+	private void runCmd(IProgressMonitor monitor, ProcessBuilder processBuilder)
+			throws IOException {
 		process = processBuilder.start();
 
-		outReader = new Thread(new StreamReader(process.getInputStream(), outStreamObservers));
-		errReader = new Thread(new StreamReader(process.getErrorStream(), errStreamObservers));
+		outReader = new Thread(new StreamReader(process.getInputStream(),
+				outStreamObservers));
+		errReader = new Thread(new StreamReader(process.getErrorStream(),
+				errStreamObservers));
 		canceler = new ExternalProcessCanceler(this, monitor);
 
 		outReader.start();
@@ -78,7 +84,10 @@ public class ExternalProcess implements IExternalProcess {
 			errReader.join();
 			canceler.join();
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			ErrorLogger
+					.appendMessageToErrorLog(
+							"Error while waiting for the end of stdout and stderr reader threads",
+							IStatus.WARNING);
 		}
 	}
 

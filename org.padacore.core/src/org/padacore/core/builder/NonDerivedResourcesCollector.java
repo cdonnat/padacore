@@ -7,6 +7,7 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
+import org.padacore.core.utils.ErrorLogger;
 
 /**
  * This class enables to collect all the non-derived ressources that are present
@@ -45,7 +46,7 @@ public class NonDerivedResourcesCollector {
 			this.container
 					.accept(new ContainerVisitor(this.containedResources));
 		} catch (CoreException e) {
-			e.printStackTrace();
+			ErrorLogger.appendExceptionToErrorLog(e);
 		}
 	}
 
