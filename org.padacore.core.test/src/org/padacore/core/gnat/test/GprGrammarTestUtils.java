@@ -35,17 +35,26 @@ public class GprGrammarTestUtils {
 	}
 
 	private static boolean RunSimpleParserRuleCheck(
-			SimpleParserRuleChecker checker, String input, boolean forceVariableDefinition) {
-		GprGrammarFixture fixture = new GprGrammarFixture(input, forceVariableDefinition);
+			SimpleParserRuleChecker checker, String input,
+			boolean forceVariableDefinition) {
+		GprGrammarFixture fixture = new GprGrammarFixture(input,
+				forceVariableDefinition);
 
 		return checker.isInputRecognizedByParserRule(fixture);
 	}
-			
+
 	private static boolean RunSimpleParserRuleCheck(
 			SimpleParserRuleChecker checker, String input) {
 		GprGrammarFixture fixture = new GprGrammarFixture(input);
 
 		return checker.isInputRecognizedByParserRule(fixture);
+	}
+
+	private static boolean RunStringParserRuleCheck(
+			StringParserRuleChecker checker, String input, String expString) {
+		GprGrammarFixture fixture = new GprGrammarFixture(input);
+
+		return checker.isInputRecognizedByParserRule(fixture, expString);
 	}
 
 	private static boolean RunSymbolParserRuleCheck(
@@ -89,6 +98,28 @@ public class GprGrammarTestUtils {
 
 		protected abstract Symbol executeParserRule(GprGrammarFixture fixture)
 				throws RecognitionException;
+	}
+
+	public static abstract class StringParserRuleChecker {
+
+		public boolean isInputRecognizedByParserRule(GprGrammarFixture fixture,
+				String expectedString) {
+			String result = null;
+
+			try {
+				result = this.executeParserRule(fixture);
+			} catch (RecognitionException e) {
+				e.printStackTrace();
+			}
+
+			return GprGrammarTestUtils.NoRecognitionExceptionOccurred(
+					fixture.parser, fixture.lexer)
+					&& result.equals(expectedString);
+		}
+
+		protected abstract String executeParserRule(GprGrammarFixture fixture)
+				throws RecognitionException;
+
 	}
 
 	public static abstract class SimpleParserRuleChecker {
@@ -234,6 +265,20 @@ public class GprGrammarTestUtils {
 		return RunSimpleParserRuleCheck(projectDecChecker, input);
 	}
 
+	public static boolean IsSimpleProjectDeclaration(String input) {
+		SimpleParserRuleChecker simpleProjectDecChecker = new SimpleParserRuleChecker() {
+
+			@Override
+			public void executeParserRule(GprGrammarFixture fixture)
+					throws RecognitionException {
+				fixture.parser.simple_project_declaration();
+
+			}
+		};
+
+		return RunSimpleParserRuleCheck(simpleProjectDecChecker, input);
+	}
+
 	public static boolean IsExternalValue(String input) {
 		SimpleParserRuleChecker externalValueChecker = new SimpleParserRuleChecker() {
 
@@ -324,6 +369,191 @@ public class GprGrammarTestUtils {
 		};
 
 		return RunSimpleParserRuleCheck(projectChecker, input);
+	}
+
+	public static boolean IsPathNameIdentified(String input,
+			String expectedString) {
+		StringParserRuleChecker pathNameChecker = new StringParserRuleChecker() {
+
+			@Override
+			protected String executeParserRule(GprGrammarFixture fixture)
+					throws RecognitionException {
+				return fixture.parser.path_name();
+			}
+		};
+
+		return RunStringParserRuleCheck(pathNameChecker, input, expectedString);
+	}
+
+	public static boolean IsSimpleName(String input) {
+		SimpleParserRuleChecker simpleNameChecker = new SimpleParserRuleChecker() {
+
+			@Override
+			protected void executeParserRule(GprGrammarFixture fixture)
+					throws RecognitionException {
+				fixture.parser.simple_name();
+
+			}
+		};
+
+		return RunSimpleParserRuleCheck(simpleNameChecker, input);
+	}
+
+	public static boolean IsSimpleDeclarativeItem(String input) {
+		SimpleParserRuleChecker simpleDecItemChecker = new SimpleParserRuleChecker() {
+
+			@Override
+			protected void executeParserRule(GprGrammarFixture fixture)
+					throws RecognitionException {
+				fixture.parser.simple_declarative_item();
+
+			}
+		};
+
+		return RunSimpleParserRuleCheck(simpleDecItemChecker, input, false);
+	}
+
+	public static boolean IsDeclarativeItem(String input) {
+		SimpleParserRuleChecker declarativeItemChecker = new SimpleParserRuleChecker() {
+
+			@Override
+			protected void executeParserRule(GprGrammarFixture fixture)
+					throws RecognitionException {
+				fixture.parser.declarative_item();
+
+			}
+		};
+
+		return RunSimpleParserRuleCheck(declarativeItemChecker, input);
+	}
+
+	public static boolean IsDiscreteChoiceList(String input) {
+		SimpleParserRuleChecker discreteChoiceChecker = new SimpleParserRuleChecker() {
+
+			@Override
+			protected void executeParserRule(GprGrammarFixture fixture)
+					throws RecognitionException {
+				fixture.parser.discrete_choice_list();
+
+			}
+		};
+
+		return RunSimpleParserRuleCheck(discreteChoiceChecker, input, false);
+	}
+
+	public static boolean IsCaseItem(String input) {
+		SimpleParserRuleChecker caseItemChecker = new SimpleParserRuleChecker() {
+
+			@Override
+			protected void executeParserRule(GprGrammarFixture fixture)
+					throws RecognitionException {
+				fixture.parser.case_item();
+
+			}
+		};
+
+		return RunSimpleParserRuleCheck(caseItemChecker, input);
+	}
+
+	public static boolean IsPackageSpec(String input) {
+		SimpleParserRuleChecker packageSpecChecker = new SimpleParserRuleChecker() {
+
+			@Override
+			protected void executeParserRule(GprGrammarFixture fixture)
+					throws RecognitionException {
+				fixture.parser.package_spec();
+
+			}
+		};
+
+		return RunSimpleParserRuleCheck(packageSpecChecker, input, false);
+	}
+
+	public static boolean IsPackageRenaming(String input) {
+		SimpleParserRuleChecker packageRenamingChecker = new SimpleParserRuleChecker() {
+
+			@Override
+			protected void executeParserRule(GprGrammarFixture fixture)
+					throws RecognitionException {
+				fixture.parser.package_renaming();
+
+			}
+		};
+
+		return RunSimpleParserRuleCheck(packageRenamingChecker, input, false);
+	}
+
+	public static boolean IsPackageExtension(String input) {
+		SimpleParserRuleChecker packageExtensionChecker = new SimpleParserRuleChecker() {
+
+			@Override
+			protected void executeParserRule(GprGrammarFixture fixture)
+					throws RecognitionException {
+				fixture.parser.package_extension();
+
+			}
+		};
+
+		return RunSimpleParserRuleCheck(packageExtensionChecker, input, false);
+	}
+
+	public static boolean IsAttributeDesignatorIdentified(String input,
+			String expString) {
+		StringParserRuleChecker attDesignatorChecker = new StringParserRuleChecker() {
+
+			@Override
+			protected String executeParserRule(GprGrammarFixture fixture)
+					throws RecognitionException {
+				return fixture.parser.attribute_designator();
+			}
+		};
+
+		return RunStringParserRuleCheck(attDesignatorChecker, input, expString);
+	}
+
+	public static boolean IsAttributePrefix(String input, String expString) {
+		StringParserRuleChecker attPrefixChecker = new StringParserRuleChecker() {
+
+			@Override
+			protected String executeParserRule(GprGrammarFixture fixture)
+					throws RecognitionException {
+				return fixture.parser.attribute_prefix();
+			}
+		};
+
+		return RunStringParserRuleCheck(attPrefixChecker, input, expString);
+	}
+
+	public static boolean IsTermIdentified(String string) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public static boolean IsTermIdentified(String input, Symbol expSymbol) {
+		SymbolParserRuleChecker termChecker = new SymbolParserRuleChecker() {
+
+			@Override
+			protected Symbol executeParserRule(GprGrammarFixture fixture)
+					throws RecognitionException {
+				return fixture.parser.expression();
+			}
+		};
+
+		return RunSymbolParserRuleCheck(termChecker, input, expSymbol);
+	}
+
+	public static boolean IsStringExpressionIdentified(String input,
+			Symbol expSymbol) {
+		SymbolParserRuleChecker stringExpChecker = new SymbolParserRuleChecker() {
+
+			@Override
+			protected Symbol executeParserRule(GprGrammarFixture fixture)
+					throws RecognitionException {
+				return fixture.parser.string_expression();
+			}
+		};
+
+		return RunSymbolParserRuleCheck(stringExpChecker, input, expSymbol);
 	}
 
 }

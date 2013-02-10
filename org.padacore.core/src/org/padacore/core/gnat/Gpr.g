@@ -208,7 +208,7 @@ attribute_designator returns [String result]
     ('.' package_name = simple_name {result += "." + $package_name.text;})? 
   ;
  
-external_value returns [Symbol result]
+external_value returns [Symbol result] //TODO
   : 
   EXTERNAL
   '(' 
