@@ -40,7 +40,7 @@ public class GnatAdaProjectTest {
 		assertTrue(
 				"GPR project with exec dir",
 				this.sut.getExecutableDirectoryPath().equals(
-						GetAbsolutePathFor(TEST_EXEC_DIR_NAME).toOSString()));
+						GetAbsolutePathFor(TEST_EXEC_DIR_NAME)));
 	}
 
 	@Test
@@ -50,7 +50,7 @@ public class GnatAdaProjectTest {
 		assertTrue(
 				"GPR project with object dir",
 				this.sut.getExecutableDirectoryPath().equals(
-						GetAbsolutePathFor(TEST_OBJ_DIR_NAME).toOSString()));
+						GetAbsolutePathFor(TEST_OBJ_DIR_NAME)));
 	}
 
 	@Test
@@ -58,7 +58,7 @@ public class GnatAdaProjectTest {
 		assertTrue(
 				"GPR project with neither exec nor object dir",
 				this.sut.getExecutableDirectoryPath().equals(
-						GetAbsolutePathFor(".").toOSString()));
+						GetAbsolutePathFor(".")));
 	}
 
 	@Test
@@ -106,7 +106,7 @@ public class GnatAdaProjectTest {
 		assertTrue(
 				"Object directory is current directory",
 				this.sut.getObjectDirectoryPath().equals(
-						GetAbsolutePathFor(".").toOSString()));
+						GetAbsolutePathFor(".")));
 	}
 
 	@Test
@@ -115,7 +115,7 @@ public class GnatAdaProjectTest {
 		assertTrue(
 				"Object directory is TEST_OBJ_DIRECTORY",
 				this.sut.getObjectDirectoryPath().equals(
-						GetAbsolutePathFor(TEST_OBJ_DIR_NAME).toOSString()));
+						GetAbsolutePathFor(TEST_OBJ_DIR_NAME)));
 	}
 
 	@Test
