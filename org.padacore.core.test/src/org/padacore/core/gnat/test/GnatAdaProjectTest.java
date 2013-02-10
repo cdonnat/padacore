@@ -62,14 +62,15 @@ public class GnatAdaProjectTest {
 	public void testExecutableNamesRetrieval() {
 		this.gprProject.addExecutableName("main.ads");
 		this.gprProject.addExecutableName("procedure.adb");
+		this.gprProject.addExecutableName("no_extension");
 
 		boolean osIsWindows = System.getProperty("os.name").contains("win")
 				|| System.getProperty("os.name").contains("Win");
 
 		List<String> execNames = this.sut.getExecutableNames();
 
-		assertTrue("Executable names list shall contain 2 elements",
-				execNames.size() == 2);
+		assertTrue("Executable names list shall contain 3 elements",
+				execNames.size() == 3);
 
 		String firstExecNameExpected = (osIsWindows ? "main.exe" : "main");
 
@@ -80,6 +81,10 @@ public class GnatAdaProjectTest {
 				: "procedure");
 		assertTrue("Second executable name is correct", execNames.get(1)
 				.equals(secondExecNameExpected));
+		
+		String thirdExecNameExpected = (osIsWindows ? "no_extension.exe" : "no_extension");
+		assertTrue("Third executable name is correct", execNames.get(2)
+				.equals(thirdExecNameExpected));
 	}
 
 	@Test

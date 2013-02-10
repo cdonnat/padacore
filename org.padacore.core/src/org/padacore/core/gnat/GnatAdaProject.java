@@ -26,7 +26,7 @@ public class GnatAdaProject implements IAdaProject {
 
 		for (String execSourceName : execSourceNames) {
 
-			String execName = removeExtensionFromFilename(execSourceName);
+			String execName = RemoveExtensionFromFilenameIfPresent(execSourceName);
 
 			// TODO we should take into account the Executable_Suffix GPR
 			// attribute
@@ -72,16 +72,21 @@ public class GnatAdaProject implements IAdaProject {
 	}
 
 	/**
-	 * Removes the extension from given filename.
+	 * Removes the extension from given filename if there is one, does nothing
+	 * otherwise.
 	 * 
 	 * @param filename
 	 *            the filename with extension.
 	 * @return the filename without extension.
 	 */
-	private static String removeExtensionFromFilename(String filename) {
-		final int EXTENSION_LENGTH = 3;
-		
-		return filename.substring(0, filename.length() - EXTENSION_LENGTH - 1);
+	private static String RemoveExtensionFromFilenameIfPresent(String filename) {
+		String fileNameWithoutExtension = filename;
+
+		if (filename.indexOf('.') != -1) {
+			fileNameWithoutExtension = filename.substring(0, filename.lastIndexOf('.'));
+		}
+
+		return fileNameWithoutExtension;
 	}
 
 	@Override

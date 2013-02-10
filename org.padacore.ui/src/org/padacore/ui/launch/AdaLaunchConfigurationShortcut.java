@@ -122,6 +122,7 @@ public class AdaLaunchConfigurationShortcut implements ILaunchShortcut {
 
 	@Override
 	public void launch(IEditorPart editor, String mode) {
+		//TODO implement launch from editor
 	}
 
 }
