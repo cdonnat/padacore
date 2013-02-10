@@ -524,11 +524,6 @@ public class GprGrammarTestUtils {
 		return RunStringParserRuleCheck(attPrefixChecker, input, expString);
 	}
 
-	public static boolean IsTermIdentified(String string) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
 	public static boolean IsTermIdentified(String input, Symbol expSymbol) {
 		SymbolParserRuleChecker termChecker = new SymbolParserRuleChecker() {
 
