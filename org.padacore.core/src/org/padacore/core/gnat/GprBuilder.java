@@ -1,5 +1,7 @@
 package org.padacore.core.gnat;
 
+import org.eclipse.core.runtime.IPath;
+
 
 public class GprBuilder {
 
@@ -9,13 +11,15 @@ public class GprBuilder {
 	private final static String SOURCE_DIRECTORIES_ATTRIBUTE = "Source_Dirs";
 
 	private IPropertiesProvider referenceProject;
+	private IPath referencePath;
 
-	public GprBuilder(IPropertiesProvider project) {
+	public GprBuilder(IPropertiesProvider project, IPath gprFilePath) {
 		this.referenceProject = project;
+		this.referencePath = gprFilePath;
 	}
 
 	public GprProject build() {
-		GprProject res = new GprProject(this.referenceProject.getName());
+		GprProject res = new GprProject(this.referenceProject.getName(), this.referencePath.removeLastSegments(1));
 		this.addSourceDirs(res);
 		this.addExecDir(res);
 		this.addObjectDir(res);

@@ -1,7 +1,6 @@
 package org.padacore.ui.launch;
 
 import org.eclipse.core.resources.IFile;
-import org.padacore.core.utils.*;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
@@ -18,6 +17,7 @@ import org.padacore.core.AbstractAdaProjectAssociationManager;
 import org.padacore.core.AdaProjectNature;
 import org.padacore.core.IAdaProject;
 import org.padacore.core.launch.AdaLaunchConfigurationUtils;
+import org.padacore.core.utils.ErrorLogger;
 
 public class AdaLaunchConfigurationShortcut implements ILaunchShortcut {
 
@@ -29,7 +29,8 @@ public class AdaLaunchConfigurationShortcut implements ILaunchShortcut {
 	 * @return true if the given selection contains only 1 item, false
 	 *         otherwise.
 	 */
-	private boolean isOnlyOneElementSelected(IStructuredSelection selection) {
+	private static boolean IsOnlyOneElementSelected(
+			IStructuredSelection selection) {
 		return selection.size() == 1;
 	}
 
@@ -38,16 +39,16 @@ public class AdaLaunchConfigurationShortcut implements ILaunchShortcut {
 		if (selection instanceof IStructuredSelection) {
 			IStructuredSelection structuredSelection = (IStructuredSelection) selection;
 
-			if (this.isOnlyOneElementSelected(structuredSelection)) {
+			if (IsOnlyOneElementSelected(structuredSelection)) {
 				Object selectedElt = structuredSelection.getFirstElement();
 
 				if (selectedElt instanceof IFile) {
 					IFile selectedFile = (IFile) selectedElt;
-					this.launchFromFile(selectedFile);
+					LaunchFromFile(selectedFile);
 
 				} else if (selectedElt instanceof IProject) {
 					IProject selectedProject = (IProject) selectedElt;
-					this.launchFromProject(selectedProject);
+					LaunchFromProject(selectedProject);
 
 				}
 			}
@@ -61,7 +62,7 @@ public class AdaLaunchConfigurationShortcut implements ILaunchShortcut {
 	 *            the selected project.
 	 * @pre selectedProject is an Ada project and has an associated GPR project.
 	 */
-	private void launchFromProject(IProject selectedProject) {
+	private static void LaunchFromProject(IProject selectedProject) {
 		try {
 			Assert.isLegal(selectedProject
 					.hasNature(AdaProjectNature.NATURE_ID));
@@ -73,17 +74,15 @@ public class AdaLaunchConfigurationShortcut implements ILaunchShortcut {
 
 			if (associatedAdaProject.getExecutableNames().size() == 1) {
 
-				IPath execPath = new Path(
+				IPath executablePath = new Path(
 						associatedAdaProject.getExecutableDirectoryPath()
 								+ System.getProperty("file.separator")
 								+ associatedAdaProject.getExecutableNames()
 										.get(0));
 
-				IFile execFile = selectedProject.getFile(execPath);
-
 				// TODO what shall be do when executable does not exist: request
 				// build or display error ?
-				this.launchFromFile(execFile);
+				LaunchExecutableAtPath(executablePath);
 
 			} else {
 				ErrorLogger
@@ -105,24 +104,39 @@ public class AdaLaunchConfigurationShortcut implements ILaunchShortcut {
 	 * @pre selected file belongs to Ada project
 	 * 
 	 */
-	private void launchFromFile(IFile selectedFile) {
+	private static void LaunchFromFile(IFile selectedFile) {
 		try {
 			Assert.isLegal(selectedFile.getProject().hasNature(
 					AdaProjectNature.NATURE_ID));
 
-			ILaunchConfiguration configForFile = AdaLaunchConfigurationUtils
-					.getLaunchConfigurationFor(selectedFile);
-
-			configForFile.launch(ILaunchManager.RUN_MODE, null);
-
 		} catch (CoreException e) {
 			ErrorLogger.appendExceptionToErrorLog(e);
 		}
+
+		LaunchExecutableAtPath(selectedFile.getRawLocation());
+	}
+
+	/**
+	 * Launches the executable found at given absolute path.
+	 * 
+	 * @param absoluteExecPath
+	 *            absolute path of the executable to launch.
+	 */
+	private static void LaunchExecutableAtPath(IPath absoluteExecPath) {
+		ILaunchConfiguration configForFile = AdaLaunchConfigurationUtils
+				.GetLaunchConfigurationFor(absoluteExecPath);
+
+		try {
+			configForFile.launch(ILaunchManager.RUN_MODE, null);
+		} catch (CoreException e) {
+			ErrorLogger.appendExceptionToErrorLog(e);
+		}
+
 	}
 
 	@Override
 	public void launch(IEditorPart editor, String mode) {
-		//TODO implement launch from editor
+		// TODO implement launch from editor
 	}
 
 }

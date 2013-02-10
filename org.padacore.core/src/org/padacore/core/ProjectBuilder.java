@@ -84,9 +84,11 @@ public class ProjectBuilder {
 			description.setLocation(location);
 			project.create(description, null);
 			project.open(null);
+			
 			if (pathToLinkedGprProject != null) {
 				this.linkProjectInWorkspaceTo(project, pathToLinkedGprProject);
 			}
+			
 			this.addAdaNature(project);
 			this.adaProjectAssociationManager.associateToAdaProject(project);
 		} catch (CoreException e) {

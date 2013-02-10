@@ -55,7 +55,7 @@ public class CommonTestUtils {
 		}
 
 	}
-	
+
 	public static IProject CreateNonAdaProject(boolean openProject) {
 		cpt++;
 		return CreateNonAdaProject("TestProject" + cpt, openProject);
@@ -86,8 +86,9 @@ public class CommonTestUtils {
 		return CreateAdaProject("TestProject" + cpt);
 	}
 
-	private static GprProject CreateGprProject(String name, boolean isExecutable) {
-		GprProject result = new GprProject(name);
+	public static GprProject CreateGprProject(String name, boolean isExecutable) {
+		GprProject result = new GprProject(name, ResourcesPlugin.getWorkspace()
+				.getRoot().getLocation());
 
 		result.setExecutable(isExecutable);
 
@@ -107,7 +108,7 @@ public class CommonTestUtils {
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
-		
+
 		return project;
 
 	}
@@ -133,7 +134,8 @@ public class CommonTestUtils {
 					.setNatureIds(new String[] { AdaProjectNature.NATURE_ID });
 			adaProject.create(description, null);
 
-			GprProject gpr = new GprProject(projectName);
+			GprProject gpr = new GprProject(projectName,
+					adaProject.getRawLocation());
 			filewriter = new FileWriter(new File(adaProject.getLocation()
 					.toOSString() + IPath.SEPARATOR + projectName + ".gpr"));
 			filewriter.write(gpr.toString());

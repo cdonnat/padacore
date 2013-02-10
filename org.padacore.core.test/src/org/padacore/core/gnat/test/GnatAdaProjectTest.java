@@ -5,10 +5,13 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
 import org.junit.Before;
 import org.junit.Test;
 import org.padacore.core.gnat.GnatAdaProject;
 import org.padacore.core.gnat.GprProject;
+import org.padacore.core.test.utils.CommonTestUtils;
 
 public class GnatAdaProjectTest {
 
@@ -20,9 +23,12 @@ public class GnatAdaProjectTest {
 
 	@Before
 	public void createFixture() {
-		this.gprProject = new GprProject("test");
-		this.gprProject.setExecutable(true);
+		this.gprProject = CommonTestUtils.CreateGprProject("test", true);
 		this.sut = new GnatAdaProject(this.gprProject);
+	}
+	
+	private static IPath GetAbsolutePathFor(String relativePath) {
+		return ResourcesPlugin.getWorkspace().getRoot().getLocation().append(relativePath);				
 	}
 
 	@Test
@@ -31,7 +37,7 @@ public class GnatAdaProjectTest {
 		this.gprProject.setExecutableDir(TEST_EXEC_DIR_NAME);
 
 		assertTrue("GPR project with exec dir", this.sut
-				.getExecutableDirectoryPath().equals(TEST_EXEC_DIR_NAME));
+				.getExecutableDirectoryPath().equals(GetAbsolutePathFor(TEST_EXEC_DIR_NAME).toOSString()));
 	}
 
 	@Test
@@ -39,13 +45,13 @@ public class GnatAdaProjectTest {
 		this.gprProject.setObjectDir(TEST_OBJ_DIR_NAME);
 
 		assertTrue("GPR project with object dir", this.sut
-				.getExecutableDirectoryPath().equals(TEST_OBJ_DIR_NAME));
+				.getExecutableDirectoryPath().equals(GetAbsolutePathFor(TEST_OBJ_DIR_NAME).toOSString()));
 	}
 
 	@Test
 	public void testExecDirRetrievalWhenNeitherExecDirNorObjectDirAreSpecified() {
 		assertTrue("GPR project with neither exec nor object dir", this.sut
-				.getExecutableDirectoryPath().equals("."));
+				.getExecutableDirectoryPath().equals(GetAbsolutePathFor(".").toOSString()));
 	}
 
 	@Test
@@ -90,13 +96,13 @@ public class GnatAdaProjectTest {
 	@Test
 	public void testObjectDirRetrievalWhenNoObjectDirIsSpecified() {
 		assertTrue("Object directory is current directory", this.sut
-				.getObjectDirectoryPath().equals("."));
+				.getObjectDirectoryPath().equals(GetAbsolutePathFor(".").toOSString()));
 	}
 
 	@Test
 	public void testObjectDirRetrievalWhenObjectDirIsSpecified() {
 		this.gprProject.setObjectDir(TEST_OBJ_DIR_NAME);
 		assertTrue("Object directory is TEST_OBJ_DIRECTORY", this.sut
-				.getObjectDirectoryPath().equals(TEST_OBJ_DIR_NAME));
+				.getObjectDirectoryPath().equals(GetAbsolutePathFor(TEST_OBJ_DIR_NAME).toOSString()));
 	}
 }

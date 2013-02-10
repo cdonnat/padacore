@@ -71,7 +71,7 @@ public class AdaProjectFromGprWizard extends Wizard implements IImportWizard {
 
 		//TODO clean this mess!
 		for (Project project : loader.getLoadedProjects()) {
-			GprBuilder builder = new GprBuilder(project);
+			GprBuilder builder = new GprBuilder(project, project.getPath());
 			GprProject gprFromFile = builder.build();
 
 			createdProject = eclipseAdaProjectBuilder.createProjectWithAdaNatureAt(

@@ -2,6 +2,7 @@ package org.padacore.core.gnat.test;
 
 import static org.junit.Assert.assertEquals;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.junit.Test;
 import org.padacore.core.gnat.GprBuilder;
@@ -15,12 +16,14 @@ public class GprBuilderTest {
 	public void test() {
 
 		GprLoader loader = new GprLoader();
-		loader.load(new Path(CommonTestUtils.GetPathToTestProject() + "sample_project.gpr"));
+		IPath sampleProjectPath = new Path(CommonTestUtils.GetPathToTestProject() + "sample_project.gpr"); 
+		loader.load(sampleProjectPath);
 
-		GprBuilder sut = new GprBuilder(loader.getLoadedProjects().get(0));
+		GprBuilder sut = new GprBuilder(loader.getLoadedProjects().get(0), sampleProjectPath);
 		GprProject gpr = sut.build();
 
 		assertEquals("sample_project", gpr.getName());
+		assertEquals(new Path(CommonTestUtils.GetPathToTestProject()), gpr.getRootDirPath());
 		assertEquals("new_exe", gpr.getExecutableDir());
 		assertEquals("new_exe", gpr.getObjectDir());
 		assertEquals(2, gpr.getSourcesDir().size());

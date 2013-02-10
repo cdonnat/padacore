@@ -14,30 +14,30 @@ public interface IAdaProject {
 	public abstract List<String> getExecutableNames();
 
 	/**
-	 * Return whether this Ada project is executable.
+	 * Returns whether this Ada project is executable.
 	 * 
 	 * @return true if the Ada project is executable, false otherwise.
 	 */
 	public abstract boolean isExecutable();
 
 	/**
-	 * Returns the path of the directory in which executables will reside.
+	 * Returns the absolute path of the directory in which executables will reside.
 	 * 
-	 * @return the executable directory path of the project relative to the
-	 * project file directory.
+	 * @return the absolute executable directory path of the project
 	 * 
 	 */
 	public abstract String getExecutableDirectoryPath();
 	
 	/**
-	 * Return the list of sources directory.
+	 * Returns the list of sources directory.
 	 * @return a list of String corresponding to the names of sources directory.
 	 */
 	public abstract List<String> getSourcesDir();
 
 	/**
-	 * Return the path of the directory in which object files will reside.
-	 * @return the object directory path of the project relative to the project file directory.
+	 * Returns the absolute path of the directory in which object files will reside.
+	 * @return the absolute object directory path of the project.
 	 */
 	public abstract String getObjectDirectoryPath();
+	
 }

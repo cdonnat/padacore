@@ -1,7 +1,8 @@
 package org.padacore.core.gnat;
 
-public interface IPropertiesProvider {
 
+public interface IPropertiesProvider {
+	
 	public abstract String getName();
 	
 	public abstract boolean variableIsDefined(String name);

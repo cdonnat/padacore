@@ -3,7 +3,8 @@ package org.padacore.core.gnat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.runtime.*;
+import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IPath;
 
 public class GprProject {
 
@@ -14,18 +15,21 @@ public class GprProject {
 	private String execDir = null;
 	private List<String> execSourceNames = new ArrayList<String>(1);
 	private List<String> withedProjects = new ArrayList<String>();
+	private IPath rootDirPath;
 
 	/**
 	 * Create a default GPR project with given name.
 	 * 
 	 * @param name
 	 *            GPR name
+	 * @param rootDir the absolute root directory path
 	 * @pre name is not empty.
 	 */
-	public GprProject(String name) {
+	public GprProject(String name, IPath rootDir) {
 		Assert.isLegal(!name.isEmpty());
 
 		this.name = name;
+		this.rootDirPath = rootDir;
 	}
 
 	/**
@@ -237,5 +241,13 @@ public class GprProject {
 					+ this.getSourcesDir().get(this.getSourcesDir().size() - 1)
 					+ "\");\n");
 		}
+	}
+
+	/**
+	 * Returns the path to the root directory of the project.
+	 * @return a path denoting the root directory
+	 */
+	public IPath getRootDirPath() {
+		return this.rootDirPath;
 	}
 }

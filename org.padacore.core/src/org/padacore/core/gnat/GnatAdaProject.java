@@ -44,15 +44,17 @@ public class GnatAdaProject implements IAdaProject {
 	public String getExecutableDirectoryPath() {
 		Assert.isTrue(this.isExecutable());
 
-		String realExecDir = ".";
+		String relativeExecDir = ".";
 
 		if (this.gprProject.getExecutableDir() != null) {
-			realExecDir = this.gprProject.getExecutableDir();
+			relativeExecDir = this.gprProject.getExecutableDir();
 		} else if (this.gprProject.getObjectDir() != null) {
-			realExecDir = this.gprProject.getObjectDir();
+			relativeExecDir = this.gprProject.getObjectDir();
 		}
+		
+		IPath absoluteExecDir = this.convertToAbsolutePath(relativeExecDir);
 
-		return realExecDir;
+		return absoluteExecDir.toOSString();
 	}
 
 	@Override
@@ -83,7 +85,8 @@ public class GnatAdaProject implements IAdaProject {
 		String fileNameWithoutExtension = filename;
 
 		if (filename.indexOf('.') != -1) {
-			fileNameWithoutExtension = filename.substring(0, filename.lastIndexOf('.'));
+			fileNameWithoutExtension = filename.substring(0,
+					filename.lastIndexOf('.'));
 		}
 
 		return fileNameWithoutExtension;
@@ -96,14 +99,17 @@ public class GnatAdaProject implements IAdaProject {
 
 	@Override
 	public String getObjectDirectoryPath() {
-		String definedObjectDirectory = this.gprProject.getObjectDir();
-		String realObjectDirectory = definedObjectDirectory;
-
-		if (definedObjectDirectory == null) {
-			realObjectDirectory = ".";
+		String relativeObjectDirectory = this.gprProject.getObjectDir();
+		
+		if(relativeObjectDirectory == null) {
+			relativeObjectDirectory = ".";
 		}
+		IPath absoluteObjectDirectory = this.convertToAbsolutePath(relativeObjectDirectory);
 
-		return realObjectDirectory;
+		return absoluteObjectDirectory.toOSString();
 	}
-
+	
+	private IPath convertToAbsolutePath(String projectRelativePath) {
+		return this.gprProject.getRootDirPath().append(projectRelativePath);
+	}
 }

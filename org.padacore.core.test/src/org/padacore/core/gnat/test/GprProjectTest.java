@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.junit.Test;
 import org.padacore.core.gnat.GprProject;
 
@@ -14,7 +15,7 @@ public class GprProjectTest {
 	@Test
 	public void testConstructor() {
 
-		this.sut = new GprProject("First_Project");
+		this.sut = new GprProject("First_Project", ResourcesPlugin.getWorkspace().getRoot().getLocation());
 
 		assertEquals("Project name shall be set", sut.getName(),
 				"First_Project");
@@ -26,7 +27,7 @@ public class GprProjectTest {
 
 	@Test
 	public void testToString() {
-		this.sut = new GprProject("Test");
+		this.sut = new GprProject("Test", ResourcesPlugin.getWorkspace().getRoot().getLocation());
 
 		this.sut.setExecutable(true);
 		this.sut.addSourceDir(".");

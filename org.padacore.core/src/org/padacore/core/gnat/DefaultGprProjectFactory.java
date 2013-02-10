@@ -44,7 +44,7 @@ public class DefaultGprProjectFactory extends AbstractGprProjectFactory {
 	 * @return a newly create GPR project file.
 	 */
 	private GprProject createProjectFile() {
-		GprProject gprProject = new GprProject(this.projectName);
+		GprProject gprProject = new GprProject(this.projectName, this.projectDirectory);
 
 		if (this.addMainProcedure) {
 			gprProject.setExecutable(true);

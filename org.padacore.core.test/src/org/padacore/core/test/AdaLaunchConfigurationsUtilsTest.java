@@ -74,7 +74,7 @@ public class AdaLaunchConfigurationsUtilsTest {
 	private void checkRetrievedConfigCorrespondsToFile(IFile file,
 			String comment) throws CoreException {
 		ILaunchConfiguration retrievedLaunchConfig = AdaLaunchConfigurationUtils
-				.getLaunchConfigurationFor(file);
+				.GetLaunchConfigurationFor(file.getRawLocation());
 
 		String retrievedExecPath = retrievedLaunchConfig.getAttribute(
 				AdaLaunchConstants.EXECUTABLE_PATH, "");

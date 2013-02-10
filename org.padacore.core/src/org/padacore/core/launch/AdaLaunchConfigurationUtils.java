@@ -1,7 +1,9 @@
 package org.padacore.core.launch;
 
-import org.eclipse.core.resources.IFile;
+import java.io.File;
+
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
@@ -10,58 +12,58 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.padacore.core.utils.ErrorLogger;
 
 public class AdaLaunchConfigurationUtils {
-	
+
 	/**
 	 * Returns the Ada launch configuration type.
 	 * 
 	 * @return an ILaunchConfigurationType corresponding to Ada launch
 	 *         configuration.
 	 */
-	private static ILaunchConfigurationType getAdaLaunchConfigType() {
+	private static ILaunchConfigurationType GetAdaLaunchConfigType() {
 		return DebugPlugin
 				.getDefault()
 				.getLaunchManager()
 				.getLaunchConfigurationType(
 						AdaLaunchConstants.ID_LAUNCH_ADA_APP);
 	}
-	
+
 	/**
 	 * Retrieves the existing Ada launch configurations.
 	 * 
 	 * @return an array containing all the existing Ada launch configurations
 	 *         (possibly empty if none exists).
 	 */
-	private static ILaunchConfiguration[] retrieveExistingAdaLaunchConfigurations()
+	private static ILaunchConfiguration[] RetrieveExistingAdaLaunchConfigurations()
 			throws CoreException {
 
-		ILaunchConfigurationType adaConfigType = getAdaLaunchConfigType();
+		ILaunchConfigurationType adaConfigType = GetAdaLaunchConfigType();
 
 		ILaunchConfiguration[] existingAdaConfigs = DebugPlugin.getDefault()
 				.getLaunchManager().getLaunchConfigurations(adaConfigType);
 
 		return existingAdaConfigs;
 	}
-	
+
 	/**
 	 * Finds an existing Ada launch configuration for given file.
 	 * 
-	 * @param selectedFile
+	 * @param executableFilePath
 	 *            the file for which a launch configuration has to be found.
 	 * @return a launch configuration for given file it one exists, null
 	 *         otherwise (or if an error occurred while retrieving the existing
 	 *         launch configuration)
 	 */
-	private static ILaunchConfiguration findExistingLaunchConfigurationFor(
-			IFile selectedFile) {
+	private static ILaunchConfiguration FindExistingLaunchConfigurationFor(
+			IPath executableFilePath) {
 
 		ILaunchConfiguration matchingConfig;
 
 		try {
 			ILaunchConfiguration[] existingAdaConfigs = AdaLaunchConfigurationUtils
-					.retrieveExistingAdaLaunchConfigurations();
+					.RetrieveExistingAdaLaunchConfigurations();
 
-			matchingConfig = findMatchingLaunchConfiguration(
-					existingAdaConfigs, selectedFile);
+			matchingConfig = FindMatchingLaunchConfiguration(
+					existingAdaConfigs, executableFilePath);
 		} catch (CoreException e) {
 			// in case of error, fail silently so that a new launch
 			// configuration can be created
@@ -70,12 +72,12 @@ public class AdaLaunchConfigurationUtils {
 
 		return matchingConfig;
 	}
-	
+
 	/**
 	 * Tries to find a launch configuration corresponding to the given file
 	 * among given launch configurations.
 	 * 
-	 * @param selectedFile
+	 * @param executableFilePath
 	 *            the currently selected file.
 	 * @param existingAdaLaunchConfigurations
 	 *            the existing Ada launch configurations.
@@ -83,9 +85,9 @@ public class AdaLaunchConfigurationUtils {
 	 * @return a launch configuration corresponding to the given file or null if
 	 *         none exists.
 	 */
-	private static ILaunchConfiguration findMatchingLaunchConfiguration(
+	private static ILaunchConfiguration FindMatchingLaunchConfiguration(
 			ILaunchConfiguration[] existingAdaLaunchConfigurations,
-			IFile selectedFile) throws CoreException {
+			IPath executableFilePath) throws CoreException {
 
 		ILaunchConfiguration matchingLaunchConfig = null;
 
@@ -96,8 +98,8 @@ public class AdaLaunchConfigurationUtils {
 
 			ILaunchConfiguration currentConfig = existingAdaLaunchConfigurations[configIndex];
 
-			if (doesLaunchConfigurationMatchFile(currentConfig,
-					selectedFile)) {
+			if (DoesLaunchConfigurationMatchFile(currentConfig,
+					executableFilePath)) {
 				matchingLaunchConfig = currentConfig;
 			}
 
@@ -106,79 +108,82 @@ public class AdaLaunchConfigurationUtils {
 
 		return matchingLaunchConfig;
 	}
-	
+
 	/**
 	 * Checks if the given launch configuration corresponds to given file.
 	 * 
 	 * @param config
 	 *            a launch configuration to match to a file.
-	 * @param file
-	 *            a file to match to a launch configuration.
+	 * @param executableFilePath
+	 *            absolute path of a file to match to a launch configuration.
 	 * @return true if launch configurations corresponds to given file, false
 	 *         otherwise.
 	 */
-	private static boolean doesLaunchConfigurationMatchFile(
-			ILaunchConfiguration config, IFile file) throws CoreException {
-
-		String absoluteFileLocation = file.getRawLocation().toOSString();
+	private static boolean DoesLaunchConfigurationMatchFile(
+			ILaunchConfiguration config, IPath executableFilePath)
+			throws CoreException {
 
 		String configExecPath = config.getAttribute(
 				AdaLaunchConstants.EXECUTABLE_PATH, "");
 
-		return configExecPath.equals(absoluteFileLocation);
+		return configExecPath.equals(executableFilePath.toOSString());
 	}
-	
+
 	/**
 	 * Creates a new Ada launch configuration for given file.
 	 * 
-	 * @param selectedFile
-	 *            the file for which an Ada launch configuration shall be
-	 *            created.
+	 * @param executableFilePath
+	 *            absolute path of the file for which an Ada launch
+	 *            configuration shall be created.
 	 * @return the new Ada launch configuration for given file.
 	 * @throws CoreException
 	 *             if a new Ada launch configuration could not be created
 	 */
-	private static ILaunchConfiguration createNewLaunchConfigurationFor(
-			IFile selectedFile) throws CoreException {
+	private static ILaunchConfiguration CreateNewLaunchConfigurationFor(
+			IPath executableFilePath) throws CoreException {
 
 		ILaunchManager launchManager = DebugPlugin.getDefault()
 				.getLaunchManager();
 
 		String newAdaConfigName = launchManager
-				.generateLaunchConfigurationName(selectedFile.getName());
+				.generateLaunchConfigurationName(new File(executableFilePath
+						.toOSString()).getName());
 
-		ILaunchConfigurationWorkingCopy newAdaConfigWc = getAdaLaunchConfigType().newInstance(null, newAdaConfigName);
+		ILaunchConfigurationWorkingCopy newAdaConfigWc = GetAdaLaunchConfigType()
+				.newInstance(null, newAdaConfigName);
 
 		newAdaConfigWc.setAttribute(AdaLaunchConstants.EXECUTABLE_PATH,
-				selectedFile.getRawLocation().toOSString());
+				executableFilePath.toOSString());
 
 		ILaunchConfiguration newAdaConfig = newAdaConfigWc.doSave();
 
 		return newAdaConfig;
 	}
-	
+
 	/**
 	 * Returns a launch configuration for given file. It can be an existing
 	 * launch configuration if it already exists or a newly created one.
 	 * 
-	 * @param selectedFile
-	 *            the file for which a launch configuration is returned.
+	 * @param executableFilePath
+	 *            absolute path of the file for which a launch configuration is
+	 *            returned.
 	 * @return a launch configuration useable for given file.
 	 */
-	public static ILaunchConfiguration getLaunchConfigurationFor(IFile selectedFile) {
-		ILaunchConfiguration launchConfigForFile = findExistingLaunchConfigurationFor(selectedFile);
+	public static ILaunchConfiguration GetLaunchConfigurationFor(
+			IPath executableFilePath) {
+		ILaunchConfiguration launchConfigForFile = FindExistingLaunchConfigurationFor(executableFilePath);
 
 		boolean existingConfigWasFoundForFile = launchConfigForFile != null;
 
 		if (!existingConfigWasFoundForFile) {
 			try {
-				launchConfigForFile = createNewLaunchConfigurationFor(selectedFile);
+				launchConfigForFile = CreateNewLaunchConfigurationFor(executableFilePath);
 			} catch (CoreException e) {
 				ErrorLogger.appendExceptionToErrorLog(e);
 			}
 		}
-		
-		assert(launchConfigForFile != null);
+
+		assert (launchConfigForFile != null);
 
 		return launchConfigForFile;
 	}
