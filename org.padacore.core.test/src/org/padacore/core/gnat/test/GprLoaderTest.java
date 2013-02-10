@@ -25,7 +25,7 @@ public class GprLoaderTest {
 	}
 
 	@Test
-	public void testSingleGpr() {
+	public void testLoading() {
 		this.createFixture("sample_project.gpr");
 
 		this.exercize();
@@ -47,20 +47,12 @@ public class GprLoaderTest {
 		checkVariable("Long_List", new String[] { "main.ada", "pack1_.ada", "pack1.ada",
 				"pack2_.ada" });
 
-		checkVariable("a_exec_dir", "exe");
-		checkVariable("a_compiler_warnings", new String[]{"-gnatwua", "-gnaty", "-gnatQ"});
-		checkVariable("a_compiler_switches", new String[]{"-gnatwua", "-gnaty", "-gnatQ"});
-		
-	}
+		checkVariable("sample_project_included_exec_dir", "exe");
+		checkVariable("sample_project_included_compiler_warnings", new String[] { "-gnatwua",
+				"-gnaty", "-gnatQ" });
+		checkVariable("sample_project_included_compiler_switches", new String[] { "-gnatwua",
+				"-gnaty", "-gnatQ" });
 
-	// @Test
-	public void testMultipleGpr() {
-		this.createFixture("b.gpr");
-
-		this.exercize();
-
-		checkNbOfLoadedProjects(1);
-		checkVariable("from_external", "static");
 	}
 
 	private void checkNbOfLoadedProjects(int expectedNumberOfLoadedProject) {
@@ -69,8 +61,8 @@ public class GprLoaderTest {
 	}
 
 	private void checkVariable(String variableName, String expectedValue) {
-		assertEquals("Variable value " + variableName, expectedValue,
-				sut.getLoadedProjects().get(0).getVariable(variableName).getAsString());
+		assertEquals("Variable value " + variableName, expectedValue, sut.getLoadedProjects()
+				.get(0).getVariable(variableName).getAsString());
 	}
 
 	private void checkVariable(String variableName, String[] expectedValues) {

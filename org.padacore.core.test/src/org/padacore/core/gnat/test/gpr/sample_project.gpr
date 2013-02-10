@@ -1,4 +1,4 @@
-with "a.gpr";
+with "sample_project_included.gpr";
 
 project Sample_Project is
 
@@ -21,9 +21,9 @@ List_With_One_Element := ("-gnaty");
 List_With_Two_Elements := List_With_One_Element & "-gnatg";
 Long_List := ("main.ada", "pack1_.ada", "pack1.ada", "pack2_.ada");
 
-a_exec_dir := A'Exec_Dir;
-a_compiler_warnings := A.Compiler.Warnings;
-a_compiler_switches := A.Compiler'Switches("Ada");
+sample_project_included_exec_dir := sample_project_included'Exec_Dir;
+sample_project_included_compiler_warnings := sample_project_Included.Compiler.Warnings;
+sample_project_included_compiler_switches := sample_project_included.Compiler'Switches("Ada");
 
 warnings := ("-w");
 

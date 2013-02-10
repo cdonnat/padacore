@@ -1,4 +1,4 @@
-project A is
+project sample_project_included is
 
 obj := "obj";
 
@@ -11,4 +11,4 @@ package Compiler is
     
 end Compiler;
 
-end A;
+end sample_project_included;

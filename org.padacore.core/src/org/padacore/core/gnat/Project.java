@@ -38,6 +38,8 @@ public class Project implements IPropertiesProvider {
 		this.currentPackage = this.selfPackage;
 	}
 
+	// Queries:
+	
 	/**
 	 * @return The name of the context.
 	 */
@@ -45,10 +47,17 @@ public class Project implements IPropertiesProvider {
 		return this.name;
 	}
 
+	/**
+	 * @return The path to the gpr project.
+	 */
 	public IPath getPath() {
 		return this.pathToGpr;
 	}
 
+	/**
+	 * 
+	 * @return The list of reference projects.
+	 */
 	public List<IPropertiesProvider> getReferenceProjects() {
 		return new ArrayList<IPropertiesProvider>(this.references.values());
 	}
@@ -57,7 +66,7 @@ public class Project implements IPropertiesProvider {
 	 * 
 	 * @param varName
 	 *            Name of the variable to look for.
-	 * @return True is returned if the variable is found in the context.
+	 * @return True is returned if the variable is found in the project.
 	 */
 	public boolean variableIsDefined(String varName) {
 		return this.isDefined(varName, new VariablesProviderDelegate());
@@ -67,7 +76,7 @@ public class Project implements IPropertiesProvider {
 	 * 
 	 * @param attributeName
 	 *            Name of the attribute to look for
-	 * @return True is returned if the attribute is defined in the context.
+	 * @return True is returned if the attribute is defined in the project.
 	 */
 	public boolean attributeIsDefined(String attributeName) {
 		return this.isDefined(FormatAttribute(attributeName), new AttributesProviderDelegate());
@@ -95,7 +104,9 @@ public class Project implements IPropertiesProvider {
 		Assert.isLegal(this.attributeIsDefined(attributeName));
 		return this.get(FormatAttribute(attributeName), new AttributesProviderDelegate());
 	}
-
+	
+	// Commands:
+	
 	/**
 	 * Add a variable to the context.
 	 * 
@@ -129,6 +140,25 @@ public class Project implements IPropertiesProvider {
 	 */
 	public void addReferenceProject(Project referenceProject) {
 		this.references.put(referenceProject.getName(), referenceProject);
+	}
+	
+	/**
+	 * Notify the project that a begin package instruction has been found.
+	 * A new package is create and it is set to the current package.
+	 * 
+	 * @param packageName Name of the package.
+	 */
+	public void beginPackage(String packageName) {
+		Package newPackage = new Package(packageName.toLowerCase());
+		this.packages.put(newPackage.getName(), newPackage);
+		this.currentPackage = newPackage;
+	}
+
+	/**
+	 * Current package is set to self package.
+	 */
+	public void endPackage() {
+		this.currentPackage = this.selfPackage;
 	}
 
 	/**
@@ -249,15 +279,5 @@ public class Project implements IPropertiesProvider {
 
 	private static String FormatAttribute(String attributeName) {
 		return attributeName.replace('\'', '.');
-	}
-
-	public void beginPackage(String packageName) {
-		Package newPackage = new Package(packageName.toLowerCase());
-		this.packages.put(newPackage.getName(), newPackage);
-		this.currentPackage = newPackage;
-	}
-
-	public void endPackage() {
-		this.currentPackage = this.selfPackage;
 	}
 }

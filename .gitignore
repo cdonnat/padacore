@@ -2,3 +2,6 @@
 .DS_Store
 bin
 antlr-generated
+org.padacore.core/src/org/padacore/core/gnat/Gpr.tokens
+org.padacore.core/src/org/padacore/core/gnat/GprLexer.java
+org.padacore.core/src/org/padacore/core/gnat/GprParser.java
