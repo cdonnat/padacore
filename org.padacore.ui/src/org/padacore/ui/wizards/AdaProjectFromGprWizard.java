@@ -69,6 +69,7 @@ public class AdaProjectFromGprWizard extends Wizard implements IImportWizard {
 
 		/* Multiple projects creation attempt... */
 
+		//TODO clean this mess!
 		for (Project project : loader.getLoadedProjects()) {
 			GprBuilder builder = new GprBuilder(project);
 			GprProject gprFromFile = builder.build();

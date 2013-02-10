@@ -115,7 +115,7 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 			}
 		}
 
-		return new IProject[] { this.getProject() };
+		return this.getProject().getReferencedProjects();
 	}
 
 	/**
