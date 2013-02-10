@@ -35,6 +35,13 @@ public class GprGrammarTestUtils {
 	}
 
 	private static boolean RunSimpleParserRuleCheck(
+			SimpleParserRuleChecker checker, String input, boolean forceVariableDefinition) {
+		GprGrammarFixture fixture = new GprGrammarFixture(input, forceVariableDefinition);
+
+		return checker.isInputRecognizedByParserRule(fixture);
+	}
+			
+	private static boolean RunSimpleParserRuleCheck(
 			SimpleParserRuleChecker checker, String input) {
 		GprGrammarFixture fixture = new GprGrammarFixture(input);
 
@@ -157,7 +164,7 @@ public class GprGrammarTestUtils {
 		return RunSimpleParserRuleCheck(varDecChecker, input);
 	}
 
-	public static boolean IsTypedVariableDeclarationIdentified(String input) {
+	public static boolean IsTypedVariableDeclaration(String input) {
 		SimpleParserRuleChecker typedVariableDecChecker = new SimpleParserRuleChecker() {
 
 			@Override
@@ -167,10 +174,10 @@ public class GprGrammarTestUtils {
 			}
 		};
 
-		return RunSimpleParserRuleCheck(typedVariableDecChecker, input);
+		return RunSimpleParserRuleCheck(typedVariableDecChecker, input, false);
 	}
 
-	public static boolean isStringListIdentified(String input,
+	public static boolean IsStringListIdentified(String input,
 			Symbol expectedSymbol) {
 		SymbolParserRuleChecker stringListChecker = new SymbolParserRuleChecker() {
 
@@ -185,7 +192,7 @@ public class GprGrammarTestUtils {
 				expectedSymbol);
 	}
 
-	public static boolean isAttributeDeclaration(String input) {
+	public static boolean IsAttributeDeclaration(String input) {
 		SimpleParserRuleChecker attributeDecChecker = new SimpleParserRuleChecker() {
 
 			@Override
@@ -199,7 +206,7 @@ public class GprGrammarTestUtils {
 		return RunSimpleParserRuleCheck(attributeDecChecker, input);
 	}
 
-	public static boolean isAttributeReference(String input) {
+	public static boolean IsAttributeReference(String input) {
 		SimpleParserRuleChecker attributeRefChecker = new SimpleParserRuleChecker() {
 
 			@Override
@@ -213,7 +220,7 @@ public class GprGrammarTestUtils {
 		return RunSimpleParserRuleCheck(attributeRefChecker, input);
 	}
 
-	public static boolean isProjectDeclaration(String input) {
+	public static boolean IsProjectDeclaration(String input) {
 		SimpleParserRuleChecker projectDecChecker = new SimpleParserRuleChecker() {
 
 			@Override
@@ -227,7 +234,7 @@ public class GprGrammarTestUtils {
 		return RunSimpleParserRuleCheck(projectDecChecker, input);
 	}
 
-	public static boolean isExternalValue(String input) {
+	public static boolean IsExternalValue(String input) {
 		SimpleParserRuleChecker externalValueChecker = new SimpleParserRuleChecker() {
 
 			@Override
@@ -240,7 +247,7 @@ public class GprGrammarTestUtils {
 		return RunSimpleParserRuleCheck(externalValueChecker, input);
 	}
 
-	public static boolean isWithClause(String input) {
+	public static boolean IsWithClause(String input) {
 		SimpleParserRuleChecker withClauseChecker = new SimpleParserRuleChecker() {
 
 			@Override
@@ -253,7 +260,7 @@ public class GprGrammarTestUtils {
 		return RunSimpleParserRuleCheck(withClauseChecker, input);
 	}
 
-	public static boolean isContextClause(String input) {
+	public static boolean IsContextClause(String input) {
 		SimpleParserRuleChecker ctxtClauseChecker = new SimpleParserRuleChecker() {
 
 			@Override
@@ -266,7 +273,7 @@ public class GprGrammarTestUtils {
 		return RunSimpleParserRuleCheck(ctxtClauseChecker, input);
 	}
 
-	public static boolean isCaseStatement(String input) {
+	public static boolean IsCaseStatement(String input) {
 		SimpleParserRuleChecker caseStmtChecker = new SimpleParserRuleChecker() {
 
 			@Override
@@ -279,7 +286,7 @@ public class GprGrammarTestUtils {
 		return RunSimpleParserRuleCheck(caseStmtChecker, input);
 	}
 
-	public static boolean isTypedStringDeclaration(String input) {
+	public static boolean IsTypedStringDeclaration(String input) {
 		SimpleParserRuleChecker typedStringDecChecker = new SimpleParserRuleChecker() {
 
 			@Override
@@ -292,7 +299,7 @@ public class GprGrammarTestUtils {
 		return RunSimpleParserRuleCheck(typedStringDecChecker, input);
 	}
 
-	public static boolean isPackageDeclaration(String input) {
+	public static boolean IsPackageDeclaration(String input) {
 		SimpleParserRuleChecker packageDecChecker = new SimpleParserRuleChecker() {
 
 			@Override
@@ -305,7 +312,7 @@ public class GprGrammarTestUtils {
 		return RunSimpleParserRuleCheck(packageDecChecker, input);
 	}
 
-	public static boolean isProject(String input) {
+	public static boolean IsProject(String input) {
 		SimpleParserRuleChecker projectChecker = new SimpleParserRuleChecker() {
 
 			@Override

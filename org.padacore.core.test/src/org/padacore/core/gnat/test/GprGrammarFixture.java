@@ -13,9 +13,20 @@ public class GprGrammarFixture {
 	public GprParser parser;
 	public GprLoader loader;
 
+	public GprGrammarFixture(String testString, boolean forceVariableDefinition) {
+		try {
+			this.loader = new GprLoaderStub(forceVariableDefinition);
+			this.lexer = GprGrammarTestUtils.CreateLexer(testString);
+			this.parser = GprGrammarTestUtils.CreateParser(this.lexer,
+					this.loader);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public GprGrammarFixture(String testString) {
 		try {
-			this.loader = new GprLoaderStub();
+			this.loader = new GprLoaderStub(true);
 			this.lexer = GprGrammarTestUtils.CreateLexer(testString);
 			this.parser = GprGrammarTestUtils.CreateParser(this.lexer,
 					this.loader);

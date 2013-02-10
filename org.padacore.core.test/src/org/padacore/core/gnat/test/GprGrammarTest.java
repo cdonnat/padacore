@@ -74,22 +74,22 @@ public class GprGrammarTest {
 	@Test
 	public void testTypedVariableDeclaration() {
 		assertTrue(GprGrammarTestUtils
-				.IsTypedVariableDeclarationIdentified("That_OS : OS := \"GNU/Linux\";"));
+				.IsTypedVariableDeclaration("That_OS : OS := \"GNU/Linux\";"));
 
 		assertTrue(GprGrammarTestUtils
-				.IsTypedVariableDeclarationIdentified("This_OS : OS := external (\"OS\");"));
+				.IsTypedVariableDeclaration("This_OS : OS := external (\"OS\");"));
 
 		assertFalse(GprGrammarTestUtils
-				.IsTypedVariableDeclarationIdentified("That_OS : OS := \"Missing_Semicolon\""));
+				.IsTypedVariableDeclaration("That_OS : OS := \"Missing_Semicolon\""));
 		assertFalse(GprGrammarTestUtils
-				.IsTypedVariableDeclarationIdentified("Untyped_variable := \"GNU/Linux\";"));
+				.IsTypedVariableDeclaration("Untyped_variable := \"GNU/Linux\";"));
 	}
 
 	@Test
 	public void testStringList() {
 		List<String> expStringList = new ArrayList<String>();
 		expStringList.add("One_Element");
-		assertTrue(GprGrammarTestUtils.isStringListIdentified(
+		assertTrue(GprGrammarTestUtils.IsStringListIdentified(
 				"(\"One_Element\")", Symbol.CreateStringList(expStringList)));
 
 		expStringList.clear();
@@ -97,11 +97,11 @@ public class GprGrammarTest {
 		expStringList.add("Second");
 		expStringList.add("Third");
 
-		assertTrue(GprGrammarTestUtils.isStringListIdentified(
+		assertTrue(GprGrammarTestUtils.IsStringListIdentified(
 				"(\"First\", \"Second\", \"Third\"))",
 				Symbol.CreateStringList(expStringList)));
 
-		assertFalse(GprGrammarTestUtils.isStringListIdentified(
+		assertFalse(GprGrammarTestUtils.IsStringListIdentified(
 				"(\"Missing\" \"comma\")", Symbol.CreateString("")));
 	}
 
@@ -109,89 +109,89 @@ public class GprGrammarTest {
 	public void testAttributeDeclarationWithSimpleAttributes() {
 
 		assertTrue(GprGrammarTestUtils
-				.isAttributeDeclaration("for Object_Dir use \"objects\";"));
+				.IsAttributeDeclaration("for Object_Dir use \"objects\";"));
 		assertTrue(GprGrammarTestUtils
-				.isAttributeDeclaration("for Source_Dirs use (\"units\", \"test/drivers\");)"));
+				.IsAttributeDeclaration("for Source_Dirs use (\"units\", \"test/drivers\");)"));
 	}
 
 	@Test
 	public void testAttributeDeclarationWithIndexedAttributes() {
 		assertTrue(GprGrammarTestUtils
-				.isAttributeDeclaration("for Body (\"main\") use \"Main.ada\";"));
+				.IsAttributeDeclaration("for Body (\"main\") use \"Main.ada\";"));
 		assertTrue(GprGrammarTestUtils
-				.isAttributeDeclaration("for Switches (\"main.ada\") use (\"-v\", \"-gnatv\");"));
+				.IsAttributeDeclaration("for Switches (\"main.ada\") use (\"-v\", \"-gnatv\");"));
 		assertTrue(GprGrammarTestUtils
-				.isAttributeDeclaration("for Switches (\"main.ada\") use Builder'Switches (\"main.ada\") & \"-g\";"));
+				.IsAttributeDeclaration("for Switches (\"main.ada\") use Builder'Switches (\"main.ada\") & \"-g\";"));
 		assertTrue(GprGrammarTestUtils
-				.isAttributeDeclaration("for Default_Switches use Default.Builder'Default_Switches;"));
+				.IsAttributeDeclaration("for Default_Switches use Default.Builder'Default_Switches;"));
 	}
 
 	@Test
 	public void testAttributeReference() {
 		assertTrue(GprGrammarTestUtils
-				.isAttributeReference("project'Object_Dir"));
+				.IsAttributeReference("project'Object_Dir"));
 		assertTrue(GprGrammarTestUtils
-				.isAttributeReference("Naming'Dot_Replacement"));
+				.IsAttributeReference("Naming'Dot_Replacement"));
 		assertTrue(GprGrammarTestUtils
-				.isAttributeReference("Imported_Project'Source_Dirs"));
+				.IsAttributeReference("Imported_Project'Source_Dirs"));
 		assertTrue(GprGrammarTestUtils
-				.isAttributeReference("Imported_Project.Naming'Casing"));
+				.IsAttributeReference("Imported_Project.Naming'Casing"));
 		assertTrue(GprGrammarTestUtils
-				.isAttributeReference("Builder'Default_Switches (\"Ada\")"));
+				.IsAttributeReference("Builder'Default_Switches (\"Ada\")"));
 	}
 
 	@Test
 	public void testProjectDeclaration() {
 		assertTrue(GprGrammarTestUtils
-				.isProjectDeclaration("project Empty is    \n\r  end Empty;"));
+				.IsProjectDeclaration("project Empty is    \n\r  end Empty;"));
 
 		assertFalse(GprGrammarTestUtils
-				.isProjectDeclaration("project Missing_Semicolon is end Missing_Semicolon"));
+				.IsProjectDeclaration("project Missing_Semicolon is end Missing_Semicolon"));
 		assertFalse(GprGrammarTestUtils
-				.isProjectDeclaration("project Missing_End is Missing_End;"));
+				.IsProjectDeclaration("project Missing_End is Missing_End;"));
 		assertFalse(GprGrammarTestUtils
-				.isProjectDeclaration("project First_Name is	end Second_Name;"));
+				.IsProjectDeclaration("project First_Name is	end Second_Name;"));
 		assertFalse(GprGrammarTestUtils
-				.isProjectDeclaration("project My_Proj is	my_var : my_type := \"Value\"; my_var : my_type := \"New_Value\"; end My_Proj;"));
+				.IsProjectDeclaration("project My_Proj is	my_var : my_type := \"Value\"; my_var : my_type := \"New_Value\"; end My_Proj;"));
 	}
 
 	@Test
 	public void testExternalValue() {
 		assertTrue(GprGrammarTestUtils
-				.isExternalValue("external (\"Variable\")"));
+				.IsExternalValue("external (\"Variable\")"));
 
 		assertTrue(GprGrammarTestUtils
-				.isExternalValue("external (\"Variable\", \"Default_Value\")"));
+				.IsExternalValue("external (\"Variable\", \"Default_Value\")"));
 	}
 
 	@Test
 	public void testWithClause() {
 		assertTrue(GprGrammarTestUtils
-				.isWithClause("with \"../../my_project.gpr\";"));
+				.IsWithClause("with \"../../my_project.gpr\";"));
 		assertTrue(GprGrammarTestUtils
-				.isWithClause("with \"..\\..\\my_project_windows.gpr\", \"../my_project_linux.gpr\";"));
+				.IsWithClause("with \"..\\..\\my_project_windows.gpr\", \"../my_project_linux.gpr\";"));
 
 		assertFalse(GprGrammarTestUtils
-				.isWithClause("with \"../../missing_semicolon.gpr\""));
+				.IsWithClause("with \"../../missing_semicolon.gpr\""));
 	}
 
 	@Test
 	public void testContextClause() {
-		assertTrue(GprGrammarTestUtils.isContextClause("\"\""));
+		assertTrue(GprGrammarTestUtils.IsContextClause("\"\""));
 		assertTrue(GprGrammarTestUtils
-				.isContextClause("with \"../../my_project.gpr\"; with \"..\\..\\my_project_windows.gpr\";"));
+				.IsContextClause("with \"../../my_project.gpr\"; with \"..\\..\\my_project_windows.gpr\";"));
 	}
 
 	@Test
 	public void testCaseStatement() {
 		assertTrue(GprGrammarTestUtils
-				.isCaseStatement("case OS is "
+				.IsCaseStatement("case OS is "
 						+ "when \"GNU/Linux\" | \"Unix\" => for Switches (\"Ada\") use (\"-gnath\"); "
 						+ "when \"NT\" => for Switches (\"Ada\") use (\"-gnatP\"); "
 						+ "when others => null; " + "end case;"));
 
 		assertFalse(GprGrammarTestUtils
-				.isCaseStatement("case OS is"
+				.IsCaseStatement("case OS is"
 						+ " when \"GNU/Linux\" | \"Unix\" => for Switches (\"Ada\") use (\"-gnath\");"
 						+ "when \"NT\" => for Switches (\"Ada\") use (\"-gnatP\"); "
 						+ "when others => null; " + "end;"));
@@ -200,18 +200,18 @@ public class GprGrammarTest {
 	@Test
 	public void testTypedStringDeclaration() {
 		assertTrue(GprGrammarTestUtils
-				.isTypedStringDeclaration("type OS is (\"NT\", \"nt\", \"Unix\", \"GNU/Linux\", \"other OS\");"));
+				.IsTypedStringDeclaration("type OS is (\"NT\", \"nt\", \"Unix\", \"GNU/Linux\", \"other OS\");"));
 	}
 
 	@Test
 	public void testPackageDeclaration() {
 		assertTrue(GprGrammarTestUtils
-				.isPackageDeclaration("package Compiler renames Logging.Compiler;"));
+				.IsPackageDeclaration("package Compiler renames Logging.Compiler;"));
 	}
 
 	@Test
 	public void testProject() {
 		assertTrue(GprGrammarTestUtils
-				.isProject("with \"../../included.gpr\"; project My_Project is end My_Project;"));
+				.IsProject("with \"../../included.gpr\"; project My_Project is end My_Project;"));
 	}
 }

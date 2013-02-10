@@ -10,6 +10,12 @@ import org.padacore.core.gnat.Project;
 import org.padacore.core.gnat.Symbol;
 
 public class GprLoaderStub extends GprLoader {
+	
+	private boolean forceVariableDefinition;
+
+	public GprLoaderStub(boolean forceVariableDefinition) {
+		this.forceVariableDefinition = forceVariableDefinition;
+	}
 
 	@Override
 	public void addVariable(String name, Symbol value) {
@@ -21,7 +27,7 @@ public class GprLoaderStub extends GprLoader {
 
 	@Override
 	public boolean variableIsDefined(String name) {
-		return true;
+		return this.forceVariableDefinition;
 	}
 
 	@Override
