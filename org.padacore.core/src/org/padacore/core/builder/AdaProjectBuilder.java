@@ -101,11 +101,6 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 		buildJob.addJobChangeListener(new DerivedResourcesIdentifier(this
 				.getProject(), this.cleaningJob));
 		buildJob.schedule();
-		try {
-			buildJob.join();
-		} catch (InterruptedException e) {
-			
-		}
 	}
 
 	@Override
