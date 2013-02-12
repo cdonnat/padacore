@@ -14,7 +14,6 @@ public class GprProject {
 	private boolean isExecutable = false;
 	private String execDir = null;
 	private List<String> execSourceNames = new ArrayList<String>(1);
-	private List<String> withedProjects = new ArrayList<String>();
 	private IPath rootDirPath;
 
 	/**
@@ -124,31 +123,12 @@ public class GprProject {
 	}
 
 	/**
-	 * Add a new withed project
-	 * 
-	 * @param projectPath
-	 *            Path of the withed project.
-	 */
-	public void addWithedProject(String projectPath) {
-		this.withedProjects.add(projectPath);
-	}
-
-	/**
 	 * The project name is returned.
 	 * 
 	 * @return The project name.
 	 */
 	public String getName() {
 		return name;
-	}
-
-	/**
-	 * Return the name of the GPR file associated.
-	 * 
-	 * @return The name of the GPR file associated.
-	 */
-	public String getFileName() {
-		return this.getName() + ".gpr";
 	}
 
 	/**

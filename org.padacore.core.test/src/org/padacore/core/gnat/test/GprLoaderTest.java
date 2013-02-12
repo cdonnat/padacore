@@ -53,6 +53,8 @@ public class GprLoaderTest {
 		checkVariable("sample_project_included_compiler_switches", new String[] { "-gnatwua",
 				"-gnaty", "-gnatQ" });
 
+		assertEquals(this.sut.getLoadedProjects().get(0).getReferenceProjects().size(), 1);
+
 	}
 
 	private void checkNbOfLoadedProjects(int expectedNumberOfLoadedProject) {

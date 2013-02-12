@@ -31,11 +31,6 @@ public class GprLoaderStub extends GprLoader {
 	}
 
 	@Override
-	public boolean attributeIsDefined(String name) {
-		return true;
-	}
-
-	@Override
 	public Symbol getVariable(String name) {
 		return Symbol.CreateString("");
 	}

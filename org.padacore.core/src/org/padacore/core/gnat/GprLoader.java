@@ -10,7 +10,6 @@ import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.padacore.core.utils.ErrorLog;
 
 public class GprLoader {
@@ -23,8 +22,6 @@ public class GprLoader {
 	public GprLoader() {
 		this.projectsToLoad = new Stack<Project>();
 		this.loadedProjects = new ArrayList<Project>();
-		this.projectsToLoad.push(new Project(new Path("FIXME"))); // for test
-																	// purpose
 	}
 
 	/**
@@ -61,18 +58,6 @@ public class GprLoader {
 	 */
 	public boolean variableIsDefined(String name) {
 		return this.getCurrentProject().variableIsDefined(name);
-	}
-
-	/**
-	 * Return whether the attribute is defined in the current project.
-	 * 
-	 * @param name
-	 *            Name of the attribute.
-	 * @return True is returned if attribute is defined in the current project.
-	 *         False otherwise.
-	 */
-	public boolean attributeIsDefined(String name) {
-		return this.getCurrentProject().attributeIsDefined(name);
 	}
 
 	/**
