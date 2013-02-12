@@ -15,7 +15,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.padacore.core.utils.ErrorLogger;
+import org.padacore.core.utils.ErrorLog;
 import org.padacore.core.utils.ExternalProcess;
 import org.padacore.core.utils.ExternalProcessOutput;
 
@@ -101,6 +101,11 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 		buildJob.addJobChangeListener(new DerivedResourcesIdentifier(this
 				.getProject(), this.cleaningJob));
 		buildJob.schedule();
+		try {
+			buildJob.join();
+		} catch (InterruptedException e) {
+			
+		}
 	}
 
 	@Override
@@ -114,7 +119,7 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 				this.build(kind);
 			}
 		}
-
+		
 		return this.getProject().getReferencedProjects();
 	}
 
@@ -187,7 +192,7 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 		try {
 			delta.accept(derivedResourcesFinder);
 		} catch (CoreException e) {
-			ErrorLogger.appendExceptionToErrorLog(e);
+			ErrorLog.appendException(e);
 		}
 		return derivedResourcesFinder.hasNonDerivedFileBeenFound();
 	}
@@ -219,7 +224,7 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 			getProject().refreshLocal(IResource.DEPTH_INFINITE,
 					new NullProgressMonitor());
 		} catch (CoreException e) {
-			ErrorLogger.appendExceptionToErrorLog(e);
+			ErrorLog.appendException(e);
 		}
 	}
 }

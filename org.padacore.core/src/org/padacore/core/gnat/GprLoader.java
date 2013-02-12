@@ -11,7 +11,7 @@ import org.antlr.runtime.RecognitionException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
-import org.padacore.core.utils.ErrorLogger;
+import org.padacore.core.utils.ErrorLog;
 
 public class GprLoader {
 
@@ -112,10 +112,11 @@ public class GprLoader {
 			GprParser parser = new GprParser(this, new CommonTokenStream(lexer));
 			parser.project();
 		} catch (IOException e) {
-			ErrorLogger.appendMessageToErrorLog("Error while opening GPR file "
-					+ path.toOSString(), IStatus.ERROR);
+			ErrorLog.appendMessage(
+					"Error while opening GPR file " + path.toOSString(),
+					IStatus.ERROR);
 		} catch (RecognitionException e) {
-			ErrorLogger.appendMessageToErrorLog("GPR file " + path.toOSString()
+			ErrorLog.appendMessage("GPR file " + path.toOSString()
 					+ " format is incorrect", IStatus.ERROR);
 		}
 	}

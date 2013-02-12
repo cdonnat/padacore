@@ -14,7 +14,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
-import org.padacore.core.utils.ErrorLogger;
+import org.padacore.core.utils.ErrorLog;
 import org.padacore.core.utils.FileUtils;
 
 public class ProjectBuilder {
@@ -84,15 +84,15 @@ public class ProjectBuilder {
 			description.setLocation(location);
 			project.create(description, null);
 			project.open(null);
-			
+
 			if (pathToLinkedGprProject != null) {
 				this.linkProjectInWorkspaceTo(project, pathToLinkedGprProject);
 			}
-			
+
 			this.addAdaNature(project);
 			this.adaProjectAssociationManager.associateToAdaProject(project);
 		} catch (CoreException e) {
-			ErrorLogger.appendExceptionToErrorLog(e);
+			ErrorLog.appendException(e);
 		}
 
 		return project;
@@ -143,12 +143,11 @@ public class ProjectBuilder {
 				shortcutToGprFile.createLink(gprFileAbsolutePath,
 						IResource.NONE, null);
 			} else {
-				ErrorLogger.appendMessageToErrorLog(
-						"Invalid link for GPR file of " + project.getName()
-								+ " project", IStatus.ERROR);
+				ErrorLog.appendMessage("Invalid link for GPR file of "
+						+ project.getName() + " project", IStatus.ERROR);
 			}
 		} catch (CoreException e) {
-			ErrorLogger.appendExceptionToErrorLog(e);
+			ErrorLog.appendException(e);
 		}
 	}
 
@@ -181,12 +180,12 @@ public class ProjectBuilder {
 				linkedFolder.createLink(gprFileParentFolderAbsolutePath,
 						IResource.NONE, null);
 			} else {
-				ErrorLogger.appendMessageToErrorLog(
+				ErrorLog.appendMessage(
 						"Invalid link for folder of " + project.getName()
 								+ " project", IStatus.ERROR);
 			}
 		} catch (CoreException e) {
-			ErrorLogger.appendExceptionToErrorLog(e);
+			ErrorLog.appendException(e);
 		}
 	}
 
@@ -213,7 +212,7 @@ public class ProjectBuilder {
 				FileUtils.CreateNewFileWithContents(filePath,
 						this.defaultMainContents());
 			} catch (IOException e) {
-				ErrorLogger.appendMessageToErrorLog(
+				ErrorLog.appendMessage(
 						"Error while creating main procedure in "
 								+ filePath.toOSString(), IStatus.ERROR);
 			}

@@ -9,7 +9,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
-import org.padacore.core.utils.ErrorLogger;
+import org.padacore.core.utils.ErrorLog;
 
 public class AdaLaunchConfigurationUtils {
 
@@ -179,7 +179,7 @@ public class AdaLaunchConfigurationUtils {
 			try {
 				launchConfigForFile = CreateNewLaunchConfigurationFor(executableFilePath);
 			} catch (CoreException e) {
-				ErrorLogger.appendExceptionToErrorLog(e);
+				ErrorLog.appendException(e);
 			}
 		}
 

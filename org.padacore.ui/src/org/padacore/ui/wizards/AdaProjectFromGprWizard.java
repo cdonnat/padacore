@@ -17,7 +17,7 @@ import org.padacore.core.gnat.GprBuilder;
 import org.padacore.core.gnat.GprLoader;
 import org.padacore.core.gnat.GprProject;
 import org.padacore.core.gnat.Project;
-import org.padacore.core.utils.ErrorLogger;
+import org.padacore.core.utils.ErrorLog;
 
 /**
  * This class defines a wizard which enables user to import an existing GPR
@@ -33,7 +33,8 @@ public class AdaProjectFromGprWizard extends Wizard implements IImportWizard {
 
 	public AdaProjectFromGprWizard() {
 		setWindowTitle("Import existing GPR Project");
-		this.eclipseAdaProjectBuilder = new ProjectBuilder(new GnatAdaProjectAssociationManager());
+		this.eclipseAdaProjectBuilder = new ProjectBuilder(
+				new GnatAdaProjectAssociationManager());
 	}
 
 	@Override
@@ -69,30 +70,33 @@ public class AdaProjectFromGprWizard extends Wizard implements IImportWizard {
 
 		/* Multiple projects creation attempt... */
 
-		//TODO clean this mess!
+		// TODO clean this mess!
 		for (Project project : loader.getLoadedProjects()) {
 			GprBuilder builder = new GprBuilder(project, project.getPath());
 			GprProject gprFromFile = builder.build();
 
-			createdProject = eclipseAdaProjectBuilder.createProjectWithAdaNatureAt(
-					gprFromFile.getName(), null, false, project.getPath());
+			createdProject = eclipseAdaProjectBuilder
+					.createProjectWithAdaNatureAt(gprFromFile.getName(), null,
+							false, project.getPath());
 		}
 
 		for (Project project : loader.getLoadedProjects()) {
 			IWorkspaceRoot workspace = ResourcesPlugin.getWorkspace().getRoot();
-			IProject[] referencedProjects = new IProject[project.getReferenceProjects().size()];
+			IProject[] referencedProjects = new IProject[project
+					.getReferenceProjects().size()];
 			for (int i = 0; i < project.getReferenceProjects().size(); i++) {
-				referencedProjects[i] = workspace.getProject(project.getReferenceProjects().get(i)
-						.getName());
+				referencedProjects[i] = workspace.getProject(project
+						.getReferenceProjects().get(i).getName());
 			}
 
 			IProject eclipseProject = workspace.getProject(project.getName());
 			try {
-				IProjectDescription description = eclipseProject.getDescription();
+				IProjectDescription description = eclipseProject
+						.getDescription();
 				description.setReferencedProjects(referencedProjects);
 				eclipseProject.setDescription(description, null);
 			} catch (CoreException e) {
-				ErrorLogger.appendExceptionToErrorLog(e);
+				ErrorLog.appendException(e);
 			}
 		}
 	}

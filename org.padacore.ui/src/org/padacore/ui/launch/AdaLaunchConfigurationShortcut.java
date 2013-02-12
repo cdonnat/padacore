@@ -17,7 +17,7 @@ import org.padacore.core.AbstractAdaProjectAssociationManager;
 import org.padacore.core.AdaProjectNature;
 import org.padacore.core.IAdaProject;
 import org.padacore.core.launch.AdaLaunchConfigurationUtils;
-import org.padacore.core.utils.ErrorLogger;
+import org.padacore.core.utils.ErrorLog;
 
 public class AdaLaunchConfigurationShortcut implements ILaunchShortcut {
 
@@ -85,14 +85,13 @@ public class AdaLaunchConfigurationShortcut implements ILaunchShortcut {
 				LaunchExecutableAtPath(executablePath);
 
 			} else {
-				ErrorLogger
-						.appendMessageToErrorLog(
-								"Launching a project with multiple executables is not implemented yet",
-								IStatus.WARNING);
+				ErrorLog.appendMessage(
+						"Launching a project with multiple executables is not implemented yet",
+						IStatus.WARNING);
 			}
 
 		} catch (CoreException e) {
-			ErrorLogger.appendExceptionToErrorLog(e);
+			ErrorLog.appendException(e);
 		}
 	}
 
@@ -110,7 +109,7 @@ public class AdaLaunchConfigurationShortcut implements ILaunchShortcut {
 					AdaProjectNature.NATURE_ID));
 
 		} catch (CoreException e) {
-			ErrorLogger.appendExceptionToErrorLog(e);
+			ErrorLog.appendException(e);
 		}
 
 		LaunchExecutableAtPath(selectedFile.getRawLocation());
@@ -129,7 +128,7 @@ public class AdaLaunchConfigurationShortcut implements ILaunchShortcut {
 		try {
 			configForFile.launch(ILaunchManager.RUN_MODE, null);
 		} catch (CoreException e) {
-			ErrorLogger.appendExceptionToErrorLog(e);
+			ErrorLog.appendException(e);
 		}
 
 	}

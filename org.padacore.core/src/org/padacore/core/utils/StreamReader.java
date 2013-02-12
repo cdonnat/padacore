@@ -30,8 +30,7 @@ class StreamReader extends Observable implements Runnable {
 				this.notifyObservers(new String(line));
 			}
 		} catch (IOException e) {
-			ErrorLogger.appendMessageToErrorLog("Error while reading input",
-					IStatus.ERROR);
+			ErrorLog.appendException(e, IStatus.ERROR);
 		} finally {
 			try {
 				this.input.close();

@@ -9,7 +9,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.padacore.core.AbstractAdaProjectAssociationManager;
 import org.padacore.core.IAdaProject;
-import org.padacore.core.utils.ErrorLogger;
+import org.padacore.core.utils.ErrorLog;
 
 /**
  * Display error messages from gprbuild.
@@ -30,7 +30,7 @@ public class GprbuildErrObserver implements Observer {
 		try {
 			this.project.deleteMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
 		} catch (CoreException e) {
-			ErrorLogger.appendExceptionToErrorLog(e);
+			ErrorLog.appendException(e);
 		}
 	}
 
@@ -57,7 +57,7 @@ public class GprbuildErrObserver implements Observer {
 				m.setAttribute(IMarker.SEVERITY, error.severity());
 			}
 		} catch (CoreException e) {
-			ErrorLogger.appendExceptionToErrorLog(e);
+			ErrorLog.appendException(e);
 		}
 	}
 

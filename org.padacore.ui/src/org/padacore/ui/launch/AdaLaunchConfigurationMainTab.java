@@ -13,7 +13,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.padacore.core.launch.AdaLaunchConstants;
-import org.padacore.core.utils.ErrorLogger;
+import org.padacore.core.utils.ErrorLog;
 
 public class AdaLaunchConfigurationMainTab extends AbstractLaunchConfigurationTab {
 
@@ -55,7 +55,7 @@ public class AdaLaunchConfigurationMainTab extends AbstractLaunchConfigurationTa
 			progText.setText(configuration.getAttribute(AdaLaunchConstants.EXECUTABLE_PATH, ""));
 
 		} catch (CoreException e) {
-			ErrorLogger.appendExceptionToErrorLog(e);
+			ErrorLog.appendException(e);
 		}
 	}
 

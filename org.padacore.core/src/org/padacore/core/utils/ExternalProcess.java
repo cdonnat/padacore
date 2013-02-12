@@ -58,10 +58,8 @@ public class ExternalProcess implements IExternalProcess {
 			runCmd(monitor, processBuilder);
 			info.finish(isSuccessful());
 		} catch (IOException e) {
-			ErrorLogger
-					.appendMessageToErrorLog(
-							"Error while launching external command: "
-									+ cmdWithArgs[0], IStatus.ERROR);
+			ErrorLog.appendMessage("Error while launching external command: "
+					+ cmdWithArgs[0], IStatus.ERROR);
 		}
 	}
 
@@ -84,10 +82,7 @@ public class ExternalProcess implements IExternalProcess {
 			errReader.join();
 			canceler.join();
 		} catch (InterruptedException e) {
-			ErrorLogger
-					.appendMessageToErrorLog(
-							"Error while waiting for the end of stdout and stderr reader threads",
-							IStatus.WARNING);
+			ErrorLog.appendException(e, IStatus.WARNING);
 		}
 	}
 

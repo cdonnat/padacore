@@ -18,7 +18,7 @@ import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
 import org.padacore.core.AbstractAdaProjectAssociationManager;
 import org.padacore.core.IAdaProject;
-import org.padacore.core.utils.ErrorLogger;
+import org.padacore.core.utils.ErrorLog;
 
 /**
  * This class implements a build process listener which purpose is to detect all
@@ -52,9 +52,7 @@ public class DerivedResourcesIdentifier implements IJobChangeListener {
 			try {
 				this.cleaningJob.join();
 			} catch (InterruptedException e) {
-				ErrorLogger.appendMessageToErrorLog(
-						"Error while waiting for the end of cleaning job",
-						IStatus.WARNING);
+				ErrorLog.appendException(e, IStatus.WARNING);
 			}
 		}
 	}
@@ -212,7 +210,7 @@ public class DerivedResourcesIdentifier implements IJobChangeListener {
 				resource.setDerived(true, null);
 			}
 		} catch (CoreException e) {
-			ErrorLogger.appendExceptionToErrorLog(e);
+			ErrorLog.appendException(e);
 		}
 	}
 
@@ -228,7 +226,7 @@ public class DerivedResourcesIdentifier implements IJobChangeListener {
 			this.setResourcesAsDerived(resourcesGeneratedByBuild);
 
 		} catch (CoreException e) {
-			ErrorLogger.appendExceptionToErrorLog(e);
+			ErrorLog.appendException(e);
 		}
 	}
 

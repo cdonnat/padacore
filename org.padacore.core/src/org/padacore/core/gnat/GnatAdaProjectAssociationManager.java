@@ -11,7 +11,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.padacore.core.AbstractAdaProjectAssociationManager;
 import org.padacore.core.AdaProjectNature;
 import org.padacore.core.IAdaProjectFactory;
-import org.padacore.core.utils.ErrorLogger;
+import org.padacore.core.utils.ErrorLog;
 
 public class GnatAdaProjectAssociationManager extends
 		AbstractAdaProjectAssociationManager {
@@ -24,7 +24,7 @@ public class GnatAdaProjectAssociationManager extends
 			Assert.isLegal(eclipseProject.hasNature(AdaProjectNature.NATURE_ID)
 					&& eclipseProject.isOpen());
 		} catch (CoreException e) {
-			ErrorLogger.appendExceptionToErrorLog(e);
+			ErrorLog.appendException(e);
 		}
 
 		IPath gprAbsolutePath = this.getGprAbsolutePath(eclipseProject);
@@ -39,14 +39,13 @@ public class GnatAdaProjectAssociationManager extends
 			Assert.isTrue(AbstractAdaProjectAssociationManager
 					.GetAssociatedAdaProject(eclipseProject) != null);
 		} catch (CoreException e) {
-			ErrorLogger.appendExceptionToErrorLog(e);
+			ErrorLog.appendException(e);
 		} catch (IOException e) {
-			ErrorLogger.appendMessageToErrorLog("Error while opening GPR file:"
+			ErrorLog.appendMessage("Error while opening GPR file:"
 					+ gprAbsolutePath.toOSString(), IStatus.ERROR);
 		} catch (RecognitionException e) {
-			ErrorLogger.appendMessageToErrorLog(
-					"GPR file " + gprAbsolutePath.toOSString()
-							+ "format is incorrect", IStatus.ERROR);
+			ErrorLog.appendMessage("GPR file " + gprAbsolutePath.toOSString()
+					+ "format is incorrect", IStatus.ERROR);
 		}
 	}
 

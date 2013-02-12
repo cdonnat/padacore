@@ -6,7 +6,7 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
-import org.padacore.core.utils.ErrorLogger;
+import org.padacore.core.utils.ErrorLog;
 
 public class ProjectOpeningListener implements IResourceChangeListener {
 
@@ -29,7 +29,7 @@ public class ProjectOpeningListener implements IResourceChangeListener {
 		try {
 			this.findAllProjectsWhichHaveBeenOpened(rootDelta);
 		} catch (CoreException e) {
-			ErrorLogger.appendExceptionToErrorLog(e);
+			ErrorLog.appendException(e);
 		}
 	}
 
