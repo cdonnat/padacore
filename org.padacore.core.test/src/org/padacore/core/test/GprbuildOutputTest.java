@@ -50,5 +50,7 @@ public class GprbuildOutputTest {
 				Error.SEVERITY_ERROR, "missing \";\"");
 		performErrorTestCase("toto_test.ads:5:35:warning: variable toto is not referenced",
 				"toto_test.ads", 5, 35, Error.SEVERITY_WARNING, "variable toto is not referenced");
+		performErrorTestCase("toto_test.ads:5:35:error: variable toto is not referenced",
+				"toto_test.ads", 5, 35, Error.SEVERITY_ERROR, "variable toto is not referenced");
 	}
 }
