@@ -1,4 +1,4 @@
-package org.padacore.core;
+package org.padacore.core.project;
 
 import java.io.File;
 import java.io.IOException;

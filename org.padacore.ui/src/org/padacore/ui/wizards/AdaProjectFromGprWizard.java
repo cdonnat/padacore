@@ -11,12 +11,12 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
-import org.padacore.core.ProjectBuilder;
 import org.padacore.core.gnat.GnatAdaProjectAssociationManager;
 import org.padacore.core.gnat.GprBuilder;
 import org.padacore.core.gnat.GprLoader;
 import org.padacore.core.gnat.GprProject;
 import org.padacore.core.gnat.Project;
+import org.padacore.core.project.ProjectBuilder;
 import org.padacore.core.utils.ErrorLog;
 
 /**

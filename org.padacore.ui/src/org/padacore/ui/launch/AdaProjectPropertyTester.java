@@ -5,9 +5,9 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
-import org.padacore.core.AbstractAdaProjectAssociationManager;
-import org.padacore.core.AdaProjectNature;
-import org.padacore.core.IAdaProject;
+import org.padacore.core.project.AbstractAdaProjectAssociationManager;
+import org.padacore.core.project.AdaProjectNature;
+import org.padacore.core.project.IAdaProject;
 
 public class AdaProjectPropertyTester extends PropertyTester {
 

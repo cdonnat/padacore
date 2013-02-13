@@ -1,8 +1,8 @@
 package org.padacore.core.gnat;
 
 import org.eclipse.core.runtime.IPath;
-import org.padacore.core.IAdaProject;
-import org.padacore.core.IAdaProjectFactory;
+import org.padacore.core.project.IAdaProject;
+import org.padacore.core.project.IAdaProjectFactory;
 
 public class GnatAdaProjectFactory implements IAdaProjectFactory {
 

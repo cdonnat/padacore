@@ -16,8 +16,8 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
-import org.padacore.core.AbstractAdaProjectAssociationManager;
-import org.padacore.core.IAdaProject;
+import org.padacore.core.project.AbstractAdaProjectAssociationManager;
+import org.padacore.core.project.IAdaProject;
 import org.padacore.core.utils.ErrorLog;
 
 /**

@@ -1,4 +1,4 @@
-package org.padacore.core.test;
+package org.padacore.core.project.test;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;

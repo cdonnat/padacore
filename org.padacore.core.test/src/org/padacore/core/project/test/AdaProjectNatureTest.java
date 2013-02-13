@@ -1,4 +1,4 @@
-package org.padacore.core.test;
+package org.padacore.core.project.test;
 
 import static org.junit.Assert.assertTrue;
 
@@ -10,7 +10,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.padacore.core.AdaProjectNature;
+import org.padacore.core.project.AdaProjectNature;
 import org.padacore.core.test.utils.CommonTestUtils;
 
 public class AdaProjectNatureTest {
