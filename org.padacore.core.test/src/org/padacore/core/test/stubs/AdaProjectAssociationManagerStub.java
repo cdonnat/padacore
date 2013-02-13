@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
-import org.padacore.core.AbstractAdaProjectAssociationManager;
+import org.padacore.core.project.AbstractAdaProjectAssociationManager;
 
 public class AdaProjectAssociationManagerStub extends
 		AbstractAdaProjectAssociationManager {

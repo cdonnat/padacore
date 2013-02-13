@@ -1,4 +1,4 @@
-package org.padacore.core.test;
+package org.padacore.core.project.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -14,7 +14,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.padacore.core.ProjectBuilder;
+import org.padacore.core.project.ProjectBuilder;
 import org.padacore.core.test.stubs.AdaProjectAssociationManagerStub;
 import org.padacore.core.test.utils.CommonTestUtils;
 import org.padacore.core.test.utils.ProjectDescriptionUtils;

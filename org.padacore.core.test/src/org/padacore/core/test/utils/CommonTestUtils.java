@@ -17,11 +17,11 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
-import org.padacore.core.AdaProjectNature;
-import org.padacore.core.IAdaProject;
 import org.padacore.core.gnat.GnatAdaProject;
 import org.padacore.core.gnat.GprProject;
 import org.padacore.core.launch.AdaLaunchConstants;
+import org.padacore.core.project.AdaProjectNature;
+import org.padacore.core.project.IAdaProject;
 
 public class CommonTestUtils {
 

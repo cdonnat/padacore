@@ -1,4 +1,4 @@
-package org.padacore.core;
+package org.padacore.core.project;
 
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IProject;

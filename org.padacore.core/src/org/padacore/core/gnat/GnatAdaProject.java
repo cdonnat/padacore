@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.*;
-import org.padacore.core.IAdaProject;
+import org.padacore.core.project.IAdaProject;
 
 public class GnatAdaProject implements IAdaProject {
 

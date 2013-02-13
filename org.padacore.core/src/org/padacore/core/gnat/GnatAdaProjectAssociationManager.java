@@ -8,9 +8,9 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
-import org.padacore.core.AbstractAdaProjectAssociationManager;
-import org.padacore.core.AdaProjectNature;
-import org.padacore.core.IAdaProjectFactory;
+import org.padacore.core.project.AbstractAdaProjectAssociationManager;
+import org.padacore.core.project.AdaProjectNature;
+import org.padacore.core.project.IAdaProjectFactory;
 import org.padacore.core.utils.ErrorLog;
 
 public class GnatAdaProjectAssociationManager extends

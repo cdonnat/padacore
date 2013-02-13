@@ -7,8 +7,8 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.padacore.core.AbstractAdaProjectAssociationManager;
-import org.padacore.core.IAdaProject;
+import org.padacore.core.project.AbstractAdaProjectAssociationManager;
+import org.padacore.core.project.IAdaProject;
 import org.padacore.core.utils.ErrorLog;
 
 /**

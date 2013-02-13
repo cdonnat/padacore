@@ -16,8 +16,8 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.padacore.core.AdaProjectNature;
-import org.padacore.core.ProjectBuilder;
+import org.padacore.core.project.AdaProjectNature;
+import org.padacore.core.project.ProjectBuilder;
 
 public class ProjectDescriptionUtils {
 

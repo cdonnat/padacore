@@ -5,7 +5,7 @@ import java.io.IOException;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.padacore.core.ProjectBuilder;
+import org.padacore.core.project.ProjectBuilder;
 import org.padacore.core.utils.FileUtils;
 
 /**

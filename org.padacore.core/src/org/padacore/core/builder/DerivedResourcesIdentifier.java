@@ -12,8 +12,8 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.padacore.core.AbstractAdaProjectAssociationManager;
-import org.padacore.core.IAdaProject;
+import org.padacore.core.project.AbstractAdaProjectAssociationManager;
+import org.padacore.core.project.IAdaProject;
 import org.padacore.core.utils.ErrorLog;
 
 /**

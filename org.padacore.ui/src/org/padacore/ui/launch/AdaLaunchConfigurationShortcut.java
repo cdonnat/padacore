@@ -13,10 +13,10 @@ import org.eclipse.debug.ui.ILaunchShortcut;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IEditorPart;
-import org.padacore.core.AbstractAdaProjectAssociationManager;
-import org.padacore.core.AdaProjectNature;
-import org.padacore.core.IAdaProject;
 import org.padacore.core.launch.AdaLaunchConfigurationUtils;
+import org.padacore.core.project.AbstractAdaProjectAssociationManager;
+import org.padacore.core.project.AdaProjectNature;
+import org.padacore.core.project.IAdaProject;
 import org.padacore.core.utils.ErrorLog;
 
 public class AdaLaunchConfigurationShortcut implements ILaunchShortcut {
