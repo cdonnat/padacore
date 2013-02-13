@@ -6,9 +6,6 @@ import java.util.regex.Pattern;
 public class GprbuildOutput {
 
 	private static final String PROGRESS_PATTERN_STRING = "completed (\\d+) out of (\\d+)";
-	// private static final String ERROR_PATTERN_STRING =
-	// "(.*.ad?):([0-9]+):([0-9]) (.*)";
-
 	private static final String ERROR_PATTERN_STRING = "^(.+):(\\d+):(\\d+):(.*:)?\\s+(.*)$";
 
 	private Pattern progressPattern;
@@ -52,7 +49,7 @@ public class GprbuildOutput {
 	 * 
 	 * @return Remaining percentage of file to process is returned.
 	 */
-	public int remainingFileToProcess() {
+	public int nbRemainingFilesToProcess() {
 		return Integer.parseInt(progressMatcher.group(2))
 				- Integer.parseInt(progressMatcher.group(1));
 	}

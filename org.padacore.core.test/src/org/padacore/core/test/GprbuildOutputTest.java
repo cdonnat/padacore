@@ -21,7 +21,7 @@ public class GprbuildOutputTest {
 		sut.evaluate(input);
 		assertEquals(sut.lastEntryIndicatesProgress(), lastEntryIndicatesProgress);
 		if (lastEntryIndicatesProgress) {
-			assertEquals(sut.remainingFileToProcess(), remaining);
+			assertEquals(sut.nbRemainingFilesToProcess(), remaining);
 		}
 	}
 
