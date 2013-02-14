@@ -9,21 +9,23 @@ public class ExternalProcessInfo {
 	private static final DateFormat Format = new SimpleDateFormat("HH:mm:ss");
 	private long startTimeInMs;
 	private String processName;
-	
-	public ExternalProcessInfo (String processName) {
+	private IConsole console;
+
+	public ExternalProcessInfo(String processName, IConsole console) {
 		this.processName = processName;
+		this.console = console;
 	}
 
 	public void start(String[] cmdWithArgs) {
-		startTimeInMs = System.currentTimeMillis();
+		this.startTimeInMs = System.currentTimeMillis();
 		StringBuilder cmd = new StringBuilder();
 		for (int i = 0; i < cmdWithArgs.length; i++) {
 			cmd.append(cmdWithArgs[i]);
 			cmd.append(" ");
 		}
-		Console.Print(cmd.toString());
+		this.console.print(cmd.toString());
 	}
-	
+
 	public void finish(boolean isSuccessful) {
 		final double elapsedTimeInS = (System.currentTimeMillis() - startTimeInMs) / 1000.0;
 
@@ -39,6 +41,6 @@ public class ExternalProcessInfo {
 		message.append(elapsedTimeInS);
 		message.append(" seconds");
 
-		Console.Print(message.toString());
+		this.console.print(message.toString());
 	}
 }

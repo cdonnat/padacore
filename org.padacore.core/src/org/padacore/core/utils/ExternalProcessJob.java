@@ -16,7 +16,8 @@ public class ExternalProcessJob extends Job {
 			Observer[] errObservers) {
 		super(name);
 		this.cmdWithArgs = cmdWithArgs;
-		this.externalProcess = new ExternalProcess(name, outputObservers, errObservers);
+		this.externalProcess = new ExternalProcess(name, new Console(), outputObservers,
+				errObservers);
 	}
 
 	@Override
@@ -56,12 +57,8 @@ public class ExternalProcessJob extends Job {
 	}
 
 	public static void runWithDefaultOutput(String name, String cmd) {
-		run(name, new String[] { cmd }, new Observer[] { new ExternalProcessOutput() },
-				new Observer[] { new ExternalProcessOutput() });
-	}
-
-	public static void runWithDefaultOutput(String name, String[] cmdWithArgs) {
-		run(name, cmdWithArgs, new Observer[] { new ExternalProcessOutput() },
-				new Observer[] { new ExternalProcessOutput() });
+		Console console = new Console();
+		run(name, new String[] { cmd }, new Observer[] { new ExternalProcessOutput(console) },
+				new Observer[] { new ExternalProcessOutput(console) });
 	}
 }

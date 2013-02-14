@@ -17,24 +17,6 @@ public class ExternalProcess implements IExternalProcess {
 	private ExternalProcessInfo info;
 
 	/**
-	 * Default constructor.
-	 */
-	public ExternalProcess(String processName) {
-		this(processName, new Observer[0], new Observer[0]);
-	}
-
-	/**
-	 * Attach given output stream observers to the external process. No observer
-	 * is attached to the error stream.
-	 * 
-	 * @param outStreamObservers
-	 *            Output stream observers.
-	 */
-	public ExternalProcess(String processName, Observer[] outStreamObservers) {
-		this(processName, outStreamObservers, new Observer[0]);
-	}
-
-	/**
 	 * Attach given output and error stream observers to the external process.
 	 * 
 	 * @param outStreamObservers
@@ -42,9 +24,9 @@ public class ExternalProcess implements IExternalProcess {
 	 * @param errStreamObservers
 	 *            Error stream observers.
 	 */
-	public ExternalProcess(String processName, Observer[] outStreamObservers,
+	public ExternalProcess(String processName, IConsole console, Observer[] outStreamObservers,
 			Observer[] errStreamObservers) {
-		this.info = new ExternalProcessInfo(processName);
+		this.info = new ExternalProcessInfo(processName, console);
 		this.threads = new ArrayList<Thread>(3);
 		this.outStreamObservers = outStreamObservers;
 		this.errStreamObservers = errStreamObservers;

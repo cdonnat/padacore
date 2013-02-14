@@ -13,6 +13,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
+import org.padacore.core.utils.Console;
 import org.padacore.core.utils.ErrorLog;
 import org.padacore.core.utils.ExternalProcess;
 import org.padacore.core.utils.ExternalProcessOutput;
@@ -72,17 +73,21 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 	private void build(int kind, IProgressMonitor monitor) throws CoreException {
 		Assert.isLegal(kind == FULL_BUILD || kind == INCREMENTAL_BUILD || kind == AUTO_BUILD);
 
+		Console console = new Console();
 		SubMonitor submonitor = SubMonitor.convert(monitor);
+
 		String message = "Building " + getProject().getName();
-		ExternalProcess process = new ExternalProcess(message, new Observer[] {
-				new GprbuildObserver(submonitor), new ExternalProcessOutput() }, new Observer[] {
-				new GprbuildErrObserver(getProject()), new ExternalProcessOutput() });
+
+		ExternalProcess process = new ExternalProcess(message, console, new Observer[] {
+				new GprbuildObserver(submonitor), new ExternalProcessOutput(console) },
+				new Observer[] { new GprbuildErrObserver(getProject()),
+						new ExternalProcessOutput(console) });
 
 		DerivedResourcesIdentifier resourcesIdentifier = new DerivedResourcesIdentifier(
 				this.getProject());
 
-		resourcesIdentifier.begin();
 		submonitor.beginTask(message, 100);
+		resourcesIdentifier.begin();
 		process.run(buildCommand(), monitor);
 		resourcesIdentifier.done();
 		submonitor.done();
@@ -178,11 +183,13 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 
 	@Override
 	protected void clean(IProgressMonitor monitor) throws CoreException {
+
+		Console console = new Console();
 		final String message = "Cleaning " + getProject().getName();
 
-		ExternalProcess process = new ExternalProcess(message,
-				new Observer[] { new ExternalProcessOutput() },
-				new Observer[] { new ExternalProcessOutput() });
+		ExternalProcess process = new ExternalProcess(message, console,
+				new Observer[] { new ExternalProcessOutput(console) },
+				new Observer[] { new ExternalProcessOutput(console) });
 
 		process.run(cleanCommand(), monitor);
 		refreshBuiltProject();
