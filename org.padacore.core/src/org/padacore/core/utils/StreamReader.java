@@ -9,7 +9,7 @@ import java.util.Observer;
 
 import org.eclipse.core.runtime.IStatus;
 
-class StreamReader extends Observable implements Runnable {
+public class StreamReader extends Observable implements Runnable {
 
 	private BufferedReader input;
 
