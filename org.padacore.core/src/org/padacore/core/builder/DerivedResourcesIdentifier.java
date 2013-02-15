@@ -12,12 +12,12 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
 import org.padacore.core.project.AbstractAdaProjectAssociationManager;
 import org.padacore.core.project.IAdaProject;
+import org.padacore.core.project.ResourceLocator;
 import org.padacore.core.utils.ErrorLog;
 
 /**
@@ -27,7 +27,7 @@ import org.padacore.core.utils.ErrorLog;
  * @author RS
  * 
  */
-//TODO refactor me!
+// TODO refactor me!
 public class DerivedResourcesIdentifier implements IJobChangeListener {
 
 	private IProject builtProject;
@@ -57,21 +57,6 @@ public class DerivedResourcesIdentifier implements IJobChangeListener {
 		}
 	}
 
-	private IPath convertAdaProjectPathToEclipseProjectPath(
-			IPath adaProjectRelativePath) {
-		IPath eclipseProjectPath;
-
-		if (this.isProjectAnImportedProject()) {
-			// TODO use the same name as GPR parent folder for linked folder
-			eclipseProjectPath = new Path("toto")
-					.append(adaProjectRelativePath);
-		} else {
-			eclipseProjectPath = adaProjectRelativePath;
-		}
-
-		return eclipseProjectPath;
-	}
-
 	@Override
 	public void aboutToRun(IJobChangeEvent event) {
 		this.waitForCleaningJobToFinish();
@@ -94,30 +79,15 @@ public class DerivedResourcesIdentifier implements IJobChangeListener {
 	 * @param absoluteDirectoryPath
 	 *            the absolute path of the directory to add in list.
 	 * @param directories
-	 *            the list of directories in which element shall be added (as a
-	 *            path relative to the project root).
+	 *            the list of directories in which element shall be added.
 	 */
 	private void addDirectoryPathToList(IPath absoluteDirectoryPath,
 			List<IPath> directories) {
 		IPath projectRoot = this.adaProjectForBuiltProject.getRootPath();
-		IPath relativeDirPath = absoluteDirectoryPath
-				.makeRelativeTo(projectRoot);
 
-		if (!relativeDirPath.isEmpty()) {
-			directories.add(relativeDirPath);
+		if (!absoluteDirectoryPath.equals(projectRoot)) {
+			directories.add(absoluteDirectoryPath);
 		}
-	}
-
-	/**
-	 * Returns True if the project corresponds to an imported project (i.e. a
-	 * project which does not reside in workspace but is linked to existing
-	 * folder), False otherwise.
-	 * 
-	 * @return
-	 */
-	private boolean isProjectAnImportedProject() {
-		return this.builtProject.getFile(this.builtProject.getName() + ".gpr")
-				.isLinked();
 	}
 
 	/**
@@ -134,11 +104,11 @@ public class DerivedResourcesIdentifier implements IJobChangeListener {
 		List<IResource> execAndObjectDirsAsResources = new ArrayList<IResource>(
 				directoryList.size());
 		IResource currentResource;
+		ResourceLocator resourceLocator = new ResourceLocator(this.builtProject);
 
 		for (Iterator<IPath> dirIt = directoryList.iterator(); dirIt.hasNext();) {
-			currentResource = this.builtProject
-					.getFolder(convertAdaProjectPathToEclipseProjectPath(dirIt
-							.next()));
+			currentResource = resourceLocator
+					.findResourceFromPath(dirIt.next());
 
 			execAndObjectDirsAsResources.add(currentResource);
 		}

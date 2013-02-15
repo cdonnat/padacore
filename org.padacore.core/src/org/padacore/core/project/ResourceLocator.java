@@ -74,9 +74,10 @@ public class ResourceLocator {
 	 * @return True if project is an imported project, False otherwise.
 	 */
 	private boolean isProjectAnImportedProject() {
-		PropertiesProvider propertiesProvider = new PropertiesProvider(
-				this.project);
-		
-		return propertiesProvider.getProjectKind() == ProjectKind.IMPORTED;
+//		PropertiesProvider propertiesProvider = new PropertiesProvider(
+//				this.project);
+//		
+//		return propertiesProvider.getProjectKind() == ProjectKind.IMPORTED;
+		return this.project.getFile(this.project.getName() + ".gpr").isLinked();
 	}
 }
