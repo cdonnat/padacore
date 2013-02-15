@@ -25,7 +25,7 @@ import org.padacore.core.project.IAdaProject;
 
 public class CommonTestUtils {
 
-	private static String SESSION_PROPERTY_QUALIFIED_NAME_PREFIX = "org.padacore";
+	public static String SESSION_PROPERTY_QUALIFIED_NAME_PREFIX = "org.padacore";
 
 	private static int cpt = 0;
 
@@ -117,9 +117,8 @@ public class CommonTestUtils {
 		return CreateAdaProject(projectName, true);
 	}
 
-	public static IProject CreateAdaProject(String projectName,
-			boolean openProject) {
-
+	public static IProject CreateAdaProjectAt(IPath location,
+			String projectName, boolean openProject) {
 		IProject adaProject = ResourcesPlugin.getWorkspace().getRoot()
 				.getProject(projectName);
 
@@ -129,7 +128,7 @@ public class CommonTestUtils {
 			IProjectDescription description = ResourcesPlugin.getWorkspace()
 					.newProjectDescription(projectName);
 
-			description.setLocation(null);
+			description.setLocation(location);
 			description
 					.setNatureIds(new String[] { AdaProjectNature.NATURE_ID });
 			adaProject.create(description, null);
@@ -162,6 +161,17 @@ public class CommonTestUtils {
 		}
 
 		return adaProject;
+	}
+
+	public static IProject CreateAdaProjectAt(IPath location) {
+		cpt++;
+		return CreateAdaProjectAt(location, "TestProject" + cpt, true);
+	}
+	
+	public static IProject CreateAdaProject(String projectName,
+			boolean openProject) {
+		return CreateAdaProjectAt(null, projectName, openProject);
+
 	}
 
 	public static String GetWorkspaceAbsolutePath() {
