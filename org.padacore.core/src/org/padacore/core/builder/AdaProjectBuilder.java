@@ -11,10 +11,9 @@ import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.SubMonitor;
+import org.padacore.core.utils.Console;
 import org.padacore.core.utils.ErrorLog;
 import org.padacore.core.utils.ExternalProcess;
 import org.padacore.core.utils.ExternalProcessOutput;
@@ -27,10 +26,7 @@ import org.padacore.core.utils.ExternalProcessOutput;
  */
 public class AdaProjectBuilder extends IncrementalProjectBuilder {
 
-	private Job cleaningJob;
-
 	public AdaProjectBuilder() {
-		this.cleaningJob = null;
 	}
 
 	/**
@@ -39,9 +35,8 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 	 * @return the absolute path of GPR file.
 	 */
 	private String getGprFullPath() {
-		String gprProjectFullPath = this.getProject()
-				.getFile(this.getProject().getName() + ".gpr").getRawLocation()
-				.toOSString();
+		String gprProjectFullPath = this.getProject().getFile(this.getProject().getName() + ".gpr")
+				.getRawLocation().toOSString();
 
 		return gprProjectFullPath;
 	}
@@ -75,46 +70,42 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 	 * @throws CoreException
 	 *             if the resources of the project cannot be retrieved.
 	 */
-	private void build(int kind) throws CoreException {
-		Assert.isLegal(kind == FULL_BUILD || kind == INCREMENTAL_BUILD
-				|| kind == AUTO_BUILD);
+	private void build(int kind, IProgressMonitor monitor) throws CoreException {
+		Assert.isLegal(kind == FULL_BUILD || kind == INCREMENTAL_BUILD || kind == AUTO_BUILD);
 
-		final String message = "Building of " + getProject().getName();
+		Console console = new Console();
+		SubMonitor submonitor = SubMonitor.convert(monitor);
 
-		Job buildJob = new Job(message) {
-			@Override
-			protected IStatus run(IProgressMonitor monitor) {
+		String message = "Building " + getProject().getName();
 
-				ExternalProcess process = new ExternalProcess(message,
-						new Observer[] { new GprbuildObserver(monitor),
-								new ExternalProcessOutput() }, new Observer[] {
-								new GprbuildErrObserver(getProject()),
-								new ExternalProcessOutput() });
+		ExternalProcess process = new ExternalProcess(message, console, new Observer[] {
+				new GprbuildObserver(submonitor), new ExternalProcessOutput(console) },
+				new Observer[] { new GprbuildErrObserver(getProject()),
+						new ExternalProcessOutput(console) });
 
-				process.run(buildCommand(), monitor);
-				refreshBuiltProject();
+		DerivedResourcesIdentifier resourcesIdentifier = new DerivedResourcesIdentifier(
+				this.getProject());
 
-				return Status.OK_STATUS;
-			}
-		};
-
-		buildJob.addJobChangeListener(new DerivedResourcesIdentifier(this
-				.getProject(), this.cleaningJob));
-		buildJob.schedule();
+		submonitor.beginTask(message, 100);
+		resourcesIdentifier.begin();
+		process.run(buildCommand(), monitor);
+		resourcesIdentifier.done();
+		submonitor.done();
+		refreshBuiltProject();
 	}
 
 	@Override
-	protected IProject[] build(int kind, Map<String, String> args,
-			IProgressMonitor monitor) throws CoreException {
+	protected IProject[] build(int kind, Map<String, String> args, IProgressMonitor monitor)
+			throws CoreException {
 
 		if (kind == FULL_BUILD) {
-			this.build(kind);
+			this.build(kind, monitor);
 		} else {
 			if (this.isIncrementalBuildRequired(this.getProject())) {
-				this.build(kind);
+				this.build(kind, monitor);
 			}
 		}
-		
+
 		return this.getProject().getReferencedProjects();
 	}
 
@@ -134,8 +125,7 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 			IResource concernedResource = delta.getResource();
 			Assert.isTrue(concernedResource.getType() == IResource.PROJECT);
 
-			buildIsRequired = this
-					.doesChangeInProjectAffectsAtLeastOneNonDerivedFile(delta);
+			buildIsRequired = this.doesChangeInProjectAffectsAtLeastOneNonDerivedFile(delta);
 		}
 
 		return buildIsRequired;
@@ -180,8 +170,7 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 	// TODO This method can easily be improved by taking into account
 	// information from GPR project: non derived files could be searched only in
 	// source directories.
-	private boolean doesChangeInProjectAffectsAtLeastOneNonDerivedFile(
-			IResourceDelta delta) {
+	private boolean doesChangeInProjectAffectsAtLeastOneNonDerivedFile(IResourceDelta delta) {
 		NonDerivedResourcesFinder derivedResourcesFinder = new NonDerivedResourcesFinder();
 
 		try {
@@ -194,21 +183,16 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 
 	@Override
 	protected void clean(IProgressMonitor monitor) throws CoreException {
-		final String message = "Cleaning of " + getProject().getName();
-		this.cleaningJob = new Job(message) {
-			@Override
-			protected IStatus run(IProgressMonitor monitor) {
 
-				ExternalProcess process = new ExternalProcess(message,
-						new Observer[] { new ExternalProcessOutput() },
-						new Observer[] { new ExternalProcessOutput() });
+		Console console = new Console();
+		final String message = "Cleaning " + getProject().getName();
 
-				process.run(cleanCommand(), monitor);
-				refreshBuiltProject();
-				return Status.OK_STATUS;
-			}
-		};
-		this.cleaningJob.schedule();
+		ExternalProcess process = new ExternalProcess(message, console,
+				new Observer[] { new ExternalProcessOutput(console) },
+				new Observer[] { new ExternalProcessOutput(console) });
+
+		process.run(cleanCommand(), monitor);
+		refreshBuiltProject();
 	}
 
 	/**
@@ -216,8 +200,7 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 	 */
 	private void refreshBuiltProject() {
 		try {
-			getProject().refreshLocal(IResource.DEPTH_INFINITE,
-					new NullProgressMonitor());
+			getProject().refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
 		} catch (CoreException e) {
 			ErrorLog.appendException(e);
 		}

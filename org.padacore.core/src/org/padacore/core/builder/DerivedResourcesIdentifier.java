@@ -11,10 +11,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.jobs.IJobChangeEvent;
-import org.eclipse.core.runtime.jobs.IJobChangeListener;
-import org.eclipse.core.runtime.jobs.Job;
 import org.padacore.core.project.AbstractAdaProjectAssociationManager;
 import org.padacore.core.project.IAdaProject;
 import org.padacore.core.project.ResourceLocator;
@@ -28,15 +24,13 @@ import org.padacore.core.utils.ErrorLog;
  * 
  */
 // TODO refactor me!
-public class DerivedResourcesIdentifier implements IJobChangeListener {
+public class DerivedResourcesIdentifier {
 
 	private IProject builtProject;
 	private NonDerivedResourcesCollector projectResourcesBeforeBuild;
-	private Job cleaningJob;
 	private IAdaProject adaProjectForBuiltProject;
 
-	public DerivedResourcesIdentifier(IProject builtProject, Job cleaningJob) {
-		this.cleaningJob = cleaningJob;
+	public DerivedResourcesIdentifier(IProject builtProject) {
 		this.builtProject = builtProject;
 		this.projectResourcesBeforeBuild = new NonDerivedResourcesCollector(
 				builtProject);
@@ -44,32 +38,12 @@ public class DerivedResourcesIdentifier implements IJobChangeListener {
 				.GetAssociatedAdaProject(builtProject);
 	}
 
-	/**
-	 * If a cleaning job is in progress, wait until it's finished.
-	 */
-	private void waitForCleaningJobToFinish() {
-		if (this.cleaningJob != null) {
-			try {
-				this.cleaningJob.join();
-			} catch (InterruptedException e) {
-				ErrorLog.appendException(e, IStatus.WARNING);
-			}
-		}
-	}
-
-	@Override
-	public void aboutToRun(IJobChangeEvent event) {
-		this.waitForCleaningJobToFinish();
+	public void begin() {
 		this.markExecAndObjectDirsAsDerived();
 		this.rememberResourcesOfProjectBeforeBuild();
 	}
 
-	@Override
-	public void awake(IJobChangeEvent event) {
-	}
-
-	@Override
-	public void done(IJobChangeEvent event) {
+	public void done() {
 		this.markResourcesGeneratedByBuildAsDerived();
 	}
 
@@ -81,8 +55,7 @@ public class DerivedResourcesIdentifier implements IJobChangeListener {
 	 * @param directories
 	 *            the list of directories in which element shall be added.
 	 */
-	private void addDirectoryPathToList(IPath absoluteDirectoryPath,
-			List<IPath> directories) {
+	private void addDirectoryPathToList(IPath absoluteDirectoryPath, List<IPath> directories) {
 		IPath projectRoot = this.adaProjectForBuiltProject.getRootPath();
 
 		if (!absoluteDirectoryPath.equals(projectRoot)) {
@@ -98,8 +71,7 @@ public class DerivedResourcesIdentifier implements IJobChangeListener {
 	 *            the directory list to convert.
 	 * @return the converted project resource list.
 	 */
-	private List<IResource> convertDirectoryListToResourceList(
-			List<IPath> directoryList) {
+	private List<IResource> convertDirectoryListToResourceList(List<IPath> directoryList) {
 
 		List<IResource> execAndObjectDirsAsResources = new ArrayList<IResource>(
 				directoryList.size());
@@ -109,7 +81,6 @@ public class DerivedResourcesIdentifier implements IJobChangeListener {
 		for (Iterator<IPath> dirIt = directoryList.iterator(); dirIt.hasNext();) {
 			currentResource = resourceLocator
 					.findResourceFromPath(dirIt.next());
-
 			execAndObjectDirsAsResources.add(currentResource);
 		}
 
@@ -225,17 +196,5 @@ public class DerivedResourcesIdentifier implements IJobChangeListener {
 						.getNonDerivedResources());
 
 		return projectResourcesGeneratedByBuild;
-	}
-
-	@Override
-	public void running(IJobChangeEvent event) {
-	}
-
-	@Override
-	public void scheduled(IJobChangeEvent event) {
-	}
-
-	@Override
-	public void sleeping(IJobChangeEvent event) {
 	}
 }

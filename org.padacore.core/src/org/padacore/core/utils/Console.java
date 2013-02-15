@@ -7,39 +7,33 @@ import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
 import org.padacore.core.Activator;
 
-public class Console {
+public class Console implements org.padacore.core.utils.IConsole {
 
-	private static MessageConsole console = null;
+	private MessageConsole messageConsole;
 
-	/**
-	 * Lazy init to create or retrieve the MessageConsole of the plugin.
-	 * @return The MessageConsole of the plugin.
-	 */
-	private static MessageConsole Get() {
-		if (console == null) {
-			IConsoleManager consoleManager = ConsolePlugin.getDefault().getConsoleManager();
-			IConsole[] consoles = consoleManager.getConsoles();
+	public Console() {
+		IConsoleManager consoleManager = ConsolePlugin.getDefault().getConsoleManager();
+		IConsole[] consoles = consoleManager.getConsoles();
 
-			for (int i = 0; i < consoles.length; i++) {
-				if (consoles[i].getName().equals(Activator.PLUGIN_ID)) {
-					console = (MessageConsole) consoles[i];
-					break;
-				}
-			}
-
-			if (console == null) {
-				console = new MessageConsole(Activator.PLUGIN_ID, null);
-				consoleManager.addConsoles(new IConsole[] { console });
+		for (int i = 0; i < consoles.length; i++) {
+			if (consoles[i].getName().equals(Activator.PLUGIN_ID)) {
+				messageConsole = (MessageConsole) consoles[i];
+				break;
 			}
 		}
-		return console;
+
+		if (messageConsole == null) {
+			messageConsole = new MessageConsole(Activator.PLUGIN_ID, null);
+			consoleManager.addConsoles(new IConsole[] { messageConsole });
+		}
 	}
 
 	/**
 	 * Display the given message in the MessageConsole of the plugin.
 	 */
-	public static void Print(String message) {
-		MessageConsoleStream out = Get().newMessageStream();
+	@Override
+	public void print(String message) {
+		MessageConsoleStream out = this.messageConsole.newMessageStream();
 		out.println(message);
 	}
 }
