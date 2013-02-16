@@ -92,17 +92,15 @@ public class GprLoader {
 	 */
 	private void parseGpr(IPath path) {
 		try {
-			GprLexer lexer = new GprLexer(
-					new ANTLRFileStream(path.toOSString()));
+			GprLexer lexer = new GprLexer(new ANTLRFileStream(path.toOSString()));
 			GprParser parser = new GprParser(this, new CommonTokenStream(lexer));
 			parser.project();
 		} catch (IOException e) {
-			ErrorLog.appendMessage(
-					"Error while opening GPR file " + path.toOSString(),
+			ErrorLog.appendMessage("Error while opening GPR file " + path.toOSString(),
 					IStatus.ERROR);
 		} catch (RecognitionException e) {
-			ErrorLog.appendMessage("GPR file " + path.toOSString()
-					+ " format is incorrect", IStatus.ERROR);
+			ErrorLog.appendMessage("GPR file " + path.toOSString() + " format is incorrect",
+					IStatus.ERROR);
 		}
 	}
 
@@ -114,8 +112,7 @@ public class GprLoader {
 	 * @return
 	 */
 	private IPath evaluatePath(String relativeProjectPath) {
-		IPath referencePath = this.getCurrentProject().getPath()
-				.removeLastSegments(1);
+		IPath referencePath = this.getCurrentProject().getPath().removeLastSegments(1);
 		IPath path = referencePath.append(relativeProjectPath);
 		String extension = path.getFileExtension();
 
@@ -183,6 +180,16 @@ public class GprLoader {
 	 */
 	public void endPackage() {
 		this.getCurrentProject().endPackage();
+	}
+
+	/**
+	 * Add a new package to the current project based on another package.
+	 * @param newPackageName Name of the package to be added.
+	 * @param projectName Name of the project containing the package to copy.
+	 * @param packageName Name of the package to copy.
+	 */
+	public void addPackageFrom(String newPackageName, String projectName, String packageName) {
+		this.getCurrentProject().addPackageFrom(newPackageName, projectName, packageName);
 	}
 
 	/**

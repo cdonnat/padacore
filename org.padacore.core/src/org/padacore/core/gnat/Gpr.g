@@ -146,7 +146,10 @@ package_spec
    
 package_renaming
   :
-  PACKAGE simple_name RENAMES simple_name '.' simple_name ';'//TODO
+  PACKAGE newPackageName = simple_name 
+  RENAMES 
+  projectName = simple_name '.' renamedPackage = simple_name ';'
+  {gprLoader.addPackageFrom($newPackageName.text, $projectName.text, $renamedPackage.text);} 
   ;
      
 package_extension

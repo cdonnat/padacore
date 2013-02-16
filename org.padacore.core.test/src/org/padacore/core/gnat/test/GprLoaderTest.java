@@ -69,6 +69,15 @@ public class GprLoaderTest {
 				pathToTestProject.substring(0, pathToTestProject.length() - 1));
 
 	}
+	
+	@Test
+	public void testRenaming() {
+		this.createFixture("sample_project.gpr");
+
+		this.exercize();
+		
+		this.checkAttribute("Builder'Switches (\"main.ada\")", new String[] {"-g"});
+	}
 
 	private void checkNbOfLoadedProjects(int expectedNumberOfLoadedProject) {
 		assertEquals("Number of loaded projects", expectedNumberOfLoadedProject, sut

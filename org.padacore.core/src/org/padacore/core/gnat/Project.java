@@ -20,8 +20,8 @@ public class Project implements IPropertiesProvider {
 	private IPath pathToGpr;
 	private Package selfPackage;
 	private Package currentPackage;
-	private Map<String, IPropertiesProvider> packages;
-	private Map<String, IPropertiesProvider> references;
+	private Map<String, Package> packages;
+	private Map<String, Project> references;
 
 	/**
 	 * Constructors
@@ -33,8 +33,8 @@ public class Project implements IPropertiesProvider {
 		this.pathToGpr = pathToGpr;
 		this.name = pathToGpr.removeFileExtension().lastSegment().toLowerCase();
 		this.selfPackage = new Package("self");
-		this.packages = new HashMap<String, IPropertiesProvider>();
-		this.references = new HashMap<String, IPropertiesProvider>();
+		this.packages = new HashMap<String, Package>();
+		this.references = new HashMap<String, Project>();
 		this.currentPackage = this.selfPackage;
 		this.addDefaultAttribute();
 
@@ -161,7 +161,7 @@ public class Project implements IPropertiesProvider {
 	 *            Name of the package.
 	 */
 	public void beginPackage(String packageName) {
-		Package newPackage = new Package(packageName.toLowerCase());
+		Package newPackage = new Package(packageName);
 		this.packages.put(newPackage.getName(), newPackage);
 		this.currentPackage = newPackage;
 	}
@@ -171,6 +171,26 @@ public class Project implements IPropertiesProvider {
 	 */
 	public void endPackage() {
 		this.currentPackage = this.selfPackage;
+	}
+
+	/**
+	 * Add a new package to the current project based on another package.
+	 * 
+	 * @param newPackageName
+	 *            Name of the package to be added.
+	 * @param projectName
+	 *            Name of the project containing the package to copy.
+	 * @param packageName
+	 *            Name of the package to copy.
+	 */
+	public void addPackageFrom(String newPackageName, String projectName, String packageName) {
+		Assert.isLegal(this.references.containsKey(projectName.toLowerCase()));
+		Assert.isLegal(this.references.get(projectName.toLowerCase()).packages
+				.containsKey(packageName.toLowerCase()));
+
+		Package newPackage = new Package(newPackageName,
+				this.references.get(projectName.toLowerCase()).packages.get(packageName.toLowerCase()));
+		this.packages.put(newPackageName.toLowerCase(), newPackage);
 	}
 
 	/**
