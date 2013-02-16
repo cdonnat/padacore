@@ -12,9 +12,7 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
 import org.padacore.core.gnat.GnatAdaProjectAssociationManager;
-import org.padacore.core.gnat.GprBuilder;
 import org.padacore.core.gnat.GprLoader;
-import org.padacore.core.gnat.GprProject;
 import org.padacore.core.gnat.Project;
 import org.padacore.core.project.ProjectBuilder;
 import org.padacore.core.utils.ErrorLog;
@@ -33,8 +31,7 @@ public class AdaProjectFromGprWizard extends Wizard implements IImportWizard {
 
 	public AdaProjectFromGprWizard() {
 		setWindowTitle("Import existing GPR Project");
-		this.eclipseAdaProjectBuilder = new ProjectBuilder(
-				new GnatAdaProjectAssociationManager());
+		this.eclipseAdaProjectBuilder = new ProjectBuilder(new GnatAdaProjectAssociationManager());
 	}
 
 	@Override
@@ -57,42 +54,24 @@ public class AdaProjectFromGprWizard extends Wizard implements IImportWizard {
 		IPath gprProjectAbsolutePath = new Path(this.page.getGprProjectPath());
 		GprLoader loader = new GprLoader();
 		loader.load(gprProjectAbsolutePath);
-		IProject createdProject;
-		//
-		// GprLoader.Load load = loader.getLoadedProject().get(0);
-		// GprBuilder builder = new GprBuilder(load.getProject());
-		// GprProject gprFromFile = builder.build();
-		//
-		// IPath projectLocation = new Path(new
-		// File(load.getPath().toOSString()).getParent());
-		// eclipseAdaProjectBuilder.createProjectWithAdaNatureAt(gprFromFile.getName(),
-		// projectLocation, false);
-
-		/* Multiple projects creation attempt... */
 
 		// TODO clean this mess!
 		for (Project project : loader.getLoadedProjects()) {
-			GprBuilder builder = new GprBuilder(project, project.getPath());
-			GprProject gprFromFile = builder.build();
-
-			createdProject = eclipseAdaProjectBuilder
-					.createProjectWithAdaNatureAt(gprFromFile.getName(), null,
-							false, project.getPath());
+			eclipseAdaProjectBuilder.createProjectWithAdaNatureAt(project.getName(), null, false,
+					project.getPath());
 		}
 
 		for (Project project : loader.getLoadedProjects()) {
 			IWorkspaceRoot workspace = ResourcesPlugin.getWorkspace().getRoot();
-			IProject[] referencedProjects = new IProject[project
-					.getReferenceProjects().size()];
+			IProject[] referencedProjects = new IProject[project.getReferenceProjects().size()];
 			for (int i = 0; i < project.getReferenceProjects().size(); i++) {
-				referencedProjects[i] = workspace.getProject(project
-						.getReferenceProjects().get(i).getName());
+				referencedProjects[i] = workspace.getProject(project.getReferenceProjects().get(i)
+						.getName());
 			}
 
 			IProject eclipseProject = workspace.getProject(project.getName());
 			try {
-				IProjectDescription description = eclipseProject
-						.getDescription();
+				IProjectDescription description = eclipseProject.getDescription();
 				description.setReferencedProjects(referencedProjects);
 				eclipseProject.setDescription(description, null);
 			} catch (CoreException e) {

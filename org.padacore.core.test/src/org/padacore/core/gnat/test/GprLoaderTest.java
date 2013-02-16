@@ -57,6 +57,19 @@ public class GprLoaderTest {
 
 	}
 
+	@Test
+	public void testDefaultAttribute() {
+		this.createFixture("sample_project.gpr");
+
+		this.exercize();
+
+		this.checkAttribute("name", "sample_project");
+		String pathToTestProject = CommonTestUtils.GetPathToTestProject();
+		this.checkAttribute("project_dir",
+				pathToTestProject.substring(0, pathToTestProject.length() - 1));
+
+	}
+
 	private void checkNbOfLoadedProjects(int expectedNumberOfLoadedProject) {
 		assertEquals("Number of loaded projects", expectedNumberOfLoadedProject, sut
 				.getLoadedProjects().size());

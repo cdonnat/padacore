@@ -22,7 +22,7 @@ public class Project implements IPropertiesProvider {
 	private Package currentPackage;
 	private Map<String, IPropertiesProvider> packages;
 	private Map<String, IPropertiesProvider> references;
-	
+
 	/**
 	 * Constructors
 	 * 
@@ -36,10 +36,21 @@ public class Project implements IPropertiesProvider {
 		this.packages = new HashMap<String, IPropertiesProvider>();
 		this.references = new HashMap<String, IPropertiesProvider>();
 		this.currentPackage = this.selfPackage;
+		this.addDefaultAttribute();
+
+	}
+
+	/**
+	 * Add the default attribute to project ("name", "project_dir, etc).
+	 */
+	private void addDefaultAttribute() {
+		this.addAttribute("name", Symbol.CreateString(this.name));
+		this.addAttribute("project_dir",
+				Symbol.CreateString(this.pathToGpr.removeLastSegments(1).toOSString()));
 	}
 
 	// Queries:
-	
+
 	/**
 	 * @return The name of the context.
 	 */
@@ -104,9 +115,9 @@ public class Project implements IPropertiesProvider {
 		Assert.isLegal(this.attributeIsDefined(attributeName));
 		return this.get(FormatAttribute(attributeName), new AttributesProviderDelegate());
 	}
-	
+
 	// Commands:
-	
+
 	/**
 	 * Add a variable to the context.
 	 * 
@@ -141,12 +152,13 @@ public class Project implements IPropertiesProvider {
 	public void addReferenceProject(Project referenceProject) {
 		this.references.put(referenceProject.getName(), referenceProject);
 	}
-	
+
 	/**
-	 * Notify the project that a begin package instruction has been found.
-	 * A new package is create and it is set to the current package.
+	 * Notify the project that a begin package instruction has been found. A new
+	 * package is create and it is set to the current package.
 	 * 
-	 * @param packageName Name of the package.
+	 * @param packageName
+	 *            Name of the package.
 	 */
 	public void beginPackage(String packageName) {
 		Package newPackage = new Package(packageName.toLowerCase());
