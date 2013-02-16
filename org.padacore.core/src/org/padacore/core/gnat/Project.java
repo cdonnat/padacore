@@ -1,9 +1,7 @@
 package org.padacore.core.gnat;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
@@ -20,8 +18,8 @@ public class Project implements IPropertiesProvider {
 	private IPath pathToGpr;
 	private Package selfPackage;
 	private Package currentPackage;
-	private Map<String, Package> packages;
-	private Map<String, Project> references;
+	private KeyStringMap<Package> packages;
+	private KeyStringMap<Project> references;
 
 	/**
 	 * Constructors
@@ -33,8 +31,8 @@ public class Project implements IPropertiesProvider {
 		this.pathToGpr = pathToGpr;
 		this.name = pathToGpr.removeFileExtension().lastSegment().toLowerCase();
 		this.selfPackage = new Package("self");
-		this.packages = new HashMap<String, Package>();
-		this.references = new HashMap<String, Project>();
+		this.packages = new KeyStringMap<Package>();
+		this.references = new KeyStringMap<Project>();
 		this.currentPackage = this.selfPackage;
 		this.addDefaultAttribute();
 
@@ -184,13 +182,12 @@ public class Project implements IPropertiesProvider {
 	 *            Name of the package to copy.
 	 */
 	public void addPackageFrom(String newPackageName, String projectName, String packageName) {
-		Assert.isLegal(this.references.containsKey(projectName.toLowerCase()));
-		Assert.isLegal(this.references.get(projectName.toLowerCase()).packages
-				.containsKey(packageName.toLowerCase()));
+		Assert.isLegal(this.references.contains(projectName));
+		Assert.isLegal(this.references.get(projectName).packages.contains(packageName));
 
 		Package newPackage = new Package(newPackageName,
-				this.references.get(projectName.toLowerCase()).packages.get(packageName.toLowerCase()));
-		this.packages.put(newPackageName.toLowerCase(), newPackage);
+				this.references.get(projectName).packages.get(packageName));
+		this.packages.put(newPackageName, newPackage);
 	}
 
 	/**
@@ -224,7 +221,7 @@ public class Project implements IPropertiesProvider {
 	 */
 	private static String GetPrefix(String fullName) {
 		String[] fullNameAsList = fullName.split("\\.", 2);
-		return fullNameAsList[0].toLowerCase();
+		return fullNameAsList[0];
 	}
 
 	/**
@@ -280,12 +277,12 @@ public class Project implements IPropertiesProvider {
 			isDefined = delegate.isDefined(this.selfPackage, symbolName);
 		}
 
-		if (!isDefined && this.references.containsKey(prefix)) {
+		if (!isDefined && this.references.contains(prefix)) {
 			IPropertiesProvider referenceProvider = this.references.get(prefix);
 			isDefined = delegate.isDefined(referenceProvider, nameWithoutPrefix);
 		}
 
-		if (!isDefined && this.packages.containsKey(prefix)) {
+		if (!isDefined && this.packages.contains(prefix)) {
 			IPropertiesProvider packageProvider = this.packages.get(prefix);
 			isDefined = delegate.isDefined(packageProvider, nameWithoutPrefix);
 		}
@@ -299,7 +296,7 @@ public class Project implements IPropertiesProvider {
 			res = delegate.get(this.currentPackage, symbolName);
 		} else if (delegate.isDefined(this.selfPackage, symbolName)) {
 			res = delegate.get(this.selfPackage, symbolName);
-		} else if (this.references.containsKey(GetPrefix(symbolName))) {
+		} else if (this.references.contains(GetPrefix(symbolName))) {
 			IPropertiesProvider referenceProvider = this.references.get(GetPrefix(symbolName));
 			res = delegate.get(referenceProvider, GetNameWithoutPrefix(symbolName));
 		} else {

@@ -14,4 +14,8 @@ package Builder is
     for Switches ("main.ada") use  ("-g");
 end Builder;
 
+package Ide is
+    for Ui use "Qt";
+end Ide;
+
 end sample_project_included;
