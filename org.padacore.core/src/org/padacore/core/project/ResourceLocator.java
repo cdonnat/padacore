@@ -6,7 +6,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.padacore.core.project.PropertiesProvider.ProjectKind;
+import org.padacore.core.project.PropertiesManager.ProjectKind;
 
 /**
  * This class enables to get a resource handle from an absolute path.

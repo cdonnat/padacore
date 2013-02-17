@@ -4,12 +4,9 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.QualifiedName;
 import org.padacore.core.utils.ErrorLog;
 
 public abstract class AbstractAdaProjectAssociationManager {
-
-	public static final String ADA_PROJECT_SESSION_PROPERTY_QUALIFIER = "org.padacore";
 
 	/**
 	 * Associates a new Ada project to an Eclipse project.
@@ -42,14 +39,9 @@ public abstract class AbstractAdaProjectAssociationManager {
 			ErrorLog.appendException(e);
 		}
 
-		QualifiedName qualifiedName = GetQualifiedNameForAdaProjectSessionProperty(eclipseProject);
-
-		try {
-			eclipseProject.setSessionProperty(qualifiedName, adaProject);
-		} catch (CoreException e) {
-			ErrorLog.appendException(e);
-		}
-
+		PropertiesManager propertiesManager = new PropertiesManager(
+				eclipseProject);
+		propertiesManager.setAdaProject(adaProject);
 	}
 
 	/**
@@ -70,17 +62,10 @@ public abstract class AbstractAdaProjectAssociationManager {
 			ErrorLog.appendException(e);
 		}
 
-		QualifiedName qualifiedName = GetQualifiedNameForAdaProjectSessionProperty(eclipseProject);
+		PropertiesManager propertiesManager = new PropertiesManager(
+				eclipseProject);
 
-		IAdaProject associatedAdaProject = null;
-
-		try {
-			associatedAdaProject = (IAdaProject) (eclipseProject
-					.getSessionProperty(qualifiedName));
-		} catch (CoreException e) {
-			ErrorLog.appendException(e);
-		}
-
+		IAdaProject associatedAdaProject = propertiesManager.getAdaProject();
 		return associatedAdaProject;
 	}
 
@@ -112,21 +97,4 @@ public abstract class AbstractAdaProjectAssociationManager {
 			}
 		}
 	}
-
-	/**
-	 * Returns the qualified name for the session property used to store Ada
-	 * project.
-	 * 
-	 * @param project
-	 *            the project for which we want the session property qualified
-	 *            name.
-	 * @return the qualified name for the session property used to store Ada
-	 *         project.
-	 */
-	private static QualifiedName GetQualifiedNameForAdaProjectSessionProperty(
-			IProject project) {
-		return new QualifiedName(ADA_PROJECT_SESSION_PROPERTY_QUALIFIER,
-				project.getName());
-	}
-
 }
