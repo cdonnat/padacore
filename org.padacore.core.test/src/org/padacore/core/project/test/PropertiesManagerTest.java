@@ -52,7 +52,7 @@ public class PropertiesManagerTest {
 			}
 
 			@Override
-			public List<String> getSourcesDir() {
+			public List<IPath> getSourceDirectoriesPaths() {
 				return null;
 			}
 

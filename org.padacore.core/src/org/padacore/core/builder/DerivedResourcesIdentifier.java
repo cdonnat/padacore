@@ -108,9 +108,9 @@ public class DerivedResourcesIdentifier {
 				this.adaProjectForBuiltProject.getObjectDirectoryPath(),
 				execAndObjectDirs);
 
-		for (Iterator<String> sourceDirIt = this.adaProjectForBuiltProject
-				.getSourcesDir().iterator(); sourceDirIt.hasNext();) {
-			String sourceDir = sourceDirIt.next();
+		for (Iterator<IPath> sourceDirIt = this.adaProjectForBuiltProject
+				.getSourceDirectoriesPaths().iterator(); sourceDirIt.hasNext();) {
+			IPath sourceDir = sourceDirIt.next();
 			execAndObjectDirs.remove(sourceDir);
 		}
 
