@@ -1,40 +1,43 @@
 package org.padacore.core.gnat;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.eclipse.core.runtime.Assert;
 
 /**
  * Symbol of a context.
+ * 
  * @author Charles
- *
+ * 
  */
 public class SymbolTable implements ISymbolProvider {
 
-	private Map<String, Symbol> properties;
+	private KeyStringMap<Symbol> properties;
 
 	/**
 	 * Default constructor.
 	 */
 	public SymbolTable() {
-		this.properties = new HashMap<String, Symbol>();
+		this.properties = new KeyStringMap<Symbol>();
 	}
-	
+
 	/**
 	 * Return whether a symbol is defined.
-	 * @param name Name of the symbol.
+	 * 
+	 * @param name
+	 *            Name of the symbol.
 	 * @return True if the symbol is defined.
 	 */
 	@Override
 	public boolean isDefined(String name) {
-		return this.properties.containsKey(FormatName(name));
+		return this.properties.contains(FormatName(name));
 	}
 
 	/**
 	 * Add a symbol to the symbol table.
-	 * @param name Name of the symbol.
-	 * @param value Symbol value.
+	 * 
+	 * @param name
+	 *            Name of the symbol.
+	 * @param value
+	 *            Symbol value.
 	 */
 	public void add(String name, Symbol value) {
 		this.properties.put(FormatName(name), value);
@@ -42,7 +45,9 @@ public class SymbolTable implements ISymbolProvider {
 
 	/**
 	 * Return the symbol value associated to a symbol.
-	 * @param name Name of the symbol.
+	 * 
+	 * @param name
+	 *            Name of the symbol.
 	 * @return Symbol value.
 	 */
 	@Override
@@ -50,13 +55,14 @@ public class SymbolTable implements ISymbolProvider {
 		Assert.isLegal(this.isDefined(name));
 		return this.properties.get(FormatName(name));
 	}
-	
+
 	/**
 	 * Return a formated name. Formated = lower case and no white spaces.
+	 * 
 	 * @param name
 	 * @return A formated name.
 	 */
-	private static String FormatName (String name) {
-		return name.toLowerCase().replace(" ", "");
+	private static String FormatName(String name) {
+		return name.replace(" ", "");
 	}
 }

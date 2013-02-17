@@ -146,15 +146,21 @@ package_spec
    
 package_renaming
   :
-  PACKAGE simple_name RENAMES simple_name '.' simple_name ';'//TODO
+  PACKAGE newPackageName = simple_name 
+  RENAMES 
+  projectName = simple_name '.' renamedPackage = simple_name ';'
+  {gprLoader.addPackageFrom($newPackageName.text, $projectName.text, $renamedPackage.text);} 
   ;
      
 package_extension
   :
-  PACKAGE begin_package_name = simple_name EXTENDS simple_name '.' simple_name IS //TODO
+  PACKAGE begin_package_name = simple_name 
+  EXTENDS 
+  projectName = simple_name '.' extendedPackage = simple_name IS
   (simple_declarative_item)*
   END end_package_name = simple_name ';'
   {$begin_package_name.text.equals($end_package_name.text)}?
+  {gprLoader.addPackageFrom($begin_package_name.text, $projectName.text, $extendedPackage.text);} 
   ;
 
 typed_variable_declaration 

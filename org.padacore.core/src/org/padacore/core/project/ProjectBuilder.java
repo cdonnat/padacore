@@ -25,8 +25,7 @@ public class ProjectBuilder {
 
 	private AbstractAdaProjectAssociationManager adaProjectAssociationManager;
 
-	public ProjectBuilder(
-			AbstractAdaProjectAssociationManager adaProjectAssociationManager) {
+	public ProjectBuilder(AbstractAdaProjectAssociationManager adaProjectAssociationManager) {
 		this.adaProjectAssociationManager = adaProjectAssociationManager;
 	}
 
@@ -44,11 +43,10 @@ public class ProjectBuilder {
 	 *            project.
 	 * @return the created project.
 	 */
-	public IProject createProjectWithAdaNatureAt(String projectName,
-			IPath location, boolean addMainProcedure) {
+	public IProject createProjectWithAdaNatureAt(String projectName, IPath location,
+			boolean addMainProcedure) {
 
-		return this.createProjectWithAdaNatureAt(projectName, location,
-				addMainProcedure, null);
+		return this.createProjectWithAdaNatureAt(projectName, location, addMainProcedure, null);
 	}
 
 	/**
@@ -69,17 +67,15 @@ public class ProjectBuilder {
 	 *            be linked.
 	 * @return the created project.
 	 */
-	public IProject createProjectWithAdaNatureAt(String projectName,
-			IPath location, boolean addMainProcedure,
-			IPath pathToLinkedGprProject) {
-		IProject project = ResourcesPlugin.getWorkspace().getRoot()
-				.getProject(projectName);
+	public IProject createProjectWithAdaNatureAt(String projectName, IPath location,
+			boolean addMainProcedure, IPath pathToLinkedGprProject) {
+		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 
 		this.addMainProcedureIfRequired(projectName, location, addMainProcedure);
 
 		try {
-			IProjectDescription description = ResourcesPlugin.getWorkspace()
-					.newProjectDescription(projectName);
+			IProjectDescription description = ResourcesPlugin.getWorkspace().newProjectDescription(
+					projectName);
 
 			description.setLocation(location);
 			project.create(description, null);
@@ -109,11 +105,9 @@ public class ProjectBuilder {
 	 * @param gprFileAbsolutePath
 	 *            the absolute path of the GPR file.
 	 */
-	private void linkProjectInWorkspaceTo(IProject project,
-			IPath gprFileAbsolutePath) {
+	private void linkProjectInWorkspaceTo(IProject project, IPath gprFileAbsolutePath) {
 
-		this.createAFolderLinkedToGpFileParentFolder(project,
-				gprFileAbsolutePath);
+		this.createAFolderLinkedToGpFileParentFolder(project, gprFileAbsolutePath);
 
 		this.createALinkToGprFile(project, gprFileAbsolutePath);
 
@@ -128,23 +122,19 @@ public class ProjectBuilder {
 	 * @param gprFileAbsolutePath
 	 *            the GPR file to which shortcut points.
 	 */
-	private void createALinkToGprFile(IProject project,
-			IPath gprFileAbsolutePath) {
+	private void createALinkToGprFile(IProject project, IPath gprFileAbsolutePath) {
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IFile shortcutToGprFile = project.getFile(project.getName()
-				+ GNAT_PROJECT_EXTENSION);
-		IStatus linkedGprFileStatus = workspace.validateLinkLocation(
-				shortcutToGprFile, gprFileAbsolutePath);
+		IFile shortcutToGprFile = project.getFile(project.getName() + GNAT_PROJECT_EXTENSION);
+		IStatus linkedGprFileStatus = workspace.validateLinkLocation(shortcutToGprFile,
+				gprFileAbsolutePath);
 
 		try {
 			if (linkedGprFileStatus.isOK()
-					|| linkedGprFileStatus.matches(IStatus.INFO
-							| IStatus.WARNING)) {
-				shortcutToGprFile.createLink(gprFileAbsolutePath,
-						IResource.NONE, null);
+					|| linkedGprFileStatus.matches(IStatus.INFO | IStatus.WARNING)) {
+				shortcutToGprFile.createLink(gprFileAbsolutePath, IResource.NONE, null);
 			} else {
-				ErrorLog.appendMessage("Invalid link for GPR file of "
-						+ project.getName() + " project", IStatus.ERROR);
+				ErrorLog.appendMessage("Invalid link for GPR file of " + project.getName()
+						+ " project", IStatus.ERROR);
 			}
 		} catch (CoreException e) {
 			ErrorLog.appendException(e);
@@ -160,29 +150,23 @@ public class ProjectBuilder {
 	 * @param gprFileAbsolutePath
 	 *            path of the GPR file.
 	 */
-	private void createAFolderLinkedToGpFileParentFolder(IProject project,
-			IPath gprFileAbsolutePath) {
-		File gprProjectParentFolder = new File(gprFileAbsolutePath.toOSString())
-				.getParentFile();
-		IPath gprFileParentFolderAbsolutePath = new Path(
-				gprProjectParentFolder.getAbsolutePath());
+	private void createAFolderLinkedToGpFileParentFolder(IProject project, IPath gprFileAbsolutePath) {
+		File gprProjectParentFolder = new File(gprFileAbsolutePath.toOSString()).getParentFile();
+		IPath gprFileParentFolderAbsolutePath = new Path(gprProjectParentFolder.getAbsolutePath());
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 
 		// TODO use the same name as GPR parent folder for linked folder
 		IFolder linkedFolder = project.getFolder("toto");
 
-		IStatus linkedFolderStatus = workspace.validateLinkLocation(
-				linkedFolder, gprFileParentFolderAbsolutePath);
+		IStatus linkedFolderStatus = workspace.validateLinkLocation(linkedFolder,
+				gprFileParentFolderAbsolutePath);
 		try {
 			if (linkedFolderStatus.isOK()
-					|| linkedFolderStatus.matches(IStatus.INFO
-							| IStatus.WARNING)) {
-				linkedFolder.createLink(gprFileParentFolderAbsolutePath,
-						IResource.NONE, null);
+					|| linkedFolderStatus.matches(IStatus.INFO | IStatus.WARNING)) {
+				linkedFolder.createLink(gprFileParentFolderAbsolutePath, IResource.NONE, null);
 			} else {
-				ErrorLog.appendMessage(
-						"Invalid link for folder of " + project.getName()
-								+ " project", IStatus.ERROR);
+				ErrorLog.appendMessage("Invalid link for folder of " + project.getName()
+						+ " project", IStatus.ERROR);
 			}
 		} catch (CoreException e) {
 			ErrorLog.appendException(e);
@@ -209,12 +193,11 @@ public class ProjectBuilder {
 
 		if (addMainProcedure) {
 			try {
-				FileUtils.CreateNewFileWithContents(filePath,
-						this.defaultMainContents());
+				FileUtils.CreateNewFileWithContents(filePath, this.defaultMainContents());
 			} catch (IOException e) {
 				ErrorLog.appendMessage(
-						"Error while creating main procedure in "
-								+ filePath.toOSString(), IStatus.ERROR);
+						"Error while creating main procedure in " + filePath.toOSString(),
+						IStatus.ERROR);
 			}
 		}
 	}
@@ -243,8 +226,8 @@ public class ProjectBuilder {
 	 */
 	public static IPath GetProjectPath(String projectName, IPath location) {
 		if (location == null) {
-			return new Path(ResourcesPlugin.getWorkspace().getRoot()
-					.getLocation().toPortableString()
+			return new Path(ResourcesPlugin.getWorkspace().getRoot().getLocation()
+					.toPortableString()
 					+ IPath.SEPARATOR + projectName);
 		} else {
 			return location;

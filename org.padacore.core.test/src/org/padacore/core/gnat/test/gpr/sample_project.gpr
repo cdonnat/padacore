@@ -34,4 +34,9 @@ package Compiler is
     
 end Compiler;
 
+package Builder renames Sample_Project_Included.Builder;
+
+package Ide extends Sample_Project_Included.Ide is
+    null;
+end Ide;
 end Sample_Project;

@@ -21,7 +21,21 @@ public class Package implements IPropertiesProvider {
 	public Package(String name) {
 		this.name = new String(name.toLowerCase());
 		this.variables = new SymbolTable();
-		this.attributes= new SymbolTable();
+		this.attributes = new SymbolTable();
+	}
+
+	/**
+	 * Create a package from another package. Only the attributes properties of
+	 * the package are copied.
+	 * 
+	 * @param name
+	 *            Name of the package.
+	 * @param from
+	 *            Package to be copied.
+	 */
+	public Package(String name, Package from) {
+		this(name);
+		this.attributes = from.attributes;
 	}
 
 	/**

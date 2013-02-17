@@ -57,6 +57,37 @@ public class GprLoaderTest {
 
 	}
 
+	@Test
+	public void testDefaultAttribute() {
+		this.createFixture("sample_project.gpr");
+
+		this.exercize();
+
+		this.checkAttribute("name", "sample_project");
+		String pathToTestProject = CommonTestUtils.GetPathToTestProject();
+		this.checkAttribute("project_dir",
+				pathToTestProject.substring(0, pathToTestProject.length() - 1));
+
+	}
+	
+	@Test
+	public void testRenames() {
+		this.createFixture("sample_project.gpr");
+
+		this.exercize();
+		
+		this.checkAttribute("Builder'Switches (\"main.ada\")", new String[] {"-g"});
+	}
+
+	@Test
+	public void testExtends() {
+		this.createFixture("sample_project.gpr");
+
+		this.exercize();
+		
+		this.checkAttribute("Ide'Ui", "Qt");
+	}
+	
 	private void checkNbOfLoadedProjects(int expectedNumberOfLoadedProject) {
 		assertEquals("Number of loaded projects", expectedNumberOfLoadedProject, sut
 				.getLoadedProjects().size());
