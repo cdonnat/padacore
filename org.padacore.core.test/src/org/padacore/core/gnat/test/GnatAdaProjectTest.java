@@ -33,7 +33,7 @@ public class GnatAdaProjectTest {
 	}
 
 	@Test
-	public void testExeDirRetrievalWhenExecDirIsSpecified() {
+	public void testExeDirWhenExecDirIsSpecified() {
 
 		this.gprProject.setExecutableDir(TEST_EXEC_DIR_NAME);
 
@@ -44,7 +44,7 @@ public class GnatAdaProjectTest {
 	}
 
 	@Test
-	public void testExeDirRetrievalWhenOnlyObjectDirIsSpecified() {
+	public void testExeDirWithOnlyObjectDir() {
 		this.gprProject.setObjectDir(TEST_OBJ_DIR_NAME);
 
 		assertTrue(
@@ -54,11 +54,9 @@ public class GnatAdaProjectTest {
 	}
 
 	@Test
-	public void testExecDirRetrievalWhenNeitherExecDirNorObjectDirAreSpecified() {
-		assertTrue(
-				"GPR project with neither exec nor object dir",
-				this.sut.getExecutableDirectoryPath().equals(
-						GetAbsolutePathFor(".")));
+	public void testExecDirWithoutExecDirNorObjectDir() {
+		assertTrue("GPR project with neither exec nor object dir", this.sut
+				.getExecutableDirectoryPath().equals(GetAbsolutePathFor(".")));
 	}
 
 	@Test
@@ -72,7 +70,7 @@ public class GnatAdaProjectTest {
 	}
 
 	@Test
-	public void testExecutableNamesRetrieval() {
+	public void testExecutableNames() {
 		this.gprProject.addExecutableName("main.ads");
 		this.gprProject.addExecutableName("procedure.adb");
 		this.gprProject.addExecutableName("no_extension");
@@ -102,15 +100,13 @@ public class GnatAdaProjectTest {
 	}
 
 	@Test
-	public void testObjectDirRetrievalWhenNoObjectDirIsSpecified() {
-		assertTrue(
-				"Object directory is current directory",
-				this.sut.getObjectDirectoryPath().equals(
-						GetAbsolutePathFor(".")));
+	public void testObjectDirWhenNoObjectDir() {
+		assertTrue("Object directory is current directory", this.sut
+				.getObjectDirectoryPath().equals(GetAbsolutePathFor(".")));
 	}
 
 	@Test
-	public void testObjectDirRetrievalWhenObjectDirIsSpecified() {
+	public void testObjectDirWithObjectDir() {
 		this.gprProject.setObjectDir(TEST_OBJ_DIR_NAME);
 		assertTrue(
 				"Object directory is TEST_OBJ_DIRECTORY",
@@ -119,7 +115,28 @@ public class GnatAdaProjectTest {
 	}
 
 	@Test
-	public void testRootDirRetrieval() {
+	public void testRootDir() {
 		assertTrue(this.sut.getRootPath().equals(GetAbsolutePathFor(".")));
+	}
+
+	@Test
+	public void testSourcesDirWhenNoneSpecified() {
+		assertTrue(this.sut.getSourceDirectoriesPaths().size() == 1);
+		assertTrue(this.sut.getSourceDirectoriesPaths().get(0)
+				.equals(this.sut.getRootPath()));
+
+	}
+
+	@Test
+	public void testSourcesDirWhenSomeExist() {
+		this.gprProject.addSourceDir("firstDir");
+		this.gprProject.addSourceDir("secondDir");
+
+		assertTrue(this.sut.getSourceDirectoriesPaths().size() == 2);
+		assertTrue(this.sut.getSourceDirectoriesPaths().get(0)
+				.equals(this.sut.getRootPath().append("firstDir")));
+		assertTrue(this.sut.getSourceDirectoriesPaths().get(1)
+				.equals(this.sut.getRootPath().append("secondDir")));
+
 	}
 }
