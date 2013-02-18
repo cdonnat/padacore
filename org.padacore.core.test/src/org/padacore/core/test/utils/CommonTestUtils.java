@@ -103,7 +103,7 @@ public class CommonTestUtils {
 
 		try {
 			project.setSessionProperty(new QualifiedName(
-					SESSION_PROPERTY_QUALIFIED_NAME_PREFIX, project.getName()),
+					SESSION_PROPERTY_QUALIFIED_NAME_PREFIX, "adaProject"),
 					adaProject);
 		} catch (CoreException e) {
 			e.printStackTrace();
@@ -167,7 +167,7 @@ public class CommonTestUtils {
 		cpt++;
 		return CreateAdaProjectAt(location, "TestProject" + cpt, true);
 	}
-	
+
 	public static IProject CreateAdaProject(String projectName,
 			boolean openProject) {
 		return CreateAdaProjectAt(null, projectName, openProject);
