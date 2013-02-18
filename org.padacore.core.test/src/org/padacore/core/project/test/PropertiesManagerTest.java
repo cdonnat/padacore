@@ -1,12 +1,10 @@
 package org.padacore.core.project.test;
 
 import static org.junit.Assert.assertTrue;
-
-import java.util.List;
+import static org.mockito.Mockito.mock;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,38 +42,8 @@ public class PropertiesManagerTest {
 
 	@Test
 	public void testAdaProject() {
-		IAdaProject adaProject = new IAdaProject() {
+		IAdaProject adaProject = mock(IAdaProject.class);
 
-			@Override
-			public boolean isExecutable() {
-				return false;
-			}
-
-			@Override
-			public List<IPath> getSourceDirectoriesPaths() {
-				return null;
-			}
-
-			@Override
-			public IPath getRootPath() {
-				return null;
-			}
-
-			@Override
-			public IPath getObjectDirectoryPath() {
-				return null;
-			}
-
-			@Override
-			public List<String> getExecutableNames() {
-				return null;
-			}
-
-			@Override
-			public IPath getExecutableDirectoryPath() {
-				return null;
-			}
-		};
 		this.fixture.sut.setAdaProject(adaProject);
 
 		assertTrue(this.fixture.sut.getAdaProject() == adaProject);

@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Test
+Bundle-Name: org.padacore.core.test
 Bundle-SymbolicName: org.padacore.core.test;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Require-Bundle: org.eclipse.core.resources;bundle-version="3.8.0",
@@ -9,7 +9,8 @@ Require-Bundle: org.eclipse.core.resources;bundle-version="3.8.0",
  org.junit;bundle-version="4.10.0",
  org.eclipse.ui;bundle-version="3.103.0",
  org.padacore.core;bundle-version="1.0.0",
- org.padacore.antlr;bundle-version="1.0.0"
+ org.padacore.antlr;bundle-version="1.0.0",
+ org.padacore.test;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: org.padacore.core.test.utils
 Bundle-ActivationPolicy: lazy
