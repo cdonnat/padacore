@@ -48,7 +48,7 @@ public class GprBuilderTest {
 		GprProject gpr = this.sut.build();
 
 		assertEquals("sample_project", gpr.getName());
-		assertEquals(new Path(CommonTestUtils.GetPathToTestProject()), gpr.getRootDirPath());
+		assertEquals(CommonTestUtils.GetPathToTestProject(), gpr.getRootDirPath());
 		assertEquals("new_exe", gpr.getExecutableDir());
 		assertEquals("obj", gpr.getObjectDir());
 		assertEquals(2, gpr.getSourcesDir().size());

@@ -64,7 +64,7 @@ public class GprLoaderTest {
 		this.exercize();
 
 		this.checkAttribute("name", "sample_project");
-		String pathToTestProject = CommonTestUtils.GetPathToTestProject();
+		String pathToTestProject = CommonTestUtils.GetPathToTestProject().toOSString();
 		this.checkAttribute("project_dir",
 				pathToTestProject.substring(0, pathToTestProject.length() - 1));
 

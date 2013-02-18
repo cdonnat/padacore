@@ -11,6 +11,7 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -283,8 +284,8 @@ public class CommonTestUtils {
 		return launchConfig;
 	}
 
-	public static String GetPathToTestProject() {
-		return System.getProperty("user.dir")
-				+ "/src/org/padacore/core/gnat/test/gpr/";
+	public static IPath GetPathToTestProject() {
+		return new Path(System.getProperty("user.dir")
+				+ "/src/org/padacore/core/gnat/test/gpr/");
 	}
 }

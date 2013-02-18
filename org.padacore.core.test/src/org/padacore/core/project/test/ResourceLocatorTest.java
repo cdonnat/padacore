@@ -69,6 +69,7 @@ public class ResourceLocatorTest {
 
 	@Test
 	public void testForImportedProject() {
+		//FIXME fails because "projectKind" property is not set for imported project yet
 		this.createFixture(true);
 
 		this.runTestForSimpleFile("testFile.txt", true);
