@@ -1,13 +1,14 @@
 package org.padacore.ui.wizards;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 import org.padacore.core.gnat.DefaultGprProjectFactory;
+import org.padacore.core.gnat.GnatAdaProject;
 import org.padacore.core.gnat.GnatAdaProjectAssociationManager;
+import org.padacore.core.gnat.GprProject;
 import org.padacore.core.project.ProjectBuilder;
 import org.padacore.ui.Messages;
 
@@ -31,8 +32,7 @@ public class NewAdaProjectWizard extends Wizard implements INewWizard {
 
 	public NewAdaProjectWizard() {
 		setWindowTitle(WIZARD_NAME);
-		this.eclipseAdaProjectBuilder = new ProjectBuilder(
-				new GnatAdaProjectAssociationManager());
+		this.eclipseAdaProjectBuilder = new ProjectBuilder(new GnatAdaProjectAssociationManager());
 	}
 
 	@Override
@@ -52,21 +52,19 @@ public class NewAdaProjectWizard extends Wizard implements INewWizard {
 	 * Creates a new default project with Ada nature.
 	 */
 	private void createNewDefaultProjectWithAdaNature() {
-		IPath projectLocation = projectCreationPage.useDefaults() ? null
-				: projectCreationPage.getLocationPath();
-
-		IProject projectHandle = projectCreationPage.getProjectHandle();
+		IPath projectLocation = projectCreationPage.useDefaults() ? null : projectCreationPage
+				.getLocationPath();
 
 		IPath eclipseProjectPath = ProjectBuilder.GetProjectPath(
-				projectHandle.getName(), projectLocation);
+				projectCreationPage.getProjectName(), projectLocation);
 
 		DefaultGprProjectFactory gprFactory = new DefaultGprProjectFactory(
-				projectHandle.getName(),
-				projectCreationPage.addMainProcedure(), eclipseProjectPath);
-		gprFactory.createGprProject();
+				projectCreationPage.getProjectName(), projectCreationPage.addMainProcedure(),
+				eclipseProjectPath);
+		GprProject gprProject = gprFactory.createGprProject();
 
-		eclipseAdaProjectBuilder.createProjectWithAdaNatureAt(
-				projectHandle.getName(), projectLocation,
+		eclipseAdaProjectBuilder.createNewProject(projectCreationPage.getProjectName(),
+				new GnatAdaProject(gprProject), projectLocation,
 				projectCreationPage.addMainProcedure());
 	}
 

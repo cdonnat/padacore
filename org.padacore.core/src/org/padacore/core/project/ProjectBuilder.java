@@ -13,7 +13,9 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.padacore.core.project.PropertiesManager.ProjectKind;
 import org.padacore.core.utils.ErrorLog;
 import org.padacore.core.utils.FileUtils;
 
@@ -71,7 +73,9 @@ public class ProjectBuilder {
 			boolean addMainProcedure, IPath pathToLinkedGprProject) {
 		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 
-		this.addMainProcedureIfRequired(projectName, location, addMainProcedure);
+		if (addMainProcedure) {
+			this.addMainProcedure(projectName, location);
+		}
 
 		try {
 			IProjectDescription description = ResourcesPlugin.getWorkspace().newProjectDescription(
@@ -85,7 +89,7 @@ public class ProjectBuilder {
 				this.linkProjectInWorkspaceTo(project, pathToLinkedGprProject);
 			}
 
-			this.addAdaNature(project);
+			this.addAdaNature(projectName);
 			this.adaProjectAssociationManager.associateToAdaProject(project);
 		} catch (CoreException e) {
 			ErrorLog.appendException(e);
@@ -174,48 +178,6 @@ public class ProjectBuilder {
 	}
 
 	/**
-	 * Adds a default main procedure to the procedure if required.
-	 * 
-	 * @param projectName
-	 *            the name of the project for which the main procedure is
-	 *            created.
-	 * @param location
-	 *            the location of the project.
-	 * @param addMainProcedure
-	 *            if true, the main procedure is added, nothing is done
-	 *            otherwise.
-	 */
-	private void addMainProcedureIfRequired(String projectName, IPath location,
-			boolean addMainProcedure) {
-
-		IPath filePath = GetProjectPath(projectName, location).append(
-				new Path(IPath.SEPARATOR + DEFAULT_EXECUTABLE_NAME));
-
-		if (addMainProcedure) {
-			try {
-				FileUtils.CreateNewFileWithContents(filePath, this.defaultMainContents());
-			} catch (IOException e) {
-				ErrorLog.appendMessage(
-						"Error while creating main procedure in " + filePath.toOSString(),
-						IStatus.ERROR);
-			}
-		}
-	}
-
-	/**
-	 * Add the Ada nature to the given IProject.
-	 * 
-	 * @param project
-	 *            Project to which the Ada nature shall be added.
-	 * @throws CoreException
-	 */
-	private void addAdaNature(IProject project) throws CoreException {
-		IProjectDescription description = project.getDescription();
-		description.setNatureIds(NATURES);
-		project.setDescription(description, null);
-	}
-
-	/**
 	 * Returns the project full path as a String.
 	 * 
 	 * @param projectName
@@ -248,5 +210,72 @@ public class ProjectBuilder {
 		mainContents.append("end Main;");
 
 		return mainContents.toString();
+	}
+
+	public void createNewProject(String name, IAdaProject adaProject, IPath location,
+			boolean addMainProcedure) {
+		this.createAndOpen(name, location);
+		this.addAdaNature(name);
+		this.setProjectProperties(name, adaProject, ProjectKind.CREATED);
+		if (addMainProcedure) {
+			this.addMainProcedure(name, location);
+		}
+		this.refreshProject(name);
+	}
+
+	private void refreshProject(String name) {
+		try {
+			GetEclipseProject(name).refreshLocal(IResource.DEPTH_INFINITE,
+					new NullProgressMonitor());
+		} catch (CoreException e) {
+			ErrorLog.appendException(e);
+		}
+	}
+
+	private void addMainProcedure(String name, IPath location) {
+		IPath filePath = GetProjectPath(name, location).append(
+				new Path(IPath.SEPARATOR + DEFAULT_EXECUTABLE_NAME));
+		try {
+			FileUtils.CreateNewFileWithContents(filePath, this.defaultMainContents());
+		} catch (IOException e) {
+			ErrorLog.appendMessage(
+					"Error while creating main procedure in " + filePath.toOSString(),
+					IStatus.ERROR);
+		}
+	}
+
+	private void setProjectProperties(String name, IAdaProject adaProject, ProjectKind kind) {
+		PropertiesManager propertiesManager = new PropertiesManager(GetEclipseProject(name));
+		propertiesManager.setAdaProject(adaProject);
+		propertiesManager.setProjectKind(kind);
+	}
+
+	private void createAndOpen(String name, IPath location) {
+		try {
+			IProject project = GetEclipseProject(name);
+			IProjectDescription description = ResourcesPlugin.getWorkspace().newProjectDescription(
+					name);
+
+			description.setLocation(location);
+			project.create(description, null);
+			project.open(null);
+		} catch (CoreException e) {
+			ErrorLog.appendMessage("Error while creating the project " + name, IStatus.ERROR);
+		}
+	}
+
+	private void addAdaNature(String name) {
+		try {
+			IProject project = GetEclipseProject(name);
+			IProjectDescription description = project.getDescription();
+			description.setNatureIds(NATURES);
+			project.setDescription(description, null);
+		} catch (CoreException e) {
+			ErrorLog.appendMessage("Error while adding Ada project nature" + name, IStatus.ERROR);
+		}
+	}
+
+	private static IProject GetEclipseProject(String name) {
+		return ResourcesPlugin.getWorkspace().getRoot().getProject(name);
 	}
 }
