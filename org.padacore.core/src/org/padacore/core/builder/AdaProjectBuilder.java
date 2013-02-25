@@ -76,12 +76,11 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 		Console console = new Console();
 		SubMonitor submonitor = SubMonitor.convert(monitor);
 
-		String message = "Building " + getProject().getName();
+		String message = "Building of " + getProject().getName();
 
-		ExternalProcess process = new ExternalProcess(message, console, new Observer[] {
-				new GprbuildObserver(submonitor), new ExternalProcessOutput(console) },
-				new Observer[] { new GprbuildErrObserver(getProject()),
-						new ExternalProcessOutput(console) });
+		ExternalProcess process = new ExternalProcess(message, console,
+				new Observer[] { new GprbuildObserver(submonitor, console) }, new Observer[] {
+						new GprbuildErrObserver(getProject()), new ExternalProcessOutput(console) });
 
 		DerivedResourcesIdentifier resourcesIdentifier = new DerivedResourcesIdentifier(
 				this.getProject());
