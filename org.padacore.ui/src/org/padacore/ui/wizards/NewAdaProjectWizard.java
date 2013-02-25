@@ -7,7 +7,6 @@ import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 import org.padacore.core.gnat.DefaultGprProjectFactory;
 import org.padacore.core.gnat.GnatAdaProject;
-import org.padacore.core.gnat.GnatAdaProjectAssociationManager;
 import org.padacore.core.gnat.GprProject;
 import org.padacore.core.project.ProjectBuilder;
 import org.padacore.ui.Messages;
@@ -28,11 +27,9 @@ public class NewAdaProjectWizard extends Wizard implements INewWizard {
 	private static final String NEW_PROJECT_DESCRIPTION = Messages.NewAdaProjectWizard_Description;
 
 	private AdaProjectCreationPage projectCreationPage;
-	private ProjectBuilder eclipseAdaProjectBuilder;
 
 	public NewAdaProjectWizard() {
 		setWindowTitle(WIZARD_NAME);
-		this.eclipseAdaProjectBuilder = new ProjectBuilder(new GnatAdaProjectAssociationManager());
 	}
 
 	@Override
@@ -52,6 +49,10 @@ public class NewAdaProjectWizard extends Wizard implements INewWizard {
 	 * Creates a new default project with Ada nature.
 	 */
 	private void createNewDefaultProjectWithAdaNature() {
+
+		ProjectBuilder eclipseAdaProjectBuilder = new ProjectBuilder(
+				projectCreationPage.getProjectName());
+
 		IPath projectLocation = projectCreationPage.useDefaults() ? null : projectCreationPage
 				.getLocationPath();
 
@@ -63,8 +64,7 @@ public class NewAdaProjectWizard extends Wizard implements INewWizard {
 				eclipseProjectPath);
 		GprProject gprProject = gprFactory.createGprProject();
 
-		eclipseAdaProjectBuilder.createNewProject(projectCreationPage.getProjectName(),
-				new GnatAdaProject(gprProject), projectLocation,
+		eclipseAdaProjectBuilder.createNewProject(new GnatAdaProject(gprProject), projectLocation,
 				projectCreationPage.addMainProcedure());
 	}
 

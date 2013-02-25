@@ -1,6 +1,5 @@
 package org.padacore.core.project;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.eclipse.core.resources.IFile;
@@ -14,7 +13,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.padacore.core.project.PropertiesManager.ProjectKind;
 import org.padacore.core.utils.ErrorLog;
 import org.padacore.core.utils.FileUtils;
@@ -22,122 +20,178 @@ import org.padacore.core.utils.FileUtils;
 public class ProjectBuilder {
 
 	private static final String[] NATURES = { AdaProjectNature.NATURE_ID };
-	private static final String GNAT_PROJECT_EXTENSION = ".gpr";
 	public static final String DEFAULT_EXECUTABLE_NAME = "main.adb";
 
-	private AbstractAdaProjectAssociationManager adaProjectAssociationManager;
+	private String projectName;
+	private IProject eclipseProject;
 
-	public ProjectBuilder(AbstractAdaProjectAssociationManager adaProjectAssociationManager) {
-		this.adaProjectAssociationManager = adaProjectAssociationManager;
+	/**
+	 * Default constructor.
+	 * 
+	 * @param projectName
+	 *            Name of the project to build.
+	 */
+	public ProjectBuilder(String projectName) {
+		this.projectName = projectName;
+		this.eclipseProject = GetEclipseProject(projectName);
 	}
 
 	/**
-	 * Create a new Eclipse project with Ada nature at given location with given
-	 * name. A main procedure is added if requested (addMainProcedure is set to
-	 * true).
+	 * Create a new eclipse project from an Ada project.
 	 * 
-	 * @param projectName
-	 *            name of the Eclipse project to create.
+	 * @param adaProject
+	 *            Ada project
 	 * @param location
-	 *            location of the Eclipse project to create.
+	 *            Location of the eclipse project.
 	 * @param addMainProcedure
-	 *            if true, a default generated main procedure is added to
-	 *            project.
-	 * @return the created project.
+	 *            True if a default main procedure must be created.
 	 */
-	public IProject createProjectWithAdaNatureAt(String projectName, IPath location,
-			boolean addMainProcedure) {
-
-		return this.createProjectWithAdaNatureAt(projectName, location, addMainProcedure, null);
-	}
-
-	/**
-	 * Create a new Eclipse project with Ada nature at given location with given
-	 * name. A main procedure is added if requested (addMainProcedure is set to
-	 * true). Link between a project folder and the GPR file is created if
-	 * pathToLinkedGprProject is not null.
-	 * 
-	 * @param projectName
-	 *            name of the Eclipse project to create.
-	 * @param location
-	 *            location of the Eclipse project to create.
-	 * @param addMainProcedure
-	 *            if true, a default generated main procedure is added to
-	 *            project.
-	 * @param pathToLinkedGprProject
-	 *            the absolute path of the GPR file to which the project should
-	 *            be linked.
-	 * @return the created project.
-	 */
-	public IProject createProjectWithAdaNatureAt(String projectName, IPath location,
-			boolean addMainProcedure, IPath pathToLinkedGprProject) {
-		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-
+	public void createNewProject(IAdaProject adaProject, IPath location, boolean addMainProcedure) {
+		this.createAndOpen(location);
+		this.addAdaNature();
+		this.setProjectProperties(adaProject, ProjectKind.CREATED);
 		if (addMainProcedure) {
-			this.addMainProcedure(projectName, location);
+			this.addMainProcedure(location);
 		}
+		this.refreshProject();
+	}
 
+	/**
+	 * Create and open an eclipse project at the given location.
+	 * 
+	 * @param location
+	 *            Location of the eclipse project.
+	 */
+	private void createAndOpen(IPath location) {
 		try {
 			IProjectDescription description = ResourcesPlugin.getWorkspace().newProjectDescription(
-					projectName);
+					this.projectName);
 
 			description.setLocation(location);
-			project.create(description, null);
-			project.open(null);
+			this.eclipseProject.create(description, null);
+			this.eclipseProject.open(null);
+		} catch (CoreException e) {
+			ErrorLog.appendMessage("Error while creating the project " + this.projectName,
+					IStatus.ERROR);
+		}
+	}
 
-			if (pathToLinkedGprProject != null) {
-				this.linkProjectInWorkspaceTo(project, pathToLinkedGprProject);
-			}
+	/**
+	 * Add the Ada nature to the eclipse project.
+	 * 
+	 */
+	private void addAdaNature() {
+		try {
+			IProjectDescription description = this.eclipseProject.getDescription();
+			description.setNatureIds(NATURES);
+			this.eclipseProject.setDescription(description, null);
+		} catch (CoreException e) {
+			ErrorLog.appendMessage("Error while adding Ada project nature" + this.projectName,
+					IStatus.ERROR);
+		}
+	}
 
-			this.addAdaNature(projectName);
-			this.adaProjectAssociationManager.associateToAdaProject(project);
+	/**
+	 * Set the session and persistent project properties.
+	 * 
+	 * @param adaProject
+	 *            Ada project corresponding to the eclipse project to build.
+	 * @param kind
+	 *            Kind of the eclipse project.
+	 */
+	private void setProjectProperties(IAdaProject adaProject, ProjectKind kind) {
+		PropertiesManager propertiesManager = new PropertiesManager(this.eclipseProject);
+		propertiesManager.setAdaProject(adaProject);
+		propertiesManager.setProjectKind(kind);
+	}
+
+	/**
+	 * Add a default main procedure to the eclipse project.
+	 * 
+	 * @param location
+	 *            Location of the eclipse project
+	 */
+	private void addMainProcedure(IPath location) {
+		IPath filePath = GetProjectPath(this.projectName, location).addTrailingSeparator().append(
+				DEFAULT_EXECUTABLE_NAME);
+		try {
+			FileUtils.CreateNewFileWithContents(filePath, this.defaultMainContents());
+		} catch (IOException e) {
+			ErrorLog.appendMessage(
+					"Error while creating main procedure in " + filePath.toOSString(),
+					IStatus.ERROR);
+		}
+	}
+
+	/**
+	 * Refresh the content of the eclipse project.
+	 */
+	private void refreshProject() {
+		try {
+			this.eclipseProject.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
 		} catch (CoreException e) {
 			ErrorLog.appendException(e);
 		}
-
-		return project;
-
 	}
 
 	/**
-	 * Links the given project to the existing GPR project file (it creates both
-	 * a direct link to the GPR file and a folder linked to the folder in which
-	 * GPR file is contained).
+	 * Return the eclipse project corresponding to the given name.
 	 * 
-	 * @param project
-	 *            the project to link to the GPR file.
-	 * @param gprFileAbsolutePath
-	 *            the absolute path of the GPR file.
+	 * @param name
+	 *            Name of the project.
+	 * @return Eclipse project corresponding.
 	 */
-	private void linkProjectInWorkspaceTo(IProject project, IPath gprFileAbsolutePath) {
-
-		this.createAFolderLinkedToGpFileParentFolder(project, gprFileAbsolutePath);
-
-		this.createALinkToGprFile(project, gprFileAbsolutePath);
-
+	private static IProject GetEclipseProject(String name) {
+		return ResourcesPlugin.getWorkspace().getRoot().getProject(name);
 	}
 
 	/**
-	 * Creates a shortcut to the GPR file at given path at the root of the given
-	 * project
+	 * Import an Ada project into an eclipse project.
 	 * 
-	 * @param project
-	 *            the project in which shortcut is created.
-	 * @param gprFileAbsolutePath
-	 *            the GPR file to which shortcut points.
+	 * @param importedProjectFilePath
+	 *            Location of the Ada project file.
+	 * @param adaProject
+	 *            Ada project corresponding.
 	 */
-	private void createALinkToGprFile(IProject project, IPath gprFileAbsolutePath) {
+	public void importProject(IPath importedProjectFilePath, IAdaProject adaProject) {
+		this.createAndOpen(null);
+		this.addAdaNature();
+		this.setProjectProperties(adaProject, ProjectKind.IMPORTED);
+		this.createLinks(importedProjectFilePath);
+	}
+
+	/**
+	 * Create the links on the project to import into the workspace.
+	 * 
+	 * @param importedProjectFilePath
+	 *            Path to the Ada project to import.
+	 */
+	private void createLinks(IPath importedProjectFilePath) {
+		this.createLinkToProjectFileParentFolder(importedProjectFilePath);
+		this.createLinkToProjectFile(importedProjectFilePath);
+	}
+
+	/**
+	 * Create a link to the folder containing the Ada project.
+	 * 
+	 * @param importedProjectFilePath
+	 *            Path to the Ada project file.
+	 */
+	private void createLinkToProjectFileParentFolder(IPath importedProjectFilePath) {
+		IPath projectFileParentFolderPath = importedProjectFilePath.removeLastSegments(1);
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IFile shortcutToGprFile = project.getFile(project.getName() + GNAT_PROJECT_EXTENSION);
-		IStatus linkedGprFileStatus = workspace.validateLinkLocation(shortcutToGprFile,
-				gprFileAbsolutePath);
 
+		// TODO use the same name as GPR parent folder for linked folder
+		IFolder linkedFolder = this.eclipseProject.getFolder("toto");
+
+		IStatus linkedFolderStatus = workspace.validateLinkLocation(linkedFolder,
+				projectFileParentFolderPath);
 		try {
-			if (linkedGprFileStatus.isOK()
-					|| linkedGprFileStatus.matches(IStatus.INFO | IStatus.WARNING)) {
-				shortcutToGprFile.createLink(gprFileAbsolutePath, IResource.NONE, null);
+			if (linkedFolderStatus.isOK()
+					|| linkedFolderStatus.matches(IStatus.INFO | IStatus.WARNING)) {
+				linkedFolder.createLink(projectFileParentFolderPath, IResource.NONE, null);
 			} else {
-				ErrorLog.appendMessage("Invalid link for GPR file of " + project.getName()
+				ErrorLog.appendMessage("Invalid link for folder of " + this.projectName
 						+ " project", IStatus.ERROR);
 			}
 		} catch (CoreException e) {
@@ -146,30 +200,24 @@ public class ProjectBuilder {
 	}
 
 	/**
-	 * Creates a folder in project which points to the parent folder of the GPR
-	 * file which path is given.
+	 * Create a link to the Ada project file.
 	 * 
-	 * @param project
-	 *            the project in which linked folder is created.
-	 * @param gprFileAbsolutePath
-	 *            path of the GPR file.
+	 * @param importedProjectFilePath
+	 *            Path to the Ada project file.
 	 */
-	private void createAFolderLinkedToGpFileParentFolder(IProject project, IPath gprFileAbsolutePath) {
-		File gprProjectParentFolder = new File(gprFileAbsolutePath.toOSString()).getParentFile();
-		IPath gprFileParentFolderAbsolutePath = new Path(gprProjectParentFolder.getAbsolutePath());
+	private void createLinkToProjectFile(IPath importedProjectFilePath) {
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IFile shortcutToProjectFile = this.eclipseProject.getFile(importedProjectFilePath
+				.lastSegment());
+		IStatus linkedGprFileStatus = workspace.validateLinkLocation(shortcutToProjectFile,
+				importedProjectFilePath);
 
-		// TODO use the same name as GPR parent folder for linked folder
-		IFolder linkedFolder = project.getFolder("toto");
-
-		IStatus linkedFolderStatus = workspace.validateLinkLocation(linkedFolder,
-				gprFileParentFolderAbsolutePath);
 		try {
-			if (linkedFolderStatus.isOK()
-					|| linkedFolderStatus.matches(IStatus.INFO | IStatus.WARNING)) {
-				linkedFolder.createLink(gprFileParentFolderAbsolutePath, IResource.NONE, null);
+			if (linkedGprFileStatus.isOK()
+					|| linkedGprFileStatus.matches(IStatus.INFO | IStatus.WARNING)) {
+				shortcutToProjectFile.createLink(importedProjectFilePath, IResource.NONE, null);
 			} else {
-				ErrorLog.appendMessage("Invalid link for folder of " + project.getName()
+				ErrorLog.appendMessage("Invalid link for GPR file of " + this.projectName
 						+ " project", IStatus.ERROR);
 			}
 		} catch (CoreException e) {
@@ -188,9 +236,8 @@ public class ProjectBuilder {
 	 */
 	public static IPath GetProjectPath(String projectName, IPath location) {
 		if (location == null) {
-			return new Path(ResourcesPlugin.getWorkspace().getRoot().getLocation()
-					.toPortableString()
-					+ IPath.SEPARATOR + projectName);
+			return ResourcesPlugin.getWorkspace().getRoot().getLocation().addTrailingSeparator()
+					.append(projectName);
 		} else {
 			return location;
 		}
@@ -210,72 +257,5 @@ public class ProjectBuilder {
 		mainContents.append("end Main;");
 
 		return mainContents.toString();
-	}
-
-	public void createNewProject(String name, IAdaProject adaProject, IPath location,
-			boolean addMainProcedure) {
-		this.createAndOpen(name, location);
-		this.addAdaNature(name);
-		this.setProjectProperties(name, adaProject, ProjectKind.CREATED);
-		if (addMainProcedure) {
-			this.addMainProcedure(name, location);
-		}
-		this.refreshProject(name);
-	}
-
-	private void refreshProject(String name) {
-		try {
-			GetEclipseProject(name).refreshLocal(IResource.DEPTH_INFINITE,
-					new NullProgressMonitor());
-		} catch (CoreException e) {
-			ErrorLog.appendException(e);
-		}
-	}
-
-	private void addMainProcedure(String name, IPath location) {
-		IPath filePath = GetProjectPath(name, location).append(
-				new Path(IPath.SEPARATOR + DEFAULT_EXECUTABLE_NAME));
-		try {
-			FileUtils.CreateNewFileWithContents(filePath, this.defaultMainContents());
-		} catch (IOException e) {
-			ErrorLog.appendMessage(
-					"Error while creating main procedure in " + filePath.toOSString(),
-					IStatus.ERROR);
-		}
-	}
-
-	private void setProjectProperties(String name, IAdaProject adaProject, ProjectKind kind) {
-		PropertiesManager propertiesManager = new PropertiesManager(GetEclipseProject(name));
-		propertiesManager.setAdaProject(adaProject);
-		propertiesManager.setProjectKind(kind);
-	}
-
-	private void createAndOpen(String name, IPath location) {
-		try {
-			IProject project = GetEclipseProject(name);
-			IProjectDescription description = ResourcesPlugin.getWorkspace().newProjectDescription(
-					name);
-
-			description.setLocation(location);
-			project.create(description, null);
-			project.open(null);
-		} catch (CoreException e) {
-			ErrorLog.appendMessage("Error while creating the project " + name, IStatus.ERROR);
-		}
-	}
-
-	private void addAdaNature(String name) {
-		try {
-			IProject project = GetEclipseProject(name);
-			IProjectDescription description = project.getDescription();
-			description.setNatureIds(NATURES);
-			project.setDescription(description, null);
-		} catch (CoreException e) {
-			ErrorLog.appendMessage("Error while adding Ada project nature" + name, IStatus.ERROR);
-		}
-	}
-
-	private static IProject GetEclipseProject(String name) {
-		return ResourcesPlugin.getWorkspace().getRoot().getProject(name);
 	}
 }

@@ -67,4 +67,8 @@ public class GprLoaderStub extends GprLoader {
 	public Project getCurrentProject() {
 		return new Project(new Path("toto"));
 	}
+	
+	@Override
+	public void addPackageFrom(String newPackageName, String projectName, String packageName) {
+	}
 }

@@ -1,5 +1,7 @@
 package org.padacore.ui.wizards;
 
+import java.util.List;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -15,7 +17,8 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
-import org.padacore.core.gnat.GnatAdaProjectAssociationManager;
+import org.padacore.core.gnat.GnatAdaProject;
+import org.padacore.core.gnat.GprBuilder;
 import org.padacore.core.gnat.GprLoader;
 import org.padacore.core.gnat.Project;
 import org.padacore.core.project.ProjectBuilder;
@@ -31,11 +34,9 @@ import org.padacore.core.utils.ErrorLog;
 public class AdaProjectFromGprWizard extends Wizard implements IImportWizard {
 
 	private AdaProjectFromGprCreationPage page;
-	private ProjectBuilder eclipseAdaProjectBuilder;
 
 	public AdaProjectFromGprWizard() {
 		setWindowTitle("Import existing GPR Project");
-		this.eclipseAdaProjectBuilder = new ProjectBuilder(new GnatAdaProjectAssociationManager());
 	}
 
 	@Override
@@ -64,14 +65,25 @@ public class AdaProjectFromGprWizard extends Wizard implements IImportWizard {
 				GprLoader loader = new GprLoader();
 				loader.load(gprProjectAbsolutePath);
 
-				// TODO clean this mess!
-				for (Project project : loader.getLoadedProjects()) {
-					eclipseAdaProjectBuilder.createProjectWithAdaNatureAt(project.getName(), null,
-							false, project.getPath());
-				}
+				this.importLoadedProjects(loader.getLoadedProjects());
+				this.setReferencesBetweenEclipseProjects(loader.getLoadedProjects());
+				
+				return Status.OK_STATUS;
+			}
 
-				for (Project project : loader.getLoadedProjects()) {
-					IWorkspaceRoot workspace = ResourcesPlugin.getWorkspace().getRoot();
+			private void importLoadedProjects(List<Project> loadedProjects) {
+				for (Project project : loadedProjects) {
+					ProjectBuilder eclipseAdaProjectBuilder = new ProjectBuilder(project.getName());
+					GprBuilder gprBuilder = new GprBuilder(project, project.getPath());
+
+					eclipseAdaProjectBuilder.importProject(project.getPath(),
+							new GnatAdaProject(gprBuilder.build()));
+				}
+			}
+			
+			private void setReferencesBetweenEclipseProjects(List<Project> loadedProjects) {
+				IWorkspaceRoot workspace = ResourcesPlugin.getWorkspace().getRoot();
+				for (Project project : loadedProjects) {
 					IProject[] referencedProjects = new IProject[project.getReferenceProjects()
 							.size()];
 					for (int i = 0; i < project.getReferenceProjects().size(); i++) {
@@ -88,7 +100,6 @@ public class AdaProjectFromGprWizard extends Wizard implements IImportWizard {
 						ErrorLog.appendException(e);
 					}
 				}
-				return Status.OK_STATUS;
 			}
 
 		};
