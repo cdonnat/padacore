@@ -27,8 +27,8 @@ public class GprbuildErrObserver implements Observer {
 	/**
 	 * Default constructor.
 	 */
-	public GprbuildErrObserver(IProject project) {
-		this.parser = new GprbuildOutput();
+	public GprbuildErrObserver(IProject project, GprbuildOutput parser) {
+		this.parser = parser;
 		this.project = project;
 		this.resourceLocator = new ResourceLocator(project);
 

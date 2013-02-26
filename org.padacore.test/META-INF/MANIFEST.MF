@@ -5,4 +5,13 @@ Bundle-SymbolicName: org.padacore.test
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: lib/mockito-all-1.9.5.jar
-Export-Package: org.mockito
+Export-Package: org.mockito;
+  uses:="org.mockito.internal,
+   org.mockito.configuration,
+   org.mockito.invocation,
+   org.mockito.listeners,
+   org.mockito.internal.progress,
+   org.mockito.verification,
+   org.mockito.stubbing,
+   org.hamcrest",
+ org.mockito.stubbing

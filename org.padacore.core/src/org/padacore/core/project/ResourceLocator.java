@@ -9,7 +9,7 @@ import org.eclipse.core.runtime.Path;
 import org.padacore.core.project.PropertiesManager.ProjectKind;
 
 /**
- * This class enables to get a resource handle from an absolute path.
+ * This class enables to get a project resource handle from an absolute path.
  * 
  * @author RS
  * 
