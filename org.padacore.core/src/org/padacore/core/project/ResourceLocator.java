@@ -6,6 +6,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.padacore.core.project.PropertiesManager.ProjectKind;
 
 /**
  * This class enables to get a resource handle from an absolute path.
@@ -73,10 +74,9 @@ public class ResourceLocator {
 	 * @return True if project is an imported project, False otherwise.
 	 */
 	private boolean isProjectAnImportedProject() {
-//		PropertiesProvider propertiesProvider = new PropertiesProvider(
-//				this.project);
-//		
-//		return propertiesProvider.getProjectKind() == ProjectKind.IMPORTED;
-		return this.project.getFile(this.project.getName() + ".gpr").isLinked();
+		PropertiesManager propertiesManager = new PropertiesManager(
+				this.project);
+		
+		return propertiesManager.getProjectKind() == ProjectKind.IMPORTED;
 	}
 }
