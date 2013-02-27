@@ -32,16 +32,19 @@ public class CommonTestUtils {
 
 	private static int cpt = 0;
 
-	public static void CreateGprFileIn(IPath gprContainingFolder, String gprProjectName) {
-		File gprFile = new File(gprContainingFolder + System.getProperty("file.separator")
-				+ gprProjectName + ".gpr");
+	public static void CreateGprFileIn(IPath gprContainingFolder,
+			String gprProjectName) {
+		File gprFile = new File(gprContainingFolder
+				+ System.getProperty("file.separator") + gprProjectName
+				+ ".gpr");
 
 		FileWriter gprWriter = null;
 		try {
 
 			gprWriter = new FileWriter(gprFile);
 
-			gprWriter.write("project " + gprProjectName + " is " + "end " + gprProjectName + ";");
+			gprWriter.write("project " + gprProjectName + " is " + "end "
+					+ gprProjectName + ";");
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
@@ -61,8 +64,10 @@ public class CommonTestUtils {
 		return CreateNonAdaProject("TestProject" + cpt, openProject);
 	}
 
-	public static IProject CreateNonAdaProject(String projectName, boolean openProject) {
-		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+	public static IProject CreateNonAdaProject(String projectName,
+			boolean openProject) {
+		IProject project = ResourcesPlugin.getWorkspace().getRoot()
+				.getProject(projectName);
 		try {
 			project.create(null);
 		} catch (CoreException e1) {
@@ -79,64 +84,73 @@ public class CommonTestUtils {
 		return project;
 	}
 
-	public static IProject CreateAdaProject() {
-		cpt++;
-		return CreateAdaProject("TestProject" + cpt);
-	}
-
-	public static GprProject CreateGprProject(String name, boolean isExecutable) {
-		GprProject result = new GprProject(name, ResourcesPlugin.getWorkspace().getRoot()
-				.getLocation());
+	public static GprProject CreateGprProject(String name, IPath rootDir,
+			boolean isExecutable) {
+		GprProject result = new GprProject(name, rootDir);
 
 		result.setExecutable(isExecutable);
 
 		return result;
 	}
 
-	public static IProject CreateExecutableAdaProject() {
-		IProject project = CreateAdaProject();
-
-		IAdaProject adaProject = new GnatAdaProject(CreateGprProject(project.getName(), true));
-
-		try {
-			project.setSessionProperty(new QualifiedName(SESSION_PROPERTY_QUALIFIED_NAME_PREFIX,
-					"adaProject"), adaProject);
-		} catch (CoreException e) {
-			e.printStackTrace();
-		}
-
-		return project;
-
+	public static GprProject CreateGprProject(String name, boolean isExecutable) {
+		return CreateGprProject(name, ResourcesPlugin.getWorkspace().getRoot()
+				.getLocation(), isExecutable);
 	}
 
-	public static IProject CreateAdaProject(String projectName) {
-		return CreateAdaProject(projectName, true);
+	public static IProject CreateAdaProject() {
+		return CreateAdaProject(true, false);
 	}
 
-	public static IProject CreateAdaProjectAt(IPath location, String projectName,
-			boolean openProject) {
-		IProject adaProject = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+	public static IProject CreateAdaProject(boolean openProject,
+			boolean isExecutable) {
+		return CreateAdaProjectAt(null, openProject, isExecutable);
+	}
+
+	public static IProject CreateAdaProjectAt(IPath location) {
+		return CreateAdaProjectAt(location, true, false);
+	}
+
+	public static IProject CreateAdaProjectAt(IPath location,
+			boolean openProject, boolean isExecutable) {
+		cpt++;
+		return CreateAdaProjectAt(location, "TestProject" + cpt, openProject,
+				isExecutable);
+	}
+
+	public static IProject CreateAdaProjectAt(IPath location,
+			String projectName, boolean openProject, boolean isExecutable) {
+		IProject eclipseProject = ResourcesPlugin.getWorkspace().getRoot()
+				.getProject(projectName);
+		IAdaProject adaProject = new GnatAdaProject(CreateGprProject(
+				eclipseProject.getName(), location, isExecutable));
 
 		FileWriter filewriter = null;
 
 		try {
-			IProjectDescription description = ResourcesPlugin.getWorkspace().newProjectDescription(
-					projectName);
+			IProjectDescription description = ResourcesPlugin.getWorkspace()
+					.newProjectDescription(projectName);
 
 			description.setLocation(location);
-			description.setNatureIds(new String[] { AdaProjectNature.NATURE_ID });
-			adaProject.create(description, null);
+			description
+					.setNatureIds(new String[] { AdaProjectNature.NATURE_ID });
+			eclipseProject.create(description, null);
 
-			GprProject gpr = new GprProject(projectName, adaProject.getRawLocation());
-			filewriter = new FileWriter(new File(adaProject.getLocation().toOSString()
-					+ IPath.SEPARATOR + projectName + ".gpr"));
+			GprProject gpr = new GprProject(projectName,
+					eclipseProject.getRawLocation());
+			filewriter = new FileWriter(new File(eclipseProject.getLocation()
+					.toOSString() + IPath.SEPARATOR + projectName + ".gpr"));
 			filewriter.write(gpr.toString());
 			filewriter.close();
 
-			adaProject.open(null);
+			eclipseProject.open(null);
+
+			eclipseProject.setSessionProperty(new QualifiedName(
+					SESSION_PROPERTY_QUALIFIED_NAME_PREFIX, "adaProject"),
+					adaProject);
 
 			if (!openProject) {
-				adaProject.close(null);
+				eclipseProject.close(null);
 			}
 		} catch (CoreException e) {
 			e.printStackTrace();
@@ -153,27 +167,19 @@ public class CommonTestUtils {
 
 		}
 
-		return adaProject;
-	}
-
-	public static IProject CreateAdaProjectAt(IPath location) {
-		cpt++;
-		return CreateAdaProjectAt(location, "TestProject" + cpt, true);
-	}
-
-	public static IProject CreateAdaProject(String projectName, boolean openProject) {
-		return CreateAdaProjectAt(null, projectName, openProject);
-
+		return eclipseProject;
 	}
 
 	public static String GetWorkspaceAbsolutePath() {
-		return ResourcesPlugin.getWorkspace().getRoot().getLocationURI().getPath();
+		return ResourcesPlugin.getWorkspace().getRoot().getLocationURI()
+				.getPath();
 	}
 
 	public static String GetFileAbsolutePath(IProject project, String filename) {
-		String res = project.getWorkspace().getRoot().getRawLocation().toOSString()
-				+ project.getFullPath().toOSString() + System.getProperty("file.separator")
-				+ filename;
+		String res = project.getWorkspace().getRoot().getRawLocation()
+				.toOSString()
+				+ project.getFullPath().toOSString()
+				+ System.getProperty("file.separator") + filename;
 
 		try {
 			IProjectDescription desc = project.getDescription();
@@ -186,26 +192,29 @@ public class CommonTestUtils {
 		return res;
 	}
 
-	public static IAdaProject CheckAdaProjectAssociationToProject(IProject createdProject,
-			boolean shallBeAssociated) {
+	public static IAdaProject CheckAdaProjectAssociationToProject(
+			IProject createdProject, boolean shallBeAssociated) {
 
 		Object sessionProperty = null;
 		try {
-			sessionProperty = createdProject.getSessionProperty(new QualifiedName(
-					SESSION_PROPERTY_QUALIFIED_NAME_PREFIX, createdProject.getName()));
+			sessionProperty = createdProject
+					.getSessionProperty(new QualifiedName(
+							SESSION_PROPERTY_QUALIFIED_NAME_PREFIX,
+							"adaProject"));
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
 
-		assertTrue("GprProject shall be associated", sessionProperty != null == shallBeAssociated);
+		assertTrue("GprProject shall be associated",
+				sessionProperty != null == shallBeAssociated);
 
 		return (IAdaProject) sessionProperty;
 	}
 
 	public static void RemoveAssociationToAdaProject(IProject project) {
 		try {
-			project.setSessionProperty(new QualifiedName(SESSION_PROPERTY_QUALIFIED_NAME_PREFIX,
-					project.getName()), null);
+			project.setSessionProperty(new QualifiedName(
+					SESSION_PROPERTY_QUALIFIED_NAME_PREFIX, "adaProject"), null);
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
@@ -213,26 +222,34 @@ public class CommonTestUtils {
 
 	public static void CheckDefaultAdaProjectContents(IAdaProject adaProject,
 			boolean mainProcedureHasBeenGenerated) {
-		assertTrue("AdaProject shall be executable: " + mainProcedureHasBeenGenerated,
+		assertTrue("AdaProject shall be executable: "
+				+ mainProcedureHasBeenGenerated,
 				adaProject.isExecutable() == mainProcedureHasBeenGenerated);
-		assertTrue("AdaProject shall have " + (mainProcedureHasBeenGenerated ? "1" : "0")
-				+ " executable",
-				adaProject.getExecutableNames().size() == (mainProcedureHasBeenGenerated ? 1 : 0));
+		assertTrue(
+				"AdaProject shall have "
+						+ (mainProcedureHasBeenGenerated ? "1" : "0")
+						+ " executable",
+				adaProject.getExecutableNames().size() == (mainProcedureHasBeenGenerated ? 1
+						: 0));
 		if (mainProcedureHasBeenGenerated) {
-			assertTrue("AdaProject executable shall be called main.adb", adaProject
-					.getExecutableNames().get(0).equals("main.adb"));
+			assertTrue("AdaProject executable shall be called main.adb",
+					adaProject.getExecutableNames().get(0).equals("main.adb"));
 		}
 
 	}
 
-	public static ILaunchConfiguration[] RetrieveAdaLaunchConfigurations() throws CoreException {
-		ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
+	public static ILaunchConfiguration[] RetrieveAdaLaunchConfigurations()
+			throws CoreException {
+		ILaunchManager launchManager = DebugPlugin.getDefault()
+				.getLaunchManager();
 
-		return launchManager.getLaunchConfigurations(GetAdaLaunchConfigurationType());
+		return launchManager
+				.getLaunchConfigurations(GetAdaLaunchConfigurationType());
 	}
 
 	private static ILaunchConfigurationType GetAdaLaunchConfigurationType() {
-		ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
+		ILaunchManager launchManager = DebugPlugin.getDefault()
+				.getLaunchManager();
 
 		ILaunchConfigurationType adaConfigType = launchManager
 				.getLaunchConfigurationType(AdaLaunchConstants.ID_LAUNCH_ADA_APP);
@@ -240,19 +257,21 @@ public class CommonTestUtils {
 		return adaConfigType;
 	}
 
-	public static ILaunchConfiguration CreateAdaLaunchConfigurationFor(String launchConfigName,
-			IProject project, String executableName) throws CoreException {
+	public static ILaunchConfiguration CreateAdaLaunchConfigurationFor(
+			String launchConfigName, IProject project, String executableName)
+			throws CoreException {
 
 		ILaunchConfigurationType adaConfigType = GetAdaLaunchConfigurationType();
 
 		ILaunchConfiguration launchConfig = null;
 
-		ILaunchConfigurationWorkingCopy configWc = adaConfigType
-				.newInstance(null, launchConfigName);
+		ILaunchConfigurationWorkingCopy configWc = adaConfigType.newInstance(
+				null, launchConfigName);
 
 		String fileAbsolutePath = GetFileAbsolutePath(project, executableName);
 
-		configWc.setAttribute(AdaLaunchConstants.EXECUTABLE_PATH, fileAbsolutePath);
+		configWc.setAttribute(AdaLaunchConstants.EXECUTABLE_PATH,
+				fileAbsolutePath);
 
 		launchConfig = configWc.doSave();
 
@@ -260,7 +279,8 @@ public class CommonTestUtils {
 	}
 
 	public static IPath GetPathToTestProject() {
-		return new Path(System.getProperty("user.dir") + "/src/org/padacore/core/gnat/test/gpr/");
+		return new Path(System.getProperty("user.dir")
+				+ "/src/org/padacore/core/gnat/test/gpr/");
 	}
 
 	public final static String IMPORTED_PROJECT = "imported";
@@ -269,17 +289,20 @@ public class CommonTestUtils {
 	private static Object GetSessionPropertyName(IProject project, String name) {
 		Object property = null;
 		try {
-			property = project.getSessionProperty(new QualifiedName("org.padacore", name));
+			property = project.getSessionProperty(new QualifiedName(
+					"org.padacore", name));
 		} catch (CoreException e) {
 			ErrorLog.appendException(e);
 		}
 		return property;
 	}
-	
-	private static Object GetPersistentPropertyName(IProject project, String name) {
+
+	private static Object GetPersistentPropertyName(IProject project,
+			String name) {
 		Object property = null;
 		try {
-			property = project.getPersistentProperty(new QualifiedName("org.padacore", name));
+			property = project.getPersistentProperty(new QualifiedName(
+					"org.padacore", name));
 		} catch (CoreException e) {
 			ErrorLog.appendException(e);
 		}
@@ -292,7 +315,8 @@ public class CommonTestUtils {
 				GetSessionPropertyName(project, "adaProject"));
 	}
 
-	public static void CheckProjectKindIsSetInProperties(IProject project, String expectedKind) {
+	public static void CheckProjectKindIsSetInProperties(IProject project,
+			String expectedKind) {
 		assertEquals("Project kind should be set", expectedKind,
 				GetPersistentPropertyName(project, "projectKind"));
 	}

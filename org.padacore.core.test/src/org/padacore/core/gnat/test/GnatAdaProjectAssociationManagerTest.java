@@ -16,7 +16,7 @@ public class GnatAdaProjectAssociationManagerTest {
 	@Before
 	public void createFixture() {
 		this.sut = new GnatAdaProjectAssociationManager();
-		this.firstAdaProject = CommonTestUtils.CreateAdaProject("adaProject");
+		this.firstAdaProject = CommonTestUtils.CreateAdaProject();
 	}
 
 	@After
