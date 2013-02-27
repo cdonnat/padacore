@@ -22,7 +22,6 @@ public class GprbuildErrObserver implements Observer {
 
 	private GprbuildOutput parser;
 	private IProject project;
-	private ResourceLocator resourceLocator;
 
 	/**
 	 * Default constructor.
@@ -30,7 +29,6 @@ public class GprbuildErrObserver implements Observer {
 	public GprbuildErrObserver(IProject project, GprbuildOutput parser) {
 		this.parser = parser;
 		this.project = project;
-		this.resourceLocator = new ResourceLocator(project);
 
 		try {
 			this.project.deleteMarkers(IMarker.PROBLEM, true,
@@ -53,7 +51,9 @@ public class GprbuildErrObserver implements Observer {
 
 	/**
 	 * Adds the given error as a resource marker.
-	 * @param error the error to convert to a resource marker.
+	 * 
+	 * @param error
+	 *            the error to convert to a resource marker.
 	 */
 	private void addError(Error error) {
 
@@ -71,27 +71,67 @@ public class GprbuildErrObserver implements Observer {
 	}
 
 	/**
-	 * Finds the resource corresponding to the given filename.
-	 * @param fileName the filename for which we want to retrieve a resource.
-	 * @return the resource handle corresponding to the given filename.
-	 */
+	 * Finds the resource corresponding to the given filename in all referenced
+	 * projects of current project.
+	 * 
+	 * @param fileName
+	 *            the filename for which we want to retrieve a resource.
+	 * @return the resource handle corresponding to the given filename (cannot
+	 *         be null).
+	 **/
 	private IResource findResource(String fileName) {
-		IResource file = project.findMember(fileName);
+		IResource file = this.findResourceInProject(fileName, this.project);
+
+		if (file == null) {
+			try {
+				IProject[] referencedProjects = this.project
+						.getReferencedProjects();
+				int project = 0;
+
+				while (file == null && project < referencedProjects.length) {
+					file = this.findResourceInProject(fileName,
+							referencedProjects[project]);
+					project++;
+				}
+
+			} catch (CoreException e) {
+				e.printStackTrace();
+			}
+		}
+
+		Assert.isNotNull(file);
+
+		return file;
+	}
+
+	/**
+	 * Searches for the resource corresponding to the given filename in given
+	 * project.
+	 * 
+	 * @param fileName
+	 *            the filename for which we want to retrieve a resource.
+	 * @return the resource handle corresponding to the given filename or null
+	 *         if it was not found in given project.
+	 */
+	private IResource findResourceInProject(String fileName, IProject project) {
+		IResource file = null;
+		ResourceLocator resourceLocator = new ResourceLocator(project);
 		IAdaProject adaProject = AbstractAdaProjectAssociationManager
 				.GetAssociatedAdaProject(project);
 
 		int srcDir = 0;
 		String absoluteFilePath;
 
-		while (file == null && srcDir < adaProject.getSourceDirectoriesPaths().size()) {
-			absoluteFilePath = adaProject.getSourceDirectoriesPaths().get(srcDir)
+		while (file == null
+				&& srcDir < adaProject.getSourceDirectoriesPaths().size()) {
+			absoluteFilePath = adaProject.getSourceDirectoriesPaths().get(
+					srcDir)
 					+ System.getProperty("file.separator") + fileName;
 
-			file = this.resourceLocator.findResourceFromPath(new Path(absoluteFilePath));
+			file = resourceLocator.findResourceFromPath(new Path(
+					absoluteFilePath));
 			srcDir++;
 		}
-
-		Assert.isNotNull(file);
 
 		return file;
 	}
