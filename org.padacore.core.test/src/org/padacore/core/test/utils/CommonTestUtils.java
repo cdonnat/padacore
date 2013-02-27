@@ -148,6 +148,9 @@ public class CommonTestUtils {
 			eclipseProject.setSessionProperty(new QualifiedName(
 					SESSION_PROPERTY_QUALIFIED_NAME_PREFIX, "adaProject"),
 					adaProject);
+			eclipseProject.setPersistentProperty(new QualifiedName(
+					SESSION_PROPERTY_QUALIFIED_NAME_PREFIX, "projectKind"),
+					"created");
 
 			if (!openProject) {
 				eclipseProject.close(null);
@@ -212,9 +215,15 @@ public class CommonTestUtils {
 	}
 
 	public static void RemoveAssociationToAdaProject(IProject project) {
+		SetAssociatedAdaProject(project, null);
+	}
+
+	public static void SetAssociatedAdaProject(IProject project,
+			IAdaProject adaProject) {
 		try {
 			project.setSessionProperty(new QualifiedName(
-					SESSION_PROPERTY_QUALIFIED_NAME_PREFIX, "adaProject"), null);
+					SESSION_PROPERTY_QUALIFIED_NAME_PREFIX, "adaProject"),
+					adaProject);
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}

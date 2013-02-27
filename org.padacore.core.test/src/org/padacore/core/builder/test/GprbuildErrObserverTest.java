@@ -5,36 +5,56 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.junit.Test;
 import org.padacore.core.builder.Error;
 import org.padacore.core.builder.GprbuildErrObserver;
 import org.padacore.core.builder.GprbuildOutput;
+import org.padacore.core.project.IAdaProject;
 import org.padacore.core.test.utils.CommonTestUtils;
 
 public class GprbuildErrObserverTest {
 
 	private IProject project;
-	private GprbuildErrObserver sut;
-	private GprbuildOutput parser;
+	private Fixture fixture;
+	
+	private class Fixture {
+		public GprbuildErrObserver sut;
+		public GprbuildOutput parser;
+	}
+	
+	private IFile setupProjectWithFileUnderRoot(String nameOfFileWithError) {
+		this.project = CommonTestUtils.CreateAdaProject();
+		
+		IFile fileWithError = this.project.getFile(nameOfFileWithError);
+		this.createAndFillWithDummyContents(fileWithError);
+		
+		return fileWithError;
+	}
 
 	private void createFixture(Error errorOnFile) {
-		this.project = CommonTestUtils.CreateAdaProject();
-
+		Assert.isNotNull(this.project);
+		
+		this.fixture = new Fixture();
 		this.createMockedParser(errorOnFile);
 
-		this.sut = new GprbuildErrObserver(this.project, this.parser);
+		this.fixture.sut = new GprbuildErrObserver(this.project, this.fixture.parser);
 	}
 
 	private void createMockedParser(Error errorOnFile) {
-		this.parser = mock(GprbuildOutput.class);
-		when(this.parser.lastEntryIndicatesError()).thenReturn(true);
-		when(this.parser.error()).thenReturn(errorOnFile);
+		this.fixture.parser = mock(GprbuildOutput.class);
+		when(this.fixture.parser.lastEntryIndicatesError()).thenReturn(true);
+		when(this.fixture.parser.error()).thenReturn(errorOnFile);
 	}
 
 	private void createAndFillWithDummyContents(IFile file) {
@@ -48,7 +68,15 @@ public class GprbuildErrObserverTest {
 	}
 
 	private void exercize() {
-		this.sut.update(null, "useless");
+		this.fixture.sut.update(null, "useless");
+	}
+
+	private void checkMarkerOfFileIsCorrect(IFile file, Error errorOnFile) {
+		IMarker[] markersOfResource = this.getErrorMarkersOfResource(file);
+
+		assertTrue(markersOfResource.length == 1);
+		assertTrue(this.checkMarkerMatchesError(errorOnFile,
+				markersOfResource[0]));
 	}
 
 	@Test
@@ -57,18 +85,57 @@ public class GprbuildErrObserverTest {
 		Error errorOnFile = new Error(nameOfFileWithError, 10, 7,
 				Error.SEVERITY_ERROR, "directlyUnderRoot");
 
+		IFile fileWithError = this.setupProjectWithFileUnderRoot(nameOfFileWithError);
+		
 		this.createFixture(errorOnFile);
-		IFile fileWithError = this.project.getFile(nameOfFileWithError);
-		this.createAndFillWithDummyContents(fileWithError);
-
 		this.exercize();
+		this.checkMarkerOfFileIsCorrect(fileWithError, errorOnFile);
 
-		IMarker[] markersOfResource = this
-				.getErrorMarkersOfResource(fileWithError);
+	}
 
-		assertTrue(markersOfResource.length == 1);
-		assertTrue(this.checkMarkerMatchesError(errorOnFile,
-				markersOfResource[0]));
+	@Test
+	public void testFileInOneOfSourceDirectories() {
+		String nameOfFileWithError = "another.ads";
+		Error errorOnFile = new Error(nameOfFileWithError, 5, 11,
+				Error.SEVERITY_WARNING, "inOneOfSourceDirs");
+		
+		IFile fileWithError = this.setupProjectWithFileInSourceDirs(nameOfFileWithError);
+		
+		this.createFixture(errorOnFile);
+		this.exercize();
+		this.checkMarkerOfFileIsCorrect(fileWithError, errorOnFile);
+
+	}
+
+	private IFile setupProjectWithFileInSourceDirs(String nameOfFileWithError) {
+		this.project = CommonTestUtils.CreateAdaProject();
+		String srcFolders[] = {"src1", "src2"};
+		IFile fileWithError = null;
+		IAdaProject adaProject = mock(IAdaProject.class);
+		List<IPath> sourceDirPaths = new ArrayList<IPath>();
+
+		
+		try {
+			IFolder srcFolder = null;
+			for (int folder = 0; folder < srcFolders.length; folder++) {
+				srcFolder = this.project.getFolder(srcFolders[folder]);
+				srcFolder.create(true, true, null);
+				sourceDirPaths.add(srcFolder.getLocation());
+			}
+			
+			// create file with error in last source folder
+			fileWithError = srcFolder.getFile(nameOfFileWithError);
+			
+			when(adaProject.getSourceDirectoriesPaths()).thenReturn(sourceDirPaths);
+			when(adaProject.getRootPath()).thenReturn(this.project.getLocation());
+			CommonTestUtils.SetAssociatedAdaProject(this.project, adaProject);
+			
+			this.createAndFillWithDummyContents(fileWithError);
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+		
+		return fileWithError;
 	}
 
 	private IMarker[] getErrorMarkersOfResource(IResource resource) {
