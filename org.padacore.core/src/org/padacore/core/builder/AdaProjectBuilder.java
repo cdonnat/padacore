@@ -59,7 +59,7 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 	 *         (command followed by arguments).
 	 */
 	private String[] cleanCommand() {
-		return new String[] { "gprclean", "-r", "-P", getGprFullPath() };
+		return new String[] { "gprclean", "-P", getGprFullPath() };
 	}
 
 	/**

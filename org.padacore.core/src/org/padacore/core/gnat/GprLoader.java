@@ -184,9 +184,13 @@ public class GprLoader {
 
 	/**
 	 * Add a new package to the current project based on another package.
-	 * @param newPackageName Name of the package to be added.
-	 * @param projectName Name of the project containing the package to copy.
-	 * @param packageName Name of the package to copy.
+	 * 
+	 * @param newPackageName
+	 *            Name of the package to be added.
+	 * @param projectName
+	 *            Name of the project containing the package to copy.
+	 * @param packageName
+	 *            Name of the package to copy.
 	 */
 	public void addPackageFrom(String newPackageName, String projectName, String packageName) {
 		this.getCurrentProject().addPackageFrom(newPackageName, projectName, packageName);
@@ -211,7 +215,7 @@ public class GprLoader {
 	private Project getProject(IPath pathToGpr) {
 		Project project = null;
 		for (Project loadedProject : this.loadedProjects) {
-			if (loadedProject.getPath().equals(pathToGpr)) {
+			if (loadedProject.getPath().toOSString().equalsIgnoreCase(pathToGpr.toOSString())) {
 				project = loadedProject;
 				break;
 			}

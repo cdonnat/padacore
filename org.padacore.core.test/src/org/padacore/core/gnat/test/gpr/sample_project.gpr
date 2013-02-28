@@ -1,4 +1,4 @@
-with "sample_project_included.gpr";
+with "Sample_project_included.gpr";
 with "sample_project_included";
 
 project Sample_Project is
