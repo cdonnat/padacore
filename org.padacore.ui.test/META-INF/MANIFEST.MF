@@ -15,5 +15,6 @@ Require-Bundle: org.padacore.core;bundle-version="1.0.0",
  org.padacore.core.test;bundle-version="1.0.0",
  org.padacore.test;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7,
+ JavaSE-1.6
 Bundle-ClassPath: src/

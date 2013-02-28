@@ -11,7 +11,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui.console;bundle-version="3.5.100",
  org.eclipse.jface;bundle-version="3.8.0"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7,
+ JavaSE-1.6
 Export-Package: org.padacore.core;uses:="org.eclipse.core.runtime,org.eclipse.core.resources,org.osgi.framework",
  org.padacore.core.builder;uses:="org.eclipse.core.runtime,org.eclipse.core.resources",
  org.padacore.core.gnat;uses:="org.antlr.runtime,org.padacore.core",

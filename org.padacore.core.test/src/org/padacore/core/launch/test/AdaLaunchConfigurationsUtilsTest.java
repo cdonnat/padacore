@@ -6,6 +6,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.padacore.core.launch.AdaLaunchConfigurationUtils;
@@ -15,11 +16,12 @@ import org.padacore.core.test.utils.CommonTestUtils;
 public class AdaLaunchConfigurationsUtilsTest {
 
 	private IProject adaProject;
+	private ILaunchConfiguration adaLaunchConfig;
 
 	private void createLaunchConfiguration() {
 		try {
 
-			CommonTestUtils.CreateAdaLaunchConfigurationFor("conf1",
+			this.adaLaunchConfig = CommonTestUtils.CreateAdaLaunchConfigurationFor("conf1",
 					this.adaProject, "existing_file");
 
 		} catch (CoreException e) {
@@ -33,6 +35,16 @@ public class AdaLaunchConfigurationsUtilsTest {
 		this.adaProject = CommonTestUtils.CreateAdaProject();
 
 		this.createLaunchConfiguration();
+	}
+	
+	@After
+	public void tearDown() {
+		try {
+			this.adaProject.delete(true, null);
+			this.adaLaunchConfig.delete();
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Test

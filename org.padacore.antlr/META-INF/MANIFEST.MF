@@ -5,4 +5,5 @@ Bundle-SymbolicName: org.padacore.antlr
 Bundle-Version: 1.0.0.qualifier
 Bundle-ClassPath: lib/antlr-3.4-complete.jar
 Export-Package: org.antlr.runtime
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7,
+ JavaSE-1.6

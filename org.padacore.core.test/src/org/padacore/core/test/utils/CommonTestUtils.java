@@ -286,7 +286,7 @@ public class CommonTestUtils {
 
 		return launchConfig;
 	}
-
+	
 	public static IPath GetPathToTestProject() {
 		return new Path(System.getProperty("user.dir")
 				+ "/src/org/padacore/core/gnat/test/gpr/");
