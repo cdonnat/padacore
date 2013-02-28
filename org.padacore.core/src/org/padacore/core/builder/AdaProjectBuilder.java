@@ -35,8 +35,9 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 	 * @return the absolute path of GPR file.
 	 */
 	private String getGprFullPath() {
-		String gprProjectFullPath = this.getProject().getFile(this.getProject().getName() + ".gpr")
-				.getRawLocation().toOSString();
+		String gprProjectFullPath = this.getProject()
+				.getFile(this.getProject().getName() + ".gpr").getRawLocation()
+				.toOSString();
 
 		return gprProjectFullPath;
 	}
@@ -71,7 +72,8 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 	 *             if the resources of the project cannot be retrieved.
 	 */
 	private void build(int kind, IProgressMonitor monitor) throws CoreException {
-		Assert.isLegal(kind == FULL_BUILD || kind == INCREMENTAL_BUILD || kind == AUTO_BUILD);
+		Assert.isLegal(kind == FULL_BUILD || kind == INCREMENTAL_BUILD
+				|| kind == AUTO_BUILD);
 
 		Console console = new Console();
 		SubMonitor submonitor = SubMonitor.convert(monitor);
@@ -79,8 +81,11 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 		String message = "Building of " + getProject().getName();
 
 		ExternalProcess process = new ExternalProcess(message, console,
-				new Observer[] { new GprbuildObserver(submonitor, console) }, new Observer[] {
-						new GprbuildErrObserver(getProject()), new ExternalProcessOutput(console) });
+				new Observer[] { new GprbuildObserver(submonitor, console) },
+				new Observer[] {
+						new GprbuildErrObserver(this.getProject(),
+								new GprbuildOutput()),
+						new ExternalProcessOutput(console) });
 
 		DerivedResourcesIdentifier resourcesIdentifier = new DerivedResourcesIdentifier(
 				this.getProject());
@@ -94,8 +99,8 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 	}
 
 	@Override
-	protected IProject[] build(int kind, Map<String, String> args, IProgressMonitor monitor)
-			throws CoreException {
+	protected IProject[] build(int kind, Map<String, String> args,
+			IProgressMonitor monitor) throws CoreException {
 
 		if (kind == FULL_BUILD) {
 			this.build(kind, monitor);
@@ -124,7 +129,8 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 			IResource concernedResource = delta.getResource();
 			Assert.isTrue(concernedResource.getType() == IResource.PROJECT);
 
-			buildIsRequired = this.doesChangeInProjectAffectsAtLeastOneNonDerivedFile(delta);
+			buildIsRequired = this
+					.doesChangeInProjectAffectsAtLeastOneNonDerivedFile(delta);
 		}
 
 		return buildIsRequired;
@@ -169,7 +175,8 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 	// TODO This method can easily be improved by taking into account
 	// information from GPR project: non derived files could be searched only in
 	// source directories.
-	private boolean doesChangeInProjectAffectsAtLeastOneNonDerivedFile(IResourceDelta delta) {
+	private boolean doesChangeInProjectAffectsAtLeastOneNonDerivedFile(
+			IResourceDelta delta) {
 		NonDerivedResourcesFinder derivedResourcesFinder = new NonDerivedResourcesFinder();
 
 		try {
@@ -199,7 +206,8 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 	 */
 	private void refreshBuiltProject() {
 		try {
-			getProject().refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
+			getProject().refreshLocal(IResource.DEPTH_INFINITE,
+					new NullProgressMonitor());
 		} catch (CoreException e) {
 			ErrorLog.appendException(e);
 		}

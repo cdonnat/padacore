@@ -22,8 +22,8 @@ public class AdaProjectPropertyTesterTest {
 	@Before
 	public void createFixture() {
 		this.executableAdaProject = CommonTestUtils
-				.CreateExecutableAdaProject();
-		this.nonExecutableAdaProject = CommonTestUtils.CreateAdaProject();
+				.CreateAdaProject(true, true);
+		this.nonExecutableAdaProject = CommonTestUtils.CreateAdaProject(true, false);
 		this.nonAdaProject = CommonTestUtils.CreateNonAdaProject(true);
 	}
 
