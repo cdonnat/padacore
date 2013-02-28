@@ -1,4 +1,4 @@
-project sample_project_included is
+project Sample_project_included is
 
 obj := "obj";
 
