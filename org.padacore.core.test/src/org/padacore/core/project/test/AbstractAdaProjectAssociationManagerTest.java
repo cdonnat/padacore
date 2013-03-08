@@ -23,8 +23,8 @@ public class AbstractAdaProjectAssociationManagerTest {
 	@Before
 	public void createFixture() {
 		this.sut = new AdaProjectAssociationManagerStub();
-		this.openedAdaProject = CommonTestUtils.CreateAdaProject(true, false);
-		this.closedAdaProject = CommonTestUtils.CreateAdaProject(false, false);
+		this.openedAdaProject = CommonTestUtils.CreateAdaProject(true);
+		this.closedAdaProject = CommonTestUtils.CreateAdaProject(false);
 		this.nonAdaProject = CommonTestUtils.CreateNonAdaProject(
 				"nonAdaProject", true);
 	}

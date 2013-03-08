@@ -1,5 +1,6 @@
 package org.padacore.ui.launch;
 
+import java.io.File;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Assert;
@@ -126,7 +127,11 @@ public class AdaLaunchConfigurationShortcut implements ILaunchShortcut {
 				.GetLaunchConfigurationFor(absoluteExecPath);
 
 		try {
-			configForFile.launch(ILaunchManager.RUN_MODE, null);
+			if(new File(absoluteExecPath.toOSString()).exists()) {
+				configForFile.launch(ILaunchManager.RUN_MODE, null);
+			} else {
+				System.err.println("Build me");
+			}
 		} catch (CoreException e) {
 			ErrorLog.appendException(e);
 		}

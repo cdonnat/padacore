@@ -96,15 +96,15 @@ public class GnatAdaProject implements IAdaProject {
 	public List<IPath> getSourceDirectoriesPaths() {
 		List<String> relativeSourceDirs = this.gprProject.getSourcesDir();
 		List<IPath> absoluteSourceDirs = new ArrayList<IPath>();
-		
-		if(relativeSourceDirs.size() == 0) {
+
+		if (relativeSourceDirs.size() == 0) {
 			absoluteSourceDirs.add(this.getRootPath());
 		} else {
 			for (String srcDirs : relativeSourceDirs) {
 				absoluteSourceDirs.add(this.getRootPath().append(srcDirs));
 			}
 		}
-		
+
 		return absoluteSourceDirs;
 	}
 
@@ -135,5 +135,10 @@ public class GnatAdaProject implements IAdaProject {
 	@Override
 	public IPath getRootPath() {
 		return this.gprProject.getRootDirPath();
+	}
+
+	@Override
+	public List<String> getExecutableSourceNames() {
+		return this.gprProject.getExecutableSourceNames();
 	}
 }

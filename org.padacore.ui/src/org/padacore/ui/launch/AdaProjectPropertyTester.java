@@ -8,6 +8,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.padacore.core.project.AbstractAdaProjectAssociationManager;
 import org.padacore.core.project.AdaProjectNature;
 import org.padacore.core.project.IAdaProject;
+import org.padacore.core.project.PropertiesManager;
 
 public class AdaProjectPropertyTester extends PropertyTester {
 
@@ -23,7 +24,7 @@ public class AdaProjectPropertyTester extends PropertyTester {
 		if (property.equals(BELONGS_TO_ADA_PROJECT)) {
 			Assert.isLegal(receiver instanceof IFile);
 			testPassed = this
-					.checkFileBelongstoAnExecutableAdaProject((IFile) receiver);
+					.checkFileIsAnExecutableInAdaProject((IFile) receiver);
 		} else if (property.equals(IS_ADA_PROJECT)) {
 			Assert.isLegal(receiver instanceof IProject);
 			testPassed = this
@@ -66,17 +67,33 @@ public class AdaProjectPropertyTester extends PropertyTester {
 	}
 
 	/**
-	 * Checks if the given file belongs to a project which has an Ada nature.
+	 * Checks if the given file correspond to an executable of a project with
+	 * Ada nature.
 	 * 
 	 * @param selectedFile
 	 *            the selected file to check.
-	 * @return True if the given file belongs to a project with Ada nature,
-	 *         False otherwise.
+	 * @return True if the given file correspond to an executable of a project
+	 *         with Ada nature, False otherwise.
 	 */
-	private boolean checkFileBelongstoAnExecutableAdaProject(IFile selectedFile) {
+	private boolean checkFileIsAnExecutableInAdaProject(IFile selectedFile) {
 
-		return this.checkProjectIsAnExecutableAdaProject(selectedFile
-				.getProject());
+		boolean belongsToExecutableAdaProject = this
+				.checkProjectIsAnExecutableAdaProject(selectedFile.getProject());
+		boolean selectedFileIsAnExecutableOfProject = false;
+
+		if (belongsToExecutableAdaProject) {
+			PropertiesManager propertiesManager = new PropertiesManager(
+					selectedFile.getProject());
+			IAdaProject adaProject = propertiesManager.getAdaProject();
+
+			selectedFileIsAnExecutableOfProject = adaProject
+					.getExecutableSourceNames()
+					.contains(selectedFile.getName())
+					|| adaProject.getExecutableNames().contains(
+							selectedFile.getName());
+		}
+
+		return selectedFileIsAnExecutableOfProject;
 	}
 
 }

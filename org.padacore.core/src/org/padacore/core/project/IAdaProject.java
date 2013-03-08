@@ -7,13 +7,23 @@ import org.eclipse.core.runtime.IPath;
 public interface IAdaProject {
 
 	/**
-	 * Returns the executable filenames of the given project.
+	 * Returns the names of executables of the given project.
 	 * 
-	 * @return a list of String corresponding to the names of executable files
-	 *         of the project.
+	 * @return a list of String corresponding to the names of executables of the
+	 *         project.
 	 * @pre the project is indeed executable
 	 */
 	public abstract List<String> getExecutableNames();
+
+	/**
+	 * Returns the names of "main" source files of the given project (the source
+	 * files used to produce executables of the project).
+	 * 
+	 * @return a list of String corresponding to the names of "main" source
+	 *         files of the project.
+	 * @pre the project is indeed executable
+	 */
+	public abstract List<String> getExecutableSourceNames();
 
 	/**
 	 * Returns whether this Ada project is executable.

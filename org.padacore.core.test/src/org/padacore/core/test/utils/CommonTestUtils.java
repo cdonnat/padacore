@@ -85,45 +85,59 @@ public class CommonTestUtils {
 	}
 
 	public static GprProject CreateGprProject(String name, IPath rootDir,
-			boolean isExecutable) {
+			boolean isExecutable, String[] executableNames) {
 		GprProject result = new GprProject(name, rootDir);
 
 		result.setExecutable(isExecutable);
 
+		if (isExecutable) {
+			for (int exec = 0; exec < executableNames.length; exec++) {
+				result.addExecutableName(executableNames[exec]);
+			}
+		}
+
 		return result;
 	}
 
-	public static GprProject CreateGprProject(String name, boolean isExecutable) {
+	public static GprProject CreateGprProject(String name,
+			boolean isExecutable, String[] executableNames) {
 		return CreateGprProject(name, ResourcesPlugin.getWorkspace().getRoot()
-				.getLocation(), isExecutable);
+				.getLocation(), isExecutable, executableNames);
 	}
 
 	public static IProject CreateAdaProject() {
-		return CreateAdaProject(true, false);
+		return CreateAdaProject(true, false, null);
 	}
 
 	public static IProject CreateAdaProject(boolean openProject,
-			boolean isExecutable) {
-		return CreateAdaProjectAt(null, openProject, isExecutable);
+			boolean isExecutable, String[] executableNames) {
+		return CreateAdaProjectAt(null, openProject, isExecutable,
+				executableNames);
+	}
+
+	public static IProject CreateAdaProject(boolean openProject) {
+		return CreateAdaProject(openProject, false, null);
 	}
 
 	public static IProject CreateAdaProjectAt(IPath location) {
-		return CreateAdaProjectAt(location, true, false);
+		return CreateAdaProjectAt(location, true, false, null);
 	}
 
 	public static IProject CreateAdaProjectAt(IPath location,
-			boolean openProject, boolean isExecutable) {
+			boolean openProject, boolean isExecutable, String[] executableNames) {
 		cpt++;
 		return CreateAdaProjectAt(location, "TestProject" + cpt, openProject,
-				isExecutable);
+				isExecutable, executableNames);
 	}
 
 	public static IProject CreateAdaProjectAt(IPath location,
-			String projectName, boolean openProject, boolean isExecutable) {
+			String projectName, boolean openProject, boolean isExecutable,
+			String[] executableNames) {
 		IProject eclipseProject = ResourcesPlugin.getWorkspace().getRoot()
 				.getProject(projectName);
 		IAdaProject adaProject = new GnatAdaProject(CreateGprProject(
-				eclipseProject.getName(), location, isExecutable));
+				eclipseProject.getName(), location, isExecutable,
+				executableNames));
 
 		FileWriter filewriter = null;
 
@@ -286,7 +300,7 @@ public class CommonTestUtils {
 
 		return launchConfig;
 	}
-	
+
 	public static IPath GetPathToTestProject() {
 		return new Path(System.getProperty("user.dir")
 				+ "/src/org/padacore/core/gnat/test/gpr/");
