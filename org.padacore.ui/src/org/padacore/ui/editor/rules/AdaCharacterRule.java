@@ -17,6 +17,7 @@ public class AdaCharacterRule implements IRule {
 		this.successToken = successToken;
 	}
 
+	@Override
 	public IToken evaluate(ICharacterScanner scanner) {
 		SmartCharacterScanner smartScanner = new SmartCharacterScanner(scanner);
 		IToken result = Token.UNDEFINED;

@@ -23,6 +23,7 @@ Export-Package: org.padacore.ui;
    org.eclipse.core.resources,
    org.eclipse.ui.plugin,
    org.osgi.framework",
+ org.padacore.ui.editor.rules,
  org.padacore.ui.launch;
   uses:="org.eclipse.debug.core,
    org.eclipse.debug.ui,

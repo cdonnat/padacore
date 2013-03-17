@@ -12,87 +12,34 @@
 package org.padacore.ui.editor.rules;
 
 import org.eclipse.jface.text.rules.ICharacterScanner;
-import org.eclipse.jface.text.rules.IPredicateRule;
+import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
-import org.eclipse.jface.text.rules.Token;
+import org.eclipse.jface.text.rules.WordRule;
 
-import org.padacore.ui.editor.rules.SyntaxUtils;
+public class AdaKeywordRule implements IRule {
 
-public class AdaKeywordRule implements IPredicateRule {
+	private WordRule rule;
 
-	private IToken fToken;
+	private static String[] adaKeywords = { "abort", "abs", "abstract", "accept", "access",
+			"aliased", "all", "and", "array", "at", "begin", "body", "case", "constant", "declare",
+			"delay", "delta", "digits", "do", "else", "elsif", "end", "entry", "exception", "exit",
+			"for", "function", "generic", "goto", "if", "in", "is", "interface", "limited", "loop",
+			"mod", "new", "not", "null", "of", "or", "others", "out", "overriding", "package",
+			"pragma", "private", "procedure", "protected", "raise", "range", "record", "rem",
+			"renames", "requeue", "return", "reverse", "select", "separate", "subtype",
+			"synchronized", "tagged", "task", "terminate", "then", "type", "until", "use", "when",
+			"while", "with", "xor" };
 
 	public AdaKeywordRule(IToken token) {
-		fToken = token;
+		this.rule = new WordRule(new AdaWordDetector());
+		for (String keyword : adaKeywords) {
+			this.rule.addWord(keyword, token);
+		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.text.rules.IPredicateRule#getSuccessToken()
-	 */
-	public IToken getSuccessToken() {
-		return fToken;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.text.rules.IPredicateRule#evaluate(org.eclipse.jface.text.rules.ICharacterScanner, boolean)
-	 */
-	public IToken evaluate(ICharacterScanner scanner, boolean resume) {
-		return doEvaluation(scanner);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.text.rules.IRule#evaluate(org.eclipse.jface.text.rules.ICharacterScanner)
-	 */
+	@Override
 	public IToken evaluate(ICharacterScanner scanner) {
-		return doEvaluation(scanner);
+		return this.rule.evaluate(scanner);
 	}
 
-	/**
-	 * Evaluates the current word on the scanner, return the proper token if 
-	 * it's a reserved word, false otherwise.
-	 * 
-	 * @param scanner
-	 * @return
-	 */
-	public IToken doEvaluation(ICharacterScanner scanner) {		
-		String word = "";
-		
-		scanner.unread();
-
-		int c = scanner.read();
-		
-		if ((c >= 'A' && c <= 'Z') ||
-				(c >= 'a' && c <= 'z') ||
-				(c >= '0' && c <= '9') ||
-				c == '_' ||
-				c == '\'') {
-			return Token.UNDEFINED;
-		}
-		
-		while (true) {
-			c = scanner.read();
-			
-			if ((c >= 'A' && c <= 'Z') ||
-				(c >= 'a' && c <= 'z') ||
-				(c >= '0' && c <= '9') || 
-				c == '_') {
-				word += (char) c;
-			}
-			else {
-				scanner.unread();
-				break;
-			}
-		}
-		
-		if (SyntaxUtils.isAdaKeyword(word)) {
-			return fToken;
-		}
-		else {
-			for (int i = 0; i < word.length(); ++i) {
-				scanner.unread();
-			}
-
-			return Token.UNDEFINED;
-		}
-	}
 }

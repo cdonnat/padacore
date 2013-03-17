@@ -13,6 +13,7 @@ public class AdaStringRule implements IRule {
 		this.rule = new SingleLineRule("\"", "\"", successToken, '\\');
 	}
 
+	@Override
 	public IToken evaluate(ICharacterScanner scanner) {
 		return this.rule.evaluate(scanner);
 	}
