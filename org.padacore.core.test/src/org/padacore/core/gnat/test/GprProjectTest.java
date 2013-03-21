@@ -33,8 +33,8 @@ public class GprProjectTest {
 		this.sut.addSourceDir(".");
 		this.sut.setObjectDir("object");
 		this.sut.setExecutableDir("exec");
-		this.sut.addExecutableName("main1.adb");
-		this.sut.addExecutableName("main2.ads");
+		this.sut.addSourceExecutableName("main1.adb");
+		this.sut.addSourceExecutableName("main2.ads");
 
 		final String expectedSavedProject = "project Test is\n"
 				+ "\tfor Source_Dirs use (\".\");\n"

@@ -9,20 +9,22 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.padacore.core.launch.AdaLaunchConfigurationUtils;
+import org.padacore.core.launch.AdaLaunchConfigurationProvider;
 import org.padacore.core.launch.AdaLaunchConstants;
 import org.padacore.core.test.utils.CommonTestUtils;
 
-public class AdaLaunchConfigurationsUtilsTest {
+public class AdaLaunchConfigurationProviderTest {
 
 	private IProject adaProject;
 	private ILaunchConfiguration adaLaunchConfig;
+	private AdaLaunchConfigurationProvider sut;
 
 	private void createLaunchConfiguration() {
 		try {
 
-			this.adaLaunchConfig = CommonTestUtils.CreateAdaLaunchConfigurationFor("conf1",
-					this.adaProject, "existing_file");
+			this.adaLaunchConfig = CommonTestUtils
+					.CreateAdaLaunchConfigurationFor("conf1", this.adaProject,
+							"existing_file");
 
 		} catch (CoreException e) {
 			e.printStackTrace();
@@ -33,10 +35,11 @@ public class AdaLaunchConfigurationsUtilsTest {
 	public void createFixture() {
 
 		this.adaProject = CommonTestUtils.CreateAdaProject();
+		this.sut = new AdaLaunchConfigurationProvider();
 
 		this.createLaunchConfiguration();
 	}
-	
+
 	@After
 	public void tearDown() {
 		try {
@@ -85,8 +88,8 @@ public class AdaLaunchConfigurationsUtilsTest {
 
 	private void checkRetrievedConfigCorrespondsToFile(IFile file,
 			String comment) throws CoreException {
-		ILaunchConfiguration retrievedLaunchConfig = AdaLaunchConfigurationUtils
-				.GetLaunchConfigurationFor(file.getRawLocation());
+		ILaunchConfiguration retrievedLaunchConfig = this.sut
+				.getLaunchConfigurationFor(file.getRawLocation());
 
 		String retrievedExecPath = retrievedLaunchConfig.getAttribute(
 				AdaLaunchConstants.EXECUTABLE_PATH, "");

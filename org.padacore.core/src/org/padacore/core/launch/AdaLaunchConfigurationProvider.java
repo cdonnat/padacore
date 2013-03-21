@@ -2,6 +2,7 @@ package org.padacore.core.launch;
 
 import java.io.File;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.debug.core.DebugPlugin;
@@ -11,7 +12,15 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.padacore.core.utils.ErrorLog;
 
-public class AdaLaunchConfigurationUtils {
+/**
+ * This class provides a launch configuration based on the executable path.
+ * Depending on conditions, a new launch configuration may be created or an
+ * existing one retrieved.
+ * 
+ * @author RS
+ * 
+ */
+public class AdaLaunchConfigurationProvider implements ILaunchConfigurationProvider {
 
 	/**
 	 * Returns the Ada launch configuration type.
@@ -59,8 +68,7 @@ public class AdaLaunchConfigurationUtils {
 		ILaunchConfiguration matchingConfig;
 
 		try {
-			ILaunchConfiguration[] existingAdaConfigs = AdaLaunchConfigurationUtils
-					.RetrieveExistingAdaLaunchConfigurations();
+			ILaunchConfiguration[] existingAdaConfigs = RetrieveExistingAdaLaunchConfigurations();
 
 			matchingConfig = FindMatchingLaunchConfiguration(
 					existingAdaConfigs, executableFilePath);
@@ -160,16 +168,11 @@ public class AdaLaunchConfigurationUtils {
 		return newAdaConfig;
 	}
 
-	/**
-	 * Returns a launch configuration for given file. It can be an existing
-	 * launch configuration if it already exists or a newly created one.
-	 * 
-	 * @param executableFilePath
-	 *            absolute path of the file for which a launch configuration is
-	 *            returned.
-	 * @return a launch configuration useable for given file.
+	/* (non-Javadoc)
+	 * @see org.padacore.core.launch.ILaunchConfigurationProvider#getLaunchConfigurationFor(org.eclipse.core.runtime.IPath)
 	 */
-	public static ILaunchConfiguration GetLaunchConfigurationFor(
+	@Override
+	public ILaunchConfiguration getLaunchConfigurationFor(
 			IPath executableFilePath) {
 		ILaunchConfiguration launchConfigForFile = FindExistingLaunchConfigurationFor(executableFilePath);
 
@@ -183,7 +186,7 @@ public class AdaLaunchConfigurationUtils {
 			}
 		}
 
-		assert (launchConfigForFile != null);
+		Assert.isNotNull(launchConfigForFile);
 
 		return launchConfigForFile;
 	}

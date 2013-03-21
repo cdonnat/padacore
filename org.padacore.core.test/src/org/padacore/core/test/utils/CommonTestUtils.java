@@ -92,7 +92,7 @@ public class CommonTestUtils {
 
 		if (isExecutable) {
 			for (int exec = 0; exec < executableNames.length; exec++) {
-				result.addExecutableName(executableNames[exec]);
+				result.addSourceExecutableName(executableNames[exec]);
 			}
 		}
 
@@ -278,6 +278,16 @@ public class CommonTestUtils {
 				.getLaunchConfigurationType(AdaLaunchConstants.ID_LAUNCH_ADA_APP);
 
 		return adaConfigType;
+	}
+
+	public static String GetExecutableNameFromExecSourceName(
+			String execSourceName) {
+		boolean osIsWindows = System.getProperty("os.name").contains("win")
+				|| System.getProperty("os.name").contains("Win");
+		String rootExecName = new Path(execSourceName).removeFileExtension()
+				.toString();
+
+		return osIsWindows ? rootExecName + ".exe" : rootExecName;
 	}
 
 	public static ILaunchConfiguration CreateAdaLaunchConfigurationFor(

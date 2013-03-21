@@ -49,7 +49,7 @@ public class DefaultGprProjectFactory extends AbstractGprProjectFactory {
 		if (this.addMainProcedure) {
 			gprProject.setExecutable(true);
 			gprProject
-					.addExecutableName(ProjectBuilder.DEFAULT_EXECUTABLE_NAME);
+					.addSourceExecutableName(ProjectBuilder.DEFAULT_EXECUTABLE_NAME);
 		}
 
 		return gprProject;

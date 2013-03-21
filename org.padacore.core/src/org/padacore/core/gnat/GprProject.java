@@ -84,7 +84,7 @@ public class GprProject {
 	 * @pre GPR is an executable project.
 	 * @param execName
 	 */
-	public void addExecutableName(String execName) {
+	public void addSourceExecutableName(String execName) {
 		Assert.isLegal(this.isExecutable());
 
 		this.execSourceNames.add(execName);
