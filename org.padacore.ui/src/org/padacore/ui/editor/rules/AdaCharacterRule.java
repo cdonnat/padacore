@@ -1,73 +1,35 @@
-
 package org.padacore.ui.editor.rules;
 
 import org.eclipse.jface.text.rules.ICharacterScanner;
-import org.eclipse.jface.text.rules.IPredicateRule;
+import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
 
 /**
- * Analyzes a code from a scanner and determines if there is an ada character
+ * Analyzes a code from a scanner and determines if there is an Ada character
  * litteral.
- * 
- * @author ochem
  */
-public class AdaCharacterRule implements IPredicateRule {
+public class AdaCharacterRule implements IRule {
 
-	private IToken fToken;
+	private IToken successToken;
 
-	public AdaCharacterRule(IToken token) {
-		fToken = token;
+	public AdaCharacterRule(IToken successToken) {
+		this.successToken = successToken;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.text.rules.IPredicateRule#getSuccessToken()
-	 */
-	public IToken getSuccessToken() {
-		return fToken;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.text.rules.IPredicateRule#evaluate(org.eclipse.jface.text.rules.ICharacterScanner, boolean)
-	 */
-	public IToken evaluate(ICharacterScanner scanner, boolean resume) {
-		return doEvaluation(scanner);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.text.rules.IRule#evaluate(org.eclipse.jface.text.rules.ICharacterScanner)
-	 */
+	@Override
 	public IToken evaluate(ICharacterScanner scanner) {
-		return doEvaluation(scanner);
-	}
+		SmartCharacterScanner smartScanner = new SmartCharacterScanner(scanner);
+		IToken result = Token.UNDEFINED;
 
-	/**
-	 * Return proper token if the scanner is on a character, UNDEFINED 
-	 * otherwise. 
-	 * 
-	 * @param scanner
-	 * @return
-	 */
-	public IToken doEvaluation(ICharacterScanner scanner) {
-		if (scanner.read() != '\'') {
-			scanner.unread();
-			return Token.UNDEFINED;
+		if (smartScanner.read() == '\'') {
+			smartScanner.read();
+			if (smartScanner.read() == '\'') {
+				return this.successToken;
+			}
 		}
-
-		if (scanner.read() == ICharacterScanner.EOF) {
-			scanner.unread();
-			scanner.unread();
-			return Token.UNDEFINED;
-		}
-
-		if (scanner.read() != '\'') {
-			scanner.unread();
-			scanner.unread();
-			scanner.unread();
-			return Token.UNDEFINED;
-		}
-
-		return fToken;
+		smartScanner.reset(); 
+		return result;
 	}
 
 }
