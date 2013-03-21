@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.QualifiedName;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
@@ -57,6 +58,13 @@ public class CommonTestUtils {
 			}
 		}
 
+	}
+
+	public static IPath GetExecutablePathFor(IProject project,
+			String executableSourceName) {
+		String executableName = GetExecutableNameFromExecSourceName(executableSourceName);
+
+		return project.getFile(executableName).getLocation();
 	}
 
 	public static IProject CreateNonAdaProject(boolean openProject) {
@@ -130,6 +138,60 @@ public class CommonTestUtils {
 				isExecutable, executableNames);
 	}
 
+	private static void CreateFakeExecutableSource(IProject project,
+			String executableSourceName) {
+		FileWriter filewriter = null;
+		try {
+			filewriter = new FileWriter(new File(project.getLocation()
+					.toOSString() + IPath.SEPARATOR + executableSourceName));
+			filewriter.write("procedure "
+					+ new Path(executableSourceName).removeFileExtension()
+					+ " is null; end;");
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (filewriter != null) {
+					filewriter.close();
+				}
+			} catch (IOException e) {
+
+			}
+		}
+	}
+
+	private static void DumpGprToFile(IProject project, GprProject gprProject) {
+		FileWriter filewriter = null;
+		try {
+			filewriter = new FileWriter(new File(project.getLocation()
+					.toOSString()
+					+ IPath.SEPARATOR
+					+ project.getName()
+					+ ".gpr"));
+			filewriter.write(gprProject.toString());
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (filewriter != null) {
+					filewriter.close();
+				}
+			} catch (IOException e) {
+
+			}
+		}
+
+	}
+
+	public static void ScheduleJobAndWaitForIt(Job job) {
+		job.schedule();
+		try {
+			job.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
 	public static IProject CreateAdaProjectAt(IPath location,
 			String projectName, boolean openProject, boolean isExecutable,
 			String[] executableNames) {
@@ -138,8 +200,6 @@ public class CommonTestUtils {
 		IAdaProject adaProject = new GnatAdaProject(CreateGprProject(
 				eclipseProject.getName(), location, isExecutable,
 				executableNames));
-
-		FileWriter filewriter = null;
 
 		try {
 			IProjectDescription description = ResourcesPlugin.getWorkspace()
@@ -150,12 +210,16 @@ public class CommonTestUtils {
 					.setNatureIds(new String[] { AdaProjectNature.NATURE_ID });
 			eclipseProject.create(description, null);
 
-			GprProject gpr = new GprProject(projectName,
-					eclipseProject.getRawLocation());
-			filewriter = new FileWriter(new File(eclipseProject.getLocation()
-					.toOSString() + IPath.SEPARATOR + projectName + ".gpr"));
-			filewriter.write(gpr.toString());
-			filewriter.close();
+			GprProject gpr = CreateGprProject(projectName, isExecutable,
+					executableNames);
+			DumpGprToFile(eclipseProject, gpr);
+
+			if (executableNames != null) {
+				for (int execIdx = 0; execIdx < executableNames.length; execIdx++) {
+					CreateFakeExecutableSource(eclipseProject,
+							executableNames[execIdx]);
+				}
+			}
 
 			eclipseProject.open(null);
 
@@ -171,17 +235,6 @@ public class CommonTestUtils {
 			}
 		} catch (CoreException e) {
 			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (filewriter != null) {
-				try {
-					filewriter.close();
-				} catch (IOException e) {
-
-				}
-			}
-
 		}
 
 		return eclipseProject;
