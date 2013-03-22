@@ -11,9 +11,12 @@ import java.io.IOException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -30,20 +33,34 @@ public class ProjectBuilderTest {
 		this.sut = new ProjectBuilder(projectName);
 	}
 
+	@Before
+	public void setup() {
+		IWorkspaceDescription workspaceDesc = ResourcesPlugin.getWorkspace()
+				.getDescription();
+		workspaceDesc.setAutoBuilding(false);
+		try {
+			ResourcesPlugin.getWorkspace().setDescription(workspaceDesc);
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+	}
+
 	@Rule
 	public TemporaryFolder testFolder = new TemporaryFolder();
 
 	@Test
 	public void testNewProjectWithDefaultLocationWithoutMain() {
 		final String projectName = "NewProjectWithDefaultLocationWithoutMain";
-		String expectedLocation = CommonTestUtils.GetWorkspaceAbsolutePath() + "/" + projectName;
+		String expectedLocation = CommonTestUtils.GetWorkspaceAbsolutePath()
+				+ "/" + projectName;
 		this.testNewProject(projectName, false, null, expectedLocation);
 	}
 
 	@Test
 	public void testNewProjectWithDefaultLocationWithMain() {
 		final String projectName = "NewProjectWithDefaultLocationWithMain";
-		String expectedLocation = CommonTestUtils.GetWorkspaceAbsolutePath() + "/" + projectName;
+		String expectedLocation = CommonTestUtils.GetWorkspaceAbsolutePath()
+				+ "/" + projectName;
 		this.testNewProject(projectName, true, null, expectedLocation);
 	}
 
@@ -51,20 +68,20 @@ public class ProjectBuilderTest {
 	public void testNewProjectWithSpecificLocationWithoutMain() {
 		final String projectName = "NewProjectWithSpecificLocationWithoutMain";
 		String expectedLocation = testFolder.getRoot().getAbsolutePath();
-		this.testNewProject(projectName, false, new Path(testFolder.getRoot().getPath()),
-				expectedLocation);
+		this.testNewProject(projectName, false, new Path(testFolder.getRoot()
+				.getPath()), expectedLocation);
 	}
 
 	@Test
 	public void testNewProjectWithSpecificLocationWithMain() {
 		final String projectName = "NewProjectWithSpecificLocationWithMain";
 		String expectedLocation = testFolder.getRoot().getAbsolutePath();
-		this.testNewProject(projectName, true, new Path(testFolder.getRoot().getPath()),
-				expectedLocation);
+		this.testNewProject(projectName, true, new Path(testFolder.getRoot()
+				.getPath()), expectedLocation);
 	}
 
-	private void testNewProject(String projectName, boolean addMain, IPath location,
-			String expectedLocation) {
+	private void testNewProject(String projectName, boolean addMain,
+			IPath location, String expectedLocation) {
 
 		this.createFixture(projectName);
 
@@ -80,46 +97,56 @@ public class ProjectBuilderTest {
 		IAdaProject adaProject = mock(IAdaProject.class);
 		String projectName = "sample_project";
 		this.createFixture(projectName);
-		IPath importedProjectFilePath = new Path(CommonTestUtils.GetPathToTestProject()
-				+ projectName + ".gpr");
+		IPath importedProjectFilePath = new Path(
+				CommonTestUtils.GetPathToTestProject() + projectName + ".gpr");
 
 		this.sut.importProject(importedProjectFilePath, adaProject);
 
-		String expectedLocation = CommonTestUtils.GetWorkspaceAbsolutePath() + "/" + projectName;
+		String expectedLocation = CommonTestUtils.GetWorkspaceAbsolutePath()
+				+ "/" + projectName;
 		this.checkProject(projectName, adaProject, false, expectedLocation,
 				CommonTestUtils.IMPORTED_PROJECT);
 		this.checkLinks(projectName, importedProjectFilePath);
 	}
 
 	private void checkLinks(String projectName, IPath importedProjectFilePath) {
-		IProject importedProject = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+		IProject importedProject = ResourcesPlugin.getWorkspace().getRoot()
+				.getProject(projectName);
 
 		IFolder toto = importedProject.getFolder("toto");
 		assertTrue("Toto folder should be created", toto.exists());
-		assertEquals("Toto folder should be link to folder containing ada project file",
-				importedProjectFilePath.removeLastSegments(1), toto.getLocation());
+		assertEquals(
+				"Toto folder should be link to folder containing ada project file",
+				importedProjectFilePath.removeLastSegments(1),
+				toto.getLocation());
 
-		IFile projectFile = importedProject.getFile(importedProjectFilePath.lastSegment());
-		assertTrue("Link to ada project file should be created (1)", projectFile.exists());
-		assertEquals("Link to ada project file should be created (2)", importedProjectFilePath,
-				projectFile.getLocation());
+		IFile projectFile = importedProject.getFile(importedProjectFilePath
+				.lastSegment());
+		assertTrue("Link to ada project file should be created (1)",
+				projectFile.exists());
+		assertEquals("Link to ada project file should be created (2)",
+				importedProjectFilePath, projectFile.getLocation());
 	}
 
 	private void checkProject(final String projectName, IAdaProject adaProject,
 			boolean mainIsExpected, String expectedLocation, String expectedKind) {
-		IProject createdProject = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+		IProject createdProject = ResourcesPlugin.getWorkspace().getRoot()
+				.getProject(projectName);
 
 		this.checkProjectIsNotNull(createdProject);
 		this.checkProjectIsOpen(createdProject);
 		this.checkProjectLocation(createdProject, expectedLocation);
 		ProjectDescriptionUtils.CheckProjectContainsAdaNature(createdProject);
 
-		CommonTestUtils.CheckAdaProjectIsSetInProperties(createdProject, adaProject);
-		CommonTestUtils.CheckProjectKindIsSetInProperties(createdProject, expectedKind);
+		CommonTestUtils.CheckAdaProjectIsSetInProperties(createdProject,
+				adaProject);
+		CommonTestUtils.CheckProjectKindIsSetInProperties(createdProject,
+				expectedKind);
 
 		if (mainIsExpected) {
-			ProjectDescriptionUtils.CheckMainProcedureHasBeenAddedWithCorrectContents(
-					createdProject, expectedLocation);
+			ProjectDescriptionUtils
+					.CheckMainProcedureHasBeenAddedWithCorrectContents(
+							createdProject, expectedLocation);
 		}
 	}
 
@@ -133,8 +160,9 @@ public class ProjectBuilderTest {
 
 	private void checkProjectLocation(IProject project, String expectedPath) {
 		try {
-			assertEquals("Project location", new File(expectedPath).getCanonicalFile(), project
-					.getLocation().toFile());
+			assertEquals("Project location",
+					new File(expectedPath).getCanonicalFile(), project
+							.getLocation().toFile());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
