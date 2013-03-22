@@ -160,6 +160,26 @@ public class AdaApplicationLauncherTest {
 
 		this.checkBothBuildAndLaunchHaveBeenPerformed();
 	}
+	
+	@Test
+	public void testLaunchFromProjectWithMissingExecFile() {
+		String execSourceFile = "main.adb";
+		this.createFixture(execSourceFile, false, false);
+		
+		this.fixture.sut.performLaunchFromProject(this.fixture.project);
+		
+		this.checkBothBuildAndLaunchHaveBeenPerformed();
+	}
+	
+	@Test
+	public void testLaunchFromProjectWithExistingExecFile() {
+		String execSourceFile = "main.adb";
+		this.createFixture(execSourceFile, true, true);
+		
+		this.fixture.sut.performLaunchFromProject(this.fixture.project);
+		
+		this.checkOnlyLaunchHasBeenPerformed();
+	}
 
 	private void checkBothBuildAndLaunchHaveBeenPerformed() {
 		verify(this.fixture.factory).createLaunchingJobFor(
