@@ -33,7 +33,10 @@ public class BuildingJob extends Job {
 		IStatus returnStatus = Status.OK_STATUS;
 
 		try {
-			launchedProject.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, monitor);
+			this.launchedProject.build(
+					IncrementalProjectBuilder.INCREMENTAL_BUILD,
+					"org.padacore.core.builder.AdaProjectBuilder", null,
+					monitor);
 		} catch (CoreException e) {
 			ErrorLog.appendException(e);
 			returnStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID,

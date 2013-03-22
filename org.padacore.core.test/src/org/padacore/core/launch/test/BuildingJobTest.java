@@ -1,12 +1,14 @@
 package org.padacore.core.launch.test;
 
 import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.isNull;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
+import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
@@ -36,10 +38,13 @@ public class BuildingJobTest {
 		this.sut = new BuildingJob(this.absoluteExecPath, this.builtProject);
 	}
 
+	@SuppressWarnings("unchecked")
 	private void checkProjectBuildHasBeenRequested() {
 		try {
 			verify(this.builtProject).build(
 					eq(IncrementalProjectBuilder.INCREMENTAL_BUILD),
+					eq("org.padacore.core.builder.AdaProjectBuilder"),
+					(Map<String, String>) isNull(),
 					(IProgressMonitor) anyObject());
 		} catch (CoreException e) {
 			e.printStackTrace();

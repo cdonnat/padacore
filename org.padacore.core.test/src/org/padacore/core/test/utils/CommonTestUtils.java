@@ -146,7 +146,7 @@ public class CommonTestUtils {
 					.toOSString() + IPath.SEPARATOR + executableSourceName));
 			filewriter.write("procedure "
 					+ new Path(executableSourceName).removeFileExtension()
-					+ " is null; end;");
+					+ " is begin null; end;");
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
@@ -197,9 +197,6 @@ public class CommonTestUtils {
 			String[] executableNames) {
 		IProject eclipseProject = ResourcesPlugin.getWorkspace().getRoot()
 				.getProject(projectName);
-		IAdaProject adaProject = new GnatAdaProject(CreateGprProject(
-				eclipseProject.getName(), location, isExecutable,
-				executableNames));
 
 		try {
 			IProjectDescription description = ResourcesPlugin.getWorkspace()
@@ -222,7 +219,12 @@ public class CommonTestUtils {
 			}
 
 			eclipseProject.open(null);
+			eclipseProject.setDescription(description, null);
 
+			IAdaProject adaProject = new GnatAdaProject(CreateGprProject(
+					eclipseProject.getName(), eclipseProject.getLocation(), isExecutable,
+					executableNames));
+			
 			eclipseProject.setSessionProperty(new QualifiedName(
 					SESSION_PROPERTY_QUALIFIED_NAME_PREFIX, "adaProject"),
 					adaProject);

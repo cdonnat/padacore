@@ -4,20 +4,14 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IncrementalProjectBuilder;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.debug.core.ILaunchManager;
 import org.padacore.core.project.IAdaProject;
 import org.padacore.core.utils.ErrorLog;
 
@@ -32,66 +26,14 @@ public class AdaApplicationLauncher implements IApplicationLauncher {
 
 	private IAdaProject adaProject;
 	private ILaunchConfigurationProvider launchConfigProvider;
-
-	private class LaunchingJob extends Job {
-
-		private ILaunchConfiguration launchConfig;
-
-		public LaunchingJob(IPath absoluteExecPath,
-				ILaunchConfiguration launchConfig) {
-			super("Launching " + absoluteExecPath);
-			this.launchConfig = launchConfig;
-		}
-
-		@Override
-		protected IStatus run(IProgressMonitor monitor) {
-			IStatus launchStatus = Status.OK_STATUS;
-
-			try {
-				this.launchConfig.launch(ILaunchManager.RUN_MODE, monitor);
-
-			} catch (CoreException e) {
-				ErrorLog.appendException(e);
-				launchStatus = e.getStatus();
-			}
-
-			return launchStatus;
-		}
-
-	}
-
-	private class BuildingJob extends Job {
-		private IProject launchedProject;
-
-		public BuildingJob(IPath absoluteExecPath, IProject launchedProject)
-				throws CoreException {
-			super("Building before launching " + absoluteExecPath);
-
-			this.launchedProject = launchedProject;
-		}
-
-		@Override
-		protected IStatus run(IProgressMonitor monitor) {
-			IStatus returnStatus = Status.OK_STATUS;
-
-			try {
-				ResourcesPlugin.getWorkspace().build(
-						launchedProject.getBuildConfigs(),
-						IncrementalProjectBuilder.INCREMENTAL_BUILD, false,
-						monitor);
-			} catch (CoreException e) {
-				ErrorLog.appendException(e);
-				returnStatus = e.getStatus();
-			}
-
-			return returnStatus;
-		}
-	};
+	private LauncherFactory factory;
 
 	public AdaApplicationLauncher(IAdaProject adaProject,
-			ILaunchConfigurationProvider launchConfigProvider) {
+			ILaunchConfigurationProvider launchConfigProvider,
+			LauncherFactory factory) {
 		this.adaProject = adaProject;
 		this.launchConfigProvider = launchConfigProvider;
+		this.factory = factory;
 	}
 
 	@Override
@@ -179,28 +121,24 @@ public class AdaApplicationLauncher implements IApplicationLauncher {
 			final IProject execProject) {
 		ILaunchConfiguration configForFile = this.launchConfigProvider
 				.getLaunchConfigurationFor(absoluteExecPath);
-		final LaunchingJob launchingJob = new LaunchingJob(absoluteExecPath,
-				configForFile);
+		final Job launchingJob = this.factory.createLaunchingJobFor(
+				absoluteExecPath, configForFile);
 
-		try {
-			if (DoesExecutableExist(absoluteExecPath)) {
-				launchingJob.schedule();
-			} else {
-				Job buildingJob = new BuildingJob(absoluteExecPath, execProject);
-				buildingJob.schedule();
+		if (DoesExecutableExist(absoluteExecPath)) {
+			launchingJob.schedule();
+		} else {
+			Job buildingJob = this.factory.createBuildingJobFor(absoluteExecPath);
+			buildingJob.schedule();
 
-				buildingJob.addJobChangeListener(new JobChangeAdapter() {
-					@Override
-					public void done(IJobChangeEvent event) {
-						if (DoesExecutableExist(absoluteExecPath)) {
-							launchingJob.schedule();
-						}
+			buildingJob.addJobChangeListener(new JobChangeAdapter() {
+				@Override
+				public void done(IJobChangeEvent event) {
+					if (event.getResult().isOK()) {
+						launchingJob.schedule();
 					}
-				});
-			}
+				}
+			});
 
-		} catch (CoreException e) {
-			ErrorLog.appendException(e);
 		}
 	}
 }

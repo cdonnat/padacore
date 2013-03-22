@@ -9,6 +9,7 @@ import org.eclipse.ui.IEditorPart;
 import org.padacore.core.launch.AdaApplicationLauncher;
 import org.padacore.core.launch.AdaLaunchConfigurationProvider;
 import org.padacore.core.launch.IApplicationLauncher;
+import org.padacore.core.launch.LauncherFactory;
 import org.padacore.core.project.PropertiesManager;
 
 /**
@@ -49,7 +50,8 @@ public class AdaLaunchConfigurationShortcut implements ILaunchShortcut {
 							selectedFile.getProject());
 					adaAppLauncher = new AdaApplicationLauncher(
 							propertiesManager.getAdaProject(),
-							new AdaLaunchConfigurationProvider());
+							new AdaLaunchConfigurationProvider(),
+							new LauncherFactory(selectedFile.getProject()));
 
 					adaAppLauncher.performLaunchFromFile(selectedFile);
 
@@ -58,7 +60,8 @@ public class AdaLaunchConfigurationShortcut implements ILaunchShortcut {
 					propertiesManager = new PropertiesManager(selectedProject);
 					adaAppLauncher = new AdaApplicationLauncher(
 							propertiesManager.getAdaProject(),
-							new AdaLaunchConfigurationProvider());
+							new AdaLaunchConfigurationProvider(),
+							new LauncherFactory(selectedProject));
 
 					adaAppLauncher.performLaunchFromProject(selectedProject);
 
