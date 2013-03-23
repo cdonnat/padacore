@@ -43,9 +43,6 @@ public class BuildingJob extends Job {
 					"Build failed for " + launchedProject.getName());
 		}
 
-		Assert.isTrue(!returnStatus.isOK()
-				|| absoluteExecPath.toFile().exists());
-
 		return returnStatus;
 	}
 };

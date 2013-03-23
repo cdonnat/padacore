@@ -45,10 +45,11 @@ public class AdaApplicationLauncherTest {
 	}
 
 	private void createFixture(String executableSourceName,
-			boolean createExecutable, boolean stubBuildingAndLaunchingJobs) {
+			boolean createExecutable, boolean stubBuildingAndLaunchingJobs,
+			boolean forceFailedBuild) {
 		this.fixture = new Fixture();
 		this.fixture.project = CommonTestUtils.CreateAdaProject(true, true,
-				new String[] { executableSourceName });
+				new String[] { executableSourceName }, forceFailedBuild);
 
 		this.fixture.expectedExecutablePath = this
 				.getExecutablePathFor(executableSourceName);
@@ -92,6 +93,12 @@ public class AdaApplicationLauncherTest {
 		this.fixture.sut = new AdaApplicationLauncher(
 				propertiesManager.getAdaProject(), launchConfigProvider,
 				this.fixture.factory);
+	}
+
+	private void createFixture(String executableSourceName,
+			boolean createExecutable, boolean stubBuildingAndLaunchingJobs) {
+		this.createFixture(executableSourceName, createExecutable,
+				stubBuildingAndLaunchingJobs, false);
 	}
 
 	private void createFile(IFile file) {
@@ -160,48 +167,84 @@ public class AdaApplicationLauncherTest {
 
 		this.checkBothBuildAndLaunchHaveBeenPerformed();
 	}
-	
+
 	@Test
-	public void testLaunchFromProjectWithMissingExecFile() {
+	public void testLaunchFromSourceFileWithMissingExecFileAndFailedBuild() {
 		String execSourceFile = "main.adb";
-		this.createFixture(execSourceFile, false, false);
-		
-		this.fixture.sut.performLaunchFromProject(this.fixture.project);
-		
-		this.checkBothBuildAndLaunchHaveBeenPerformed();
-	}
-	
-	@Test
-	public void testLaunchFromProjectWithExistingExecFile() {
-		String execSourceFile = "main.adb";
-		this.createFixture(execSourceFile, true, true);
-		
-		this.fixture.sut.performLaunchFromProject(this.fixture.project);
-		
-		this.checkOnlyLaunchHasBeenPerformed();
+		this.createFixture(execSourceFile, false, false, true);
+
+		this.fixture.sut.performLaunchFromFile(this.fixture.project
+				.getFile(execSourceFile));
+
+		this.checkOnlyBuildHasBeenPerformedAndExecutableFileDoesNotExist();
 	}
 
-	private void checkBothBuildAndLaunchHaveBeenPerformed() {
-		verify(this.fixture.factory).createLaunchingJobFor(
-				this.fixture.expectedExecutablePath, this.fixture.launchConfig);
-		verify(this.fixture.factory).createBuildingJobFor(
-				this.fixture.expectedExecutablePath);
-
+	private void checkBuildAndLaunch(
+			boolean expectedSuccessfulBuildAndLaunchPerformed) {
 		try {
 			this.fixture.buildingJob.join();
-			assertTrue(this.fixture.expectedExecutablePath.toFile().exists());
+			assertTrue(this.fixture.expectedExecutablePath.toFile().exists() == expectedSuccessfulBuildAndLaunchPerformed);
 			this.fixture.launchingJob.join();
-			verify(this.fixture.launchConfig)
-					.launch(eq(ILaunchManager.RUN_MODE),
-							(IProgressMonitor) anyObject());
-		} catch (Exception e) {
+			if (expectedSuccessfulBuildAndLaunchPerformed) {
+				verify(this.fixture.launchConfig).launch(
+						eq(ILaunchManager.RUN_MODE),
+						(IProgressMonitor) anyObject());
+			} else {
+				verifyZeroInteractions(this.fixture.launchConfig);
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (CoreException e) {
 			e.printStackTrace();
 		}
 	}
 
-	private void checkOnlyLaunchHasBeenPerformed() {
+	private void checkOnlyBuildHasBeenPerformedAndExecutableFileDoesNotExist() {
+		this.checkCorrectLaunchingJobHasBeenCreated();
+		this.checkCorrectBuildingJobHasBeenCreated();
+
+		this.checkBuildAndLaunch(false);
+	}
+
+	private void checkCorrectLaunchingJobHasBeenCreated() {
 		verify(this.fixture.factory).createLaunchingJobFor(
 				this.fixture.expectedExecutablePath, this.fixture.launchConfig);
+	}
+
+	private void checkCorrectBuildingJobHasBeenCreated() {
+		verify(this.fixture.factory).createBuildingJobFor(
+				this.fixture.expectedExecutablePath);
+	}
+
+	@Test
+	public void testLaunchFromProjectWithMissingExecFile() {
+		String execSourceFile = "main.adb";
+		this.createFixture(execSourceFile, false, false);
+
+		this.fixture.sut.performLaunchFromProject(this.fixture.project);
+
+		this.checkBothBuildAndLaunchHaveBeenPerformed();
+	}
+
+	@Test
+	public void testLaunchFromProjectWithExistingExecFile() {
+		String execSourceFile = "main.adb";
+		this.createFixture(execSourceFile, true, true);
+
+		this.fixture.sut.performLaunchFromProject(this.fixture.project);
+
+		this.checkOnlyLaunchHasBeenPerformed();
+	}
+
+	private void checkBothBuildAndLaunchHaveBeenPerformed() {
+		this.checkCorrectLaunchingJobHasBeenCreated();
+		this.checkCorrectBuildingJobHasBeenCreated();
+
+		this.checkBuildAndLaunch(true);
+	}
+
+	private void checkOnlyLaunchHasBeenPerformed() {
+		this.checkCorrectLaunchingJobHasBeenCreated();
 		verifyNoMoreInteractions(this.fixture.factory);
 
 		verify(this.fixture.launchingJob).schedule();

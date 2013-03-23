@@ -121,8 +121,15 @@ public class CommonTestUtils {
 
 	public static IProject CreateAdaProject(boolean openProject,
 			boolean isExecutable, String[] executableNames) {
+		return CreateAdaProject(openProject, isExecutable, executableNames,
+				false);
+	}
+
+	public static IProject CreateAdaProject(boolean openProject,
+			boolean isExecutable, String[] executableNames,
+			boolean preventCorrectBuild) {
 		return CreateAdaProjectAt(null, openProject, isExecutable,
-				executableNames);
+				executableNames, preventCorrectBuild);
 	}
 
 	public static IProject CreateAdaProject(boolean openProject) {
@@ -130,25 +137,34 @@ public class CommonTestUtils {
 	}
 
 	public static IProject CreateAdaProjectAt(IPath location) {
-		return CreateAdaProjectAt(location, true, false, null);
+		return CreateAdaProjectAt(location, true, false, null, false);
 	}
 
 	public static IProject CreateAdaProjectAt(IPath location,
-			boolean openProject, boolean isExecutable, String[] executableNames) {
+			boolean openProject, boolean isExecutable,
+			String[] executableNames, boolean preventCorrectBuild) {
 		cpt++;
 		return CreateAdaProjectAt(location, "TestProject" + cpt, openProject,
-				isExecutable, executableNames);
+				isExecutable, executableNames, preventCorrectBuild);
 	}
 
 	private static void CreateFakeExecutableSource(IProject project,
-			String executableSourceName) {
+			String executableSourceName, boolean preventCorrectCompiling) {
 		FileWriter filewriter = null;
+		String sourceContents;
+
+		if (preventCorrectCompiling) {
+			sourceContents = "failed";
+		} else {
+			sourceContents = "procedure "
+					+ new Path(executableSourceName).removeFileExtension()
+					+ " is begin null; end;";
+		}
+
 		try {
 			filewriter = new FileWriter(new File(project.getLocation()
 					.toOSString() + IPath.SEPARATOR + executableSourceName));
-			filewriter.write("procedure "
-					+ new Path(executableSourceName).removeFileExtension()
-					+ " is begin null; end;");
+			filewriter.write(sourceContents);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
@@ -207,7 +223,7 @@ public class CommonTestUtils {
 
 	public static IProject CreateAdaProjectAt(IPath location,
 			String projectName, boolean openProject, boolean isExecutable,
-			String[] executableNames) {
+			String[] executableNames, boolean preventCorrectBuild) {
 		IProject eclipseProject = ResourcesPlugin.getWorkspace().getRoot()
 				.getProject(projectName);
 
@@ -227,7 +243,7 @@ public class CommonTestUtils {
 			if (executableNames != null) {
 				for (int execIdx = 0; execIdx < executableNames.length; execIdx++) {
 					CreateFakeExecutableSource(eclipseProject,
-							executableNames[execIdx]);
+							executableNames[execIdx], preventCorrectBuild);
 				}
 			}
 

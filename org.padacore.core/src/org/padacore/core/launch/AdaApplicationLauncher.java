@@ -133,7 +133,7 @@ public class AdaApplicationLauncher implements IApplicationLauncher {
 			buildingJob.addJobChangeListener(new JobChangeAdapter() {
 				@Override
 				public void done(IJobChangeEvent event) {
-					if (event.getResult().isOK()) {
+					if (DoesExecutableExist(absoluteExecPath)) {
 						launchingJob.schedule();
 					}
 				}
