@@ -5,8 +5,6 @@ import java.util.Observer;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
@@ -97,89 +95,9 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 	protected IProject[] build(int kind, Map<String, String> args,
 			IProgressMonitor monitor) throws CoreException {
 
-		if (kind == FULL_BUILD) {
-			this.build(kind, monitor);
-		} else {
-			if (this.isIncrementalBuildRequired(this.getProject())) {
-				this.build(kind, monitor);
-			}
-		}
+		this.build(kind, monitor);
 
 		return this.getProject().getReferencedProjects();
-	}
-
-	/**
-	 * Returns true if an incremental build is required for the given project,
-	 * false otherwise.
-	 * 
-	 * @param project
-	 *            the project for which incremental build is requested.
-	 * @return if incremental build shall be performed, False otherwise.
-	 */
-	private boolean isIncrementalBuildRequired(IProject project) {
-		boolean buildIsRequired = true;
-		IResourceDelta delta = this.getDelta(project);
-
-		if (delta != null) {
-			IResource concernedResource = delta.getResource();
-			Assert.isTrue(concernedResource.getType() == IResource.PROJECT);
-
-			buildIsRequired = this
-					.doesChangeInProjectAffectsAtLeastOneNonDerivedFile(delta);
-		}
-
-		return buildIsRequired;
-	}
-
-	private class NonDerivedResourcesFinder implements IResourceDeltaVisitor {
-
-		private boolean nonDerivedFileFound;
-
-		public NonDerivedResourcesFinder() {
-			this.nonDerivedFileFound = false;
-		}
-
-		@Override
-		public boolean visit(IResourceDelta delta) throws CoreException {
-			IResource resource = delta.getResource();
-
-			boolean resourceIsNotADerivedFolder = !(resource.getType() == IResource.FOLDER && resource
-					.isDerived());
-
-			this.nonDerivedFileFound = resource.getType() == IResource.FILE
-					&& !resource.isDerived();
-
-			return !this.nonDerivedFileFound && resourceIsNotADerivedFolder;
-		}
-
-		public boolean hasNonDerivedFileBeenFound() {
-			return this.nonDerivedFileFound;
-		}
-
-	}
-
-	/**
-	 * Checks if the given delta contains at least one change to a non-derived
-	 * file.
-	 * 
-	 * @param delta
-	 *            the delta to examine.
-	 * @return true if the given delta contains at least one change to a
-	 *         non-derived file, false otherwise.
-	 */
-	// TODO This method can easily be improved by taking into account
-	// information from GPR project: non derived files could be searched only in
-	// source directories.
-	private boolean doesChangeInProjectAffectsAtLeastOneNonDerivedFile(
-			IResourceDelta delta) {
-		NonDerivedResourcesFinder derivedResourcesFinder = new NonDerivedResourcesFinder();
-
-		try {
-			delta.accept(derivedResourcesFinder);
-		} catch (CoreException e) {
-			ErrorLog.appendException(e);
-		}
-		return derivedResourcesFinder.hasNonDerivedFileBeenFound();
 	}
 
 	@Override
