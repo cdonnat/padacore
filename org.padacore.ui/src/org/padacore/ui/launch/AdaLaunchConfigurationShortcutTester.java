@@ -5,15 +5,19 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IFileEditorInput;
 import org.padacore.core.project.AbstractAdaProjectAssociationManager;
 import org.padacore.core.project.AdaProjectNature;
 import org.padacore.core.project.IAdaProject;
 import org.padacore.core.project.PropertiesManager;
 
-public class AdaProjectPropertyTester extends PropertyTester {
+public class AdaLaunchConfigurationShortcutTester extends PropertyTester {
 
 	private final static String BELONGS_TO_ADA_PROJECT = "belongsToAdaProject";
 	private final static String IS_ADA_PROJECT = "isAdaProject";
+	private final static String IS_ADA_EDITOR = "isAdaExecutableEditor";
 
 	@Override
 	public boolean test(Object receiver, String property, Object[] args,
@@ -23,16 +27,42 @@ public class AdaProjectPropertyTester extends PropertyTester {
 
 		if (property.equals(BELONGS_TO_ADA_PROJECT)) {
 			Assert.isLegal(receiver instanceof IFile);
-			testPassed = this
-					.checkFileIsAnExecutableInAdaProject((IFile) receiver);
+			testPassed = this.isFileAnExecutableInAdaProject((IFile) receiver);
 		} else if (property.equals(IS_ADA_PROJECT)) {
 			Assert.isLegal(receiver instanceof IProject);
 			testPassed = this
-					.checkProjectIsAnExecutableAdaProject((IProject) receiver);
+					.isProjectAnExecutableAdaProject((IProject) receiver);
+		} else if (property.equals(IS_ADA_EDITOR)) {
+			Assert.isLegal(receiver instanceof IEditorPart);
+			testPassed = this
+					.doesEditorPointsToAnExecutableInAdaProject((IEditorPart) receiver);
 		}
 
 		return testPassed;
 
+	}
+
+	/**
+	 * Checks if the given editor points to an executable of a project with Ada
+	 * nature.
+	 * 
+	 * @param selectedEditor
+	 *            the selected editor to check.
+	 * @return True if the given editor points to an executable of a project
+	 *         with Ada nature, False otherwise.
+	 */
+	private boolean doesEditorPointsToAnExecutableInAdaProject(
+			IEditorPart selectedEditor) {
+		IEditorInput editorInput = selectedEditor.getEditorInput();
+		boolean testPassed = false;
+
+		if (editorInput instanceof IFileEditorInput) {
+			IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
+			IFile editedFile = fileEditorInput.getFile();
+
+			testPassed = this.isFileAnExecutableInAdaProject(editedFile);
+		}
+		return testPassed;
 	}
 
 	/**
@@ -44,16 +74,17 @@ public class AdaProjectPropertyTester extends PropertyTester {
 	 * @return True if the given project is open, has an Ada nature and is
 	 *         executable, False otherwise.
 	 */
-	private boolean checkProjectIsAnExecutableAdaProject(
-			IProject selectedProject) {
+	private boolean isProjectAnExecutableAdaProject(IProject selectedProject) {
 		boolean hasAdaNatureAndIsOpen = false;
 		boolean isAnExecutableProject = false;
 
 		IAdaProject associatedAdaProject;
 
 		try {
-			hasAdaNatureAndIsOpen = selectedProject.isOpen()
-					&& selectedProject.hasNature(AdaProjectNature.NATURE_ID);
+			if (selectedProject.isOpen()) {
+				hasAdaNatureAndIsOpen = selectedProject
+						.hasNature(AdaProjectNature.NATURE_ID);
+			}
 
 			if (hasAdaNatureAndIsOpen) {
 				associatedAdaProject = AbstractAdaProjectAssociationManager
@@ -61,6 +92,7 @@ public class AdaProjectPropertyTester extends PropertyTester {
 				isAnExecutableProject = associatedAdaProject.isExecutable();
 			}
 		} catch (CoreException e) {
+			hasAdaNatureAndIsOpen = false;
 		}
 
 		return hasAdaNatureAndIsOpen && isAnExecutableProject;
@@ -75,25 +107,23 @@ public class AdaProjectPropertyTester extends PropertyTester {
 	 * @return True if the given file correspond to an executable of a project
 	 *         with Ada nature, False otherwise.
 	 */
-	private boolean checkFileIsAnExecutableInAdaProject(IFile selectedFile) {
+	private boolean isFileAnExecutableInAdaProject(IFile selectedFile) {
 
 		boolean belongsToExecutableAdaProject = this
-				.checkProjectIsAnExecutableAdaProject(selectedFile.getProject());
+				.isProjectAnExecutableAdaProject(selectedFile.getProject());
 		boolean selectedFileIsAnExecutableOfProject = false;
 
-		if (belongsToExecutableAdaProject) {
-			PropertiesManager propertiesManager = new PropertiesManager(
-					selectedFile.getProject());
-			IAdaProject adaProject = propertiesManager.getAdaProject();
+		PropertiesManager propertiesManager = new PropertiesManager(
+				selectedFile.getProject());
+		IAdaProject adaProject = propertiesManager.getAdaProject();
 
+		if (belongsToExecutableAdaProject) {
 			selectedFileIsAnExecutableOfProject = adaProject
-					.getExecutableSourceNames()
-					.contains(selectedFile.getName())
-					|| adaProject.getExecutableNames().contains(
+					.getExecutableNames().contains(selectedFile.getName())
+					|| adaProject.getExecutableSourceNames().contains(
 							selectedFile.getName());
 		}
 
 		return selectedFileIsAnExecutableOfProject;
 	}
-
 }

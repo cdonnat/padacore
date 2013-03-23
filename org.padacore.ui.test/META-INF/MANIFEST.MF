@@ -19,3 +19,4 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7,
  JavaSE-1.6
 Bundle-ClassPath: src/
+Import-Package: org.eclipse.ui

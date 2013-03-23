@@ -3,10 +3,12 @@ package org.padacore.core.test.utils;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -160,6 +162,17 @@ public class CommonTestUtils {
 		}
 	}
 
+	public static void CreateFileIfNotExisting(IFile fileHandle) {
+		if (!fileHandle.exists()) {
+			try {
+				fileHandle.create(new ByteArrayInputStream(new byte[] { 'e' }),
+						false, null);
+			} catch (CoreException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
 	private static void DumpGprToFile(IProject project, GprProject gprProject) {
 		FileWriter filewriter = null;
 		try {
@@ -222,9 +235,9 @@ public class CommonTestUtils {
 			eclipseProject.setDescription(description, null);
 
 			IAdaProject adaProject = new GnatAdaProject(CreateGprProject(
-					eclipseProject.getName(), eclipseProject.getLocation(), isExecutable,
-					executableNames));
-			
+					eclipseProject.getName(), eclipseProject.getLocation(),
+					isExecutable, executableNames));
+
 			eclipseProject.setSessionProperty(new QualifiedName(
 					SESSION_PROPERTY_QUALIFIED_NAME_PREFIX, "adaProject"),
 					adaProject);

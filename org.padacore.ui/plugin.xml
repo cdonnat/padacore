@@ -96,6 +96,7 @@
             modes="run">
             <contextualLaunch>
   <enablement>
+    <or>
     <with variable="selection">
      <count value="1"/>
      <iterate>
@@ -108,9 +109,14 @@
      	<instanceof value="org.eclipse.core.resources.IFile"/>
      	<test property="org.padacore.belongsToAdaProject"/>
      	</and>
-     	</or>
+     </or>
      </iterate>
      </with>
+     <with variable="activeEditor">
+        <instanceof value="org.eclipse.ui.IEditorPart"/>
+        <test property="org.padacore.isAdaExecutableEditor"/>
+     </with>
+     </or>     
   </enablement>
          </contextualLaunch>
       </shortcut>
@@ -118,18 +124,25 @@
    <extension
          point="org.eclipse.core.expressions.propertyTesters">
       <propertyTester
-            class="org.padacore.ui.launch.AdaProjectPropertyTester"
+            class="org.padacore.ui.launch.AdaLaunchConfigurationShortcutTester"
             id="org.padacore.belongsToAdaProject"
             namespace="org.padacore"
             properties="belongsToAdaProject"
             type="org.eclipse.core.resources.IFile">
       </propertyTester>
       <propertyTester
-            class="org.padacore.ui.launch.AdaProjectPropertyTester"
+            class="org.padacore.ui.launch.AdaLaunchConfigurationShortcutTester"
             id="org.padacore.isAdaProject"
             namespace="org.padacore"
             properties="isAdaProject"
             type="org.eclipse.core.resources.IProject">
+      </propertyTester>
+       <propertyTester
+            class="org.padacore.ui.launch.AdaLaunchConfigurationShortcutTester"
+            id="org.padacore.isAdaExecutableEditor"
+            namespace="org.padacore"
+            properties="isAdaExecutableEditor"
+            type="org.eclipse.ui.IEditorPart">
       </propertyTester>
    </extension>
    <extension
