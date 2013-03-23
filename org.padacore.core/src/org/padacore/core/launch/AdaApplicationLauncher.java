@@ -26,11 +26,11 @@ public class AdaApplicationLauncher implements IApplicationLauncher {
 
 	private IAdaProject adaProject;
 	private ILaunchConfigurationProvider launchConfigProvider;
-	private LauncherFactory factory;
+	private ApplicationLauncherJobFactory factory;
 
 	public AdaApplicationLauncher(IAdaProject adaProject,
 			ILaunchConfigurationProvider launchConfigProvider,
-			LauncherFactory factory) {
+			ApplicationLauncherJobFactory factory) {
 		this.adaProject = adaProject;
 		this.launchConfigProvider = launchConfigProvider;
 		this.factory = factory;

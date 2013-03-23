@@ -24,7 +24,7 @@ import org.junit.Test;
 import org.padacore.core.launch.AdaApplicationLauncher;
 import org.padacore.core.launch.BuildingJob;
 import org.padacore.core.launch.ILaunchConfigurationProvider;
-import org.padacore.core.launch.LauncherFactory;
+import org.padacore.core.launch.ApplicationLauncherJobFactory;
 import org.padacore.core.launch.LaunchingJob;
 import org.padacore.core.project.PropertiesManager;
 import org.padacore.core.test.utils.CommonTestUtils;
@@ -38,7 +38,7 @@ public class AdaApplicationLauncherTest {
 		public IProject project;
 		public Job launchingJob;
 		public Job buildingJob;
-		public LauncherFactory factory;
+		public ApplicationLauncherJobFactory factory;
 		public ILaunchConfiguration launchConfig;
 		public IFile executableFile;
 		public IPath expectedExecutablePath;
@@ -77,7 +77,7 @@ public class AdaApplicationLauncherTest {
 					this.fixture.expectedExecutablePath, this.fixture.project);
 		}
 
-		this.fixture.factory = mock(LauncherFactory.class);
+		this.fixture.factory = mock(ApplicationLauncherJobFactory.class);
 		when(
 				this.fixture.factory.createLaunchingJobFor(
 						this.fixture.expectedExecutablePath,

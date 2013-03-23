@@ -8,8 +8,16 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
+import org.padacore.core.Activator;
 import org.padacore.core.utils.ErrorLog;
 
+/**
+ * This class defines a job whose purpose is to run the given launch
+ * configuration.
+ * 
+ * @author RS
+ * 
+ */
 public class LaunchingJob extends Job {
 
 	private ILaunchConfiguration launchConfig;
@@ -29,7 +37,8 @@ public class LaunchingJob extends Job {
 
 		} catch (CoreException e) {
 			ErrorLog.appendException(e);
-			launchStatus = e.getStatus();
+			launchStatus = new Status(e.getStatus().getSeverity(),
+					Activator.PLUGIN_ID, e.getMessage());
 		}
 
 		return launchStatus;

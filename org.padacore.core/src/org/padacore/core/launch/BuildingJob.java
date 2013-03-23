@@ -12,6 +12,13 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.padacore.core.Activator;
 import org.padacore.core.utils.ErrorLog;
 
+/**
+ * This class defines a job whose purpose is to build a project so that one of
+ * its executables can be run afterwards.
+ * 
+ * @author RS
+ * 
+ */
 public class BuildingJob extends Job {
 	private IProject launchedProject;
 	private IPath absoluteExecPath;
