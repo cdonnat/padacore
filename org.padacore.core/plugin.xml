@@ -33,7 +33,7 @@
             delegate="org.padacore.core.launch.AdaLaunchConfigurationDelegate"
             id="org.padacore.core.launch.AdaLaunchConfiguration"
             modes="run"
-            name="AdaLaunchConfiguration">
+            name="Ada Application">
       </launchConfigurationType>
    </extension>
 
