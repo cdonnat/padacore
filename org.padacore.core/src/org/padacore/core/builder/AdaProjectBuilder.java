@@ -87,13 +87,8 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 								new GprbuildOutput()),
 						new ExternalProcessOutput(console) });
 
-		DerivedResourcesIdentifier resourcesIdentifier = new DerivedResourcesIdentifier(
-				this.getProject());
-
 		submonitor.beginTask(message, 100);
-		resourcesIdentifier.begin();
 		process.run(buildCommand(), monitor);
-		resourcesIdentifier.done();
 		submonitor.done();
 		refreshBuiltProject();
 	}
