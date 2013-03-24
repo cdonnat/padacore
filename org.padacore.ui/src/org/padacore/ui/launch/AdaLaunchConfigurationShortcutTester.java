@@ -66,7 +66,7 @@ public class AdaLaunchConfigurationShortcutTester extends PropertyTester {
 	}
 
 	/**
-	 * Checks if the given project: + has an Ada nature. + is open. + is
+	 * Checks if the given project has an Ada nature, is open and is
 	 * executable.
 	 * 
 	 * @param selectedProject

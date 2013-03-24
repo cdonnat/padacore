@@ -1,7 +1,6 @@
 package org.padacore.ui.launch;
 
 import org.eclipse.core.resources.IFile;
-
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.ui.ILaunchShortcut;
@@ -11,8 +10,8 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
 import org.padacore.core.launch.AdaApplicationLauncher;
 import org.padacore.core.launch.AdaLaunchConfigurationProvider;
+import org.padacore.core.launch.ApplicationLauncherJobFactory;
 import org.padacore.core.launch.IApplicationLauncher;
-import org.padacore.core.launch.LauncherFactory;
 import org.padacore.core.project.PropertiesManager;
 
 /**
@@ -48,8 +47,8 @@ public class AdaLaunchConfigurationShortcut implements ILaunchShortcut {
 		PropertiesManager propertiesManager = new PropertiesManager(project);
 		IApplicationLauncher appLauncher = new AdaApplicationLauncher(
 				propertiesManager.getAdaProject(),
-				new AdaLaunchConfigurationProvider(), new LauncherFactory(
-						project));
+				new AdaLaunchConfigurationProvider(),
+				new ApplicationLauncherJobFactory(project));
 
 		return appLauncher;
 
@@ -73,12 +72,18 @@ public class AdaLaunchConfigurationShortcut implements ILaunchShortcut {
 					adaAppLauncher.performLaunchFromFile(selectedFile);
 
 				} else if (selectedElt instanceof IProject) {
-					IProject selectedProject = (IProject) selectedElt;
+					final IProject selectedProject = (IProject) selectedElt;
 
-					adaAppLauncher = this
-							.getApplicationLauncherFor(selectedProject);
-					adaAppLauncher.performLaunchFromProject(selectedProject);
+					ExecutableSelector execSelector = new ExecutableSelector(
+							selectedProject);
 
+					if (execSelector.isExecutableSelected()) {
+						adaAppLauncher = this
+								.getApplicationLauncherFor(selectedProject);
+
+						adaAppLauncher.performLaunchFromFile(execSelector
+								.getSelectedExecutable());
+					}
 				}
 			}
 		}

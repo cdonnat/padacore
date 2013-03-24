@@ -82,25 +82,6 @@ public class AdaApplicationLauncher implements IApplicationLauncher {
 		return executableNames.get(execIndex);
 	}
 
-	@Override
-	public void performLaunchFromProject(IProject project) {
-		if (this.adaProject.getExecutableNames().size() == 1) {
-
-			IPath executablePath = new Path(
-					this.adaProject.getExecutableDirectoryPath()
-							+ System.getProperty("file.separator")
-							+ this.adaProject.getExecutableNames().get(0));
-
-			this.launchExecutableAtPath(executablePath, project);
-
-		} else {
-			ErrorLog.appendMessage(
-					"Launching a project with multiple executables is not implemented yet",
-					IStatus.WARNING);
-		}
-
-	}
-
 	/**
 	 * Returns true if the executable at given path exists, false otherwise.
 	 * 
