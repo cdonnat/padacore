@@ -1,5 +1,7 @@
 package org.padacore.core.gnat;
 
+import org.gpr4j.core.Gpr;
+
 /**
  * Abstract class for a GPR project factory.
  * @author RS
@@ -14,7 +16,7 @@ public abstract class AbstractGprProjectFactory {
 	 * 
 	 * @return the newly created GPR project.
 	 */
-	public abstract GprProject createGprProject();
+	public abstract Gpr createGprProject();
 	
 	/**
 	 * Returns the file extension for GPR project files.

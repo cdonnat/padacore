@@ -7,10 +7,10 @@ import java.util.List;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
+import org.gpr4j.core.Gpr;
 import org.junit.Before;
 import org.junit.Test;
 import org.padacore.core.gnat.GnatAdaProject;
-import org.padacore.core.gnat.GprProject;
 import org.padacore.core.test.utils.CommonTestUtils;
 
 public class GnatAdaProjectTest {
@@ -19,7 +19,7 @@ public class GnatAdaProjectTest {
 	private final static String TEST_OBJ_DIR_NAME = "object_dir";
 	private final static String[] EXECUTABLE_SOURCE_NAMES = {"main.ads", "another.adb", "no_extension"};
 
-	private GprProject gprProject;
+	private Gpr gprProject;
 	private GnatAdaProject sut;
 
 	@Before

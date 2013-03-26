@@ -2,9 +2,11 @@ package org.padacore.core.gnat;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.gpr4j.core.Gpr;
 import org.padacore.core.project.ProjectBuilder;
 import org.padacore.core.utils.FileUtils;
 
@@ -20,17 +22,17 @@ public class DefaultGprProjectFactory extends AbstractGprProjectFactory {
 	private String projectName;
 	private IPath projectDirectory;
 
-	public DefaultGprProjectFactory(String projectName,
-			boolean addMainProcedure, IPath projectDirectory) {
+	public DefaultGprProjectFactory(String projectName, boolean addMainProcedure,
+			IPath projectDirectory) {
 		this.projectName = projectName;
 		this.addMainProcedure = addMainProcedure;
 		this.projectDirectory = projectDirectory;
 	}
 
 	@Override
-	public GprProject createGprProject() {
+	public Gpr createGprProject() {
 
-		GprProject defaultGpr = this.createProjectFile();
+		Gpr defaultGpr = this.createProjectFile();
 		this.createProjectDirectory();
 		this.writeProjectFileToDisk(defaultGpr);
 
@@ -43,13 +45,12 @@ public class DefaultGprProjectFactory extends AbstractGprProjectFactory {
 	 * 
 	 * @return a newly create GPR project file.
 	 */
-	private GprProject createProjectFile() {
-		GprProject gprProject = new GprProject(this.projectName, this.projectDirectory);
+	private Gpr createProjectFile() {
+		Gpr gprProject = new Gpr(this.projectName, Paths.get(this.projectDirectory.toOSString()));
 
 		if (this.addMainProcedure) {
 			gprProject.setExecutable(true);
-			gprProject
-					.addSourceExecutableName(ProjectBuilder.DEFAULT_EXECUTABLE_NAME);
+			gprProject.addSourceExecutableName(ProjectBuilder.DEFAULT_EXECUTABLE_NAME);
 		}
 
 		return gprProject;
@@ -61,10 +62,9 @@ public class DefaultGprProjectFactory extends AbstractGprProjectFactory {
 	 * @param gprProject
 	 *            the project file to write to disk.
 	 */
-	private void writeProjectFileToDisk(GprProject gprProject) {
+	private void writeProjectFileToDisk(Gpr gprProject) {
 		try {
-			FileUtils.CreateNewFileWithContents(this.getGprAbsolutePath(),
-					gprProject.toString());
+			FileUtils.CreateNewFileWithContents(this.getGprAbsolutePath(), gprProject.toString());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -89,8 +89,7 @@ public class DefaultGprProjectFactory extends AbstractGprProjectFactory {
 
 		pathBuilder.append(IPath.SEPARATOR);
 		pathBuilder.append(this.projectName);
-		pathBuilder.append(AbstractGprProjectFactory
-				.GetGprProjectFileExtension());
+		pathBuilder.append(AbstractGprProjectFactory.GetGprProjectFileExtension());
 
 		return new Path(pathBuilder.toString());
 	}

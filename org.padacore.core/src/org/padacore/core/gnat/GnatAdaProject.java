@@ -3,14 +3,17 @@ package org.padacore.core.gnat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.runtime.*;
+import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
+import org.gpr4j.core.Gpr;
 import org.padacore.core.project.IAdaProject;
 
 public class GnatAdaProject implements IAdaProject {
 
-	private GprProject gprProject;
+	private Gpr gprProject;
 
-	public GnatAdaProject(GprProject gprProject) {
+	public GnatAdaProject(Gpr gprProject) {
 		this.gprProject = gprProject;
 	}
 
@@ -18,11 +21,10 @@ public class GnatAdaProject implements IAdaProject {
 	public List<String> getExecutableNames() {
 		Assert.isLegal(this.isExecutable());
 
-		List<String> execNames = new ArrayList<String>(this.gprProject
-				.getExecutableSourceNames().size());
+		List<String> execNames = new ArrayList<String>(this.gprProject.getExecutableSourceNames()
+				.size());
 		boolean isWindowsSystem = isWindowsSystem();
-		List<String> execSourceNames = this.gprProject
-				.getExecutableSourceNames();
+		List<String> execSourceNames = this.gprProject.getExecutableSourceNames();
 
 		for (String execSourceName : execSourceNames) {
 
@@ -85,8 +87,7 @@ public class GnatAdaProject implements IAdaProject {
 		String fileNameWithoutExtension = filename;
 
 		if (filename.indexOf('.') != -1) {
-			fileNameWithoutExtension = filename.substring(0,
-					filename.lastIndexOf('.'));
+			fileNameWithoutExtension = filename.substring(0, filename.lastIndexOf('.'));
 		}
 
 		return fileNameWithoutExtension;
@@ -115,8 +116,7 @@ public class GnatAdaProject implements IAdaProject {
 		if (relativeObjectDirectory == null) {
 			relativeObjectDirectory = ".";
 		}
-		IPath absoluteObjectDirectory = this
-				.convertToAbsolutePath(relativeObjectDirectory);
+		IPath absoluteObjectDirectory = this.convertToAbsolutePath(relativeObjectDirectory);
 
 		return absoluteObjectDirectory;
 	}
@@ -129,12 +129,12 @@ public class GnatAdaProject implements IAdaProject {
 	 * @return an absolute path equivalent to given relative path.
 	 */
 	private IPath convertToAbsolutePath(String projectRelativePath) {
-		return this.gprProject.getRootDirPath().append(projectRelativePath);
+		return new Path(this.gprProject.getRootDirPath().toString()).append(projectRelativePath);
 	}
 
 	@Override
 	public IPath getRootPath() {
-		return this.gprProject.getRootDirPath();
+		return new Path(this.gprProject.getRootDirPath().toString());
 	}
 
 	@Override

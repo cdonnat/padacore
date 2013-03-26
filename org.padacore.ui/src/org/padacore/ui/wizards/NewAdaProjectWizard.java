@@ -5,9 +5,9 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
+import org.gpr4j.core.Gpr;
 import org.padacore.core.gnat.DefaultGprProjectFactory;
 import org.padacore.core.gnat.GnatAdaProject;
-import org.padacore.core.gnat.GprProject;
 import org.padacore.core.project.ProjectBuilder;
 import org.padacore.ui.Messages;
 
@@ -62,7 +62,7 @@ public class NewAdaProjectWizard extends Wizard implements INewWizard {
 		DefaultGprProjectFactory gprFactory = new DefaultGprProjectFactory(
 				projectCreationPage.getProjectName(), projectCreationPage.addMainProcedure(),
 				eclipseProjectPath);
-		GprProject gprProject = gprFactory.createGprProject();
+		Gpr gprProject = gprFactory.createGprProject();
 
 		eclipseAdaProjectBuilder.createNewProject(new GnatAdaProject(gprProject), projectLocation,
 				projectCreationPage.addMainProcedure());

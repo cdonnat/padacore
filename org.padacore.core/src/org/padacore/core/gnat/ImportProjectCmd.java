@@ -1,5 +1,8 @@
 package org.padacore.core.gnat;
 
+import java.nio.file.Paths;
+
+import org.antlr.runtime.RecognitionException;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -8,6 +11,10 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.Path;
+import org.gpr4j.core.Factory;
+import org.gpr4j.core.ILoader;
+import org.gpr4j.core.IProjectUnit;
 import org.padacore.core.project.ProjectBuilder;
 import org.padacore.core.utils.CancelableJob;
 import org.padacore.core.utils.ErrorLog;
@@ -15,17 +22,22 @@ import org.padacore.core.utils.ErrorLog;
 public class ImportProjectCmd extends CancelableJob {
 
 	private IPath absoluteGprPath;
-	private GprLoader loader;
+	private ILoader loader;
 
 	public ImportProjectCmd(IPath absoluteGprPath) {
 		super("Import project " + absoluteGprPath.removeFileExtension().lastSegment());
 		this.absoluteGprPath = absoluteGprPath;
-		this.loader = new GprLoader();
+		this.loader = Factory.CreateLoader();
 	}
 
 	@Override
 	protected void execute(IProgressMonitor monitor) throws OperationCanceledException {
-		this.loader.load(this.absoluteGprPath);
+		try {
+			this.loader.load(Paths.get(this.absoluteGprPath.toOSString()));
+		} catch (RecognitionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		this.importLoadedProjects(monitor);
 		this.setReferencesBetweenEclipseProjects(monitor);
 	}
@@ -33,7 +45,7 @@ public class ImportProjectCmd extends CancelableJob {
 	@Override
 	protected void executeWhenCanceled() {
 		IWorkspaceRoot workspace = ResourcesPlugin.getWorkspace().getRoot();
-		for (Project project : this.loader.getLoadedProjects()) {
+		for (IProjectUnit project : this.loader.getLoadedProjects()) {
 			try {
 				IProject eclipseProject = workspace.getProject(project.getName());
 				if (eclipseProject.exists()) {
@@ -54,14 +66,13 @@ public class ImportProjectCmd extends CancelableJob {
 	 * 
 	 */
 	private void importLoadedProjects(IProgressMonitor monitor) {
-		for (Project project : this.loader.getLoadedProjects()) {
+		for (IProjectUnit project : this.loader.getLoadedProjects()) {
 			this.checkCanceled(monitor);
 
 			ProjectBuilder eclipseAdaProjectBuilder = new ProjectBuilder(project.getName());
-			GprBuilder gprBuilder = new GprBuilder(project, project.getPath());
 
-			eclipseAdaProjectBuilder.importProject(project.getPath(),
-					new GnatAdaProject(gprBuilder.build()));
+			eclipseAdaProjectBuilder.importProject(new Path(project.getPath().toString()),
+					new GnatAdaProject(Factory.CreateGpr(project)));
 		}
 	}
 
@@ -73,9 +84,9 @@ public class ImportProjectCmd extends CancelableJob {
 	 */
 	private void setReferencesBetweenEclipseProjects(IProgressMonitor monitor) {
 		IWorkspaceRoot workspace = ResourcesPlugin.getWorkspace().getRoot();
-		for (Project project : this.loader.getLoadedProjects()) {
+		for (IProjectUnit project : this.loader.getLoadedProjects()) {
 			this.checkCanceled(monitor);
-			
+
 			IProject[] referencedProjects = new IProject[project.getReferenceProjects().size()];
 			for (int i = 0; i < project.getReferenceProjects().size(); i++) {
 				referencedProjects[i] = workspace.getProject(project.getReferenceProjects().get(i)
