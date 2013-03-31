@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: org.padacore.antlr
+Bundle-Name: org.padacore.gpr4j
 Bundle-SymbolicName: org.padacore.gpr4j
 Bundle-Version: 1.0.0.qualifier
 Bundle-ClassPath: lib/antlr-3.4-complete.jar,
