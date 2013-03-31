@@ -10,6 +10,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.gpr4j.core.Factory;
@@ -35,8 +36,7 @@ public class ImportProjectCmd extends CancelableJob {
 		try {
 			this.loader.load(Paths.get(this.absoluteGprPath.toOSString()));
 		} catch (RecognitionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			ErrorLog.appendMessage(e.getMessage(), IStatus.ERROR);
 		}
 		this.importLoadedProjects(monitor);
 		this.setReferencesBetweenEclipseProjects(monitor);

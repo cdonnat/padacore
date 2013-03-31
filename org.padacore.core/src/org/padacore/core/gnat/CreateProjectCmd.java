@@ -2,26 +2,27 @@ package org.padacore.core.gnat;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.gpr4j.core.Gpr;
 import org.padacore.core.project.ProjectBuilder;
-import org.padacore.core.utils.CancelableJob;
 
-public class CreateProjectCmd extends CancelableJob {
+public class CreateProjectCmd extends Job {
 
 	private IPath projectPath;
 	private String projectName;
 	private boolean mainIsRequired;
 
-	public CreateProjectCmd (IPath projectPath, String projectName, boolean mainIsRequired) {
+	public CreateProjectCmd(IPath projectPath, String projectName, boolean mainIsRequired) {
 		super("Create project " + projectName);
 		this.projectPath = projectPath;
 		this.projectName = projectName;
 		this.mainIsRequired = mainIsRequired;
-	} 
+	}
 
 	@Override
-	protected void execute(IProgressMonitor monitor) throws OperationCanceledException {
+	public IStatus run(IProgressMonitor monitor) {
 		IPath eclipseProjectPath = ProjectBuilder
 				.GetProjectPath(this.projectName, this.projectPath);
 
@@ -32,12 +33,7 @@ public class CreateProjectCmd extends CancelableJob {
 		ProjectBuilder eclipseAdaProjectBuilder = new ProjectBuilder(this.projectName);
 		eclipseAdaProjectBuilder.createNewProject(new GnatAdaProject(gprProject), this.projectPath,
 				this.mainIsRequired);
-	}
-
-	@Override
-	protected void executeWhenCanceled() {
-		// TODO Auto-generated method stub
 		
+		return Status.OK_STATUS;
 	}
-
 }
