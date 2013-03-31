@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: org.padacore.antlr
+Bundle-SymbolicName: org.padacore.gpr4j
+Bundle-Version: 1.0.0.qualifier
+Bundle-ClassPath: lib/antlr-3.4-complete.jar,
+ lib/gpr4j-1.0.jar,
+ lib/guava-14.0.1.jar
+Export-Package: com.google.common.base,
+ org.antlr.runtime,
+ org.gpr4j.core
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7,
+ JavaSE-1.6

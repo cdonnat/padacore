@@ -1,14 +1,12 @@
 package org.padacore.ui.wizards;
 
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
-import org.gpr4j.core.Gpr;
-import org.padacore.core.gnat.DefaultGprProjectFactory;
-import org.padacore.core.gnat.GnatAdaProject;
-import org.padacore.core.project.ProjectBuilder;
+import org.padacore.core.gnat.CreateProjectCmd;
 import org.padacore.ui.Messages;
 
 /**
@@ -40,32 +38,14 @@ public class NewAdaProjectWizard extends Wizard implements INewWizard {
 	@Override
 	public boolean performFinish() {
 
-		this.createNewDefaultProjectWithAdaNature();
-
-		return true;
-	}
-
-	/**
-	 * Creates a new default project with Ada nature.
-	 */
-	private void createNewDefaultProjectWithAdaNature() {
-
-		ProjectBuilder eclipseAdaProjectBuilder = new ProjectBuilder(
-				projectCreationPage.getProjectName());
-
 		IPath projectLocation = projectCreationPage.useDefaults() ? null : projectCreationPage
 				.getLocationPath();
 
-		IPath eclipseProjectPath = ProjectBuilder.GetProjectPath(
-				projectCreationPage.getProjectName(), projectLocation);
+		Job job = new CreateProjectCmd(projectLocation, this.projectCreationPage.getProjectName(),
+				this.projectCreationPage.addMainProcedure());
 
-		DefaultGprProjectFactory gprFactory = new DefaultGprProjectFactory(
-				projectCreationPage.getProjectName(), projectCreationPage.addMainProcedure(),
-				eclipseProjectPath);
-		Gpr gprProject = gprFactory.createGprProject();
-
-		eclipseAdaProjectBuilder.createNewProject(new GnatAdaProject(gprProject), projectLocation,
-				projectCreationPage.addMainProcedure());
+		job.schedule();
+		return true;
 	}
 
 	@Override
