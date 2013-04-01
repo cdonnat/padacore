@@ -3,6 +3,7 @@ package org.padacore.core.project.test;
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -33,8 +34,8 @@ public class ResourceLocatorTest {
 
 	public void createFixture(boolean projectIsImported) {
 		this.fixture = new Fixture();
-		this.fixture.project = CommonTestUtils.CreateAdaProjectAt(new Path(
-				this.testFolder.getRoot().getAbsolutePath()));
+		this.fixture.project = CommonTestUtils.CreateAdaProjectAt(new Path(this.testFolder
+				.getRoot().getAbsolutePath()));
 		this.fixture.sut = new ResourceLocator(this.fixture.project);
 
 		CommonTestUtils.CreateGprFileIn(this.fixture.project.getRawLocation(),
@@ -51,8 +52,8 @@ public class ResourceLocatorTest {
 			}
 
 			this.fixture.project.setPersistentProperty(new QualifiedName(
-					CommonTestUtils.SESSION_PROPERTY_QUALIFIED_NAME_PREFIX,
-					"projectKind"), projectKindPpty);
+					CommonTestUtils.SESSION_PROPERTY_QUALIFIED_NAME_PREFIX, "projectKind"),
+					projectKindPpty);
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
@@ -80,8 +81,7 @@ public class ResourceLocatorTest {
 		IFile fileInProject;
 
 		if (projectIsImported) {
-			fileInProject = this.fixture.project.getFolder("toto").getFile(
-					fileName);
+			fileInProject = this.fixture.project.getFolder("toto").getFile(fileName);
 		} else {
 			fileInProject = this.fixture.project.getFile(fileName);
 		}
@@ -91,22 +91,24 @@ public class ResourceLocatorTest {
 	}
 
 	private void checkResourceWasFound(IPath relativeResourcePath) {
-		IPath absoluteResourcePath = new Path(this.testFolder.getRoot()
-				.getAbsolutePath()).append(relativeResourcePath);
+		IPath absoluteResourcePath = null;
+		try {
+			absoluteResourcePath = new Path(this.testFolder.getRoot().getCanonicalPath())
+					.append(relativeResourcePath);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
-		IResource retrievedResource = this.fixture.sut
-				.findResourceFromPath(absoluteResourcePath);
+		IResource retrievedResource = this.fixture.sut.findResourceFromPath(absoluteResourcePath);
 
-		assertTrue(retrievedResource.getLocation().equals(
-				retrievedResource.getLocation()));
+		assertTrue(retrievedResource.getLocation().toOSString()
+				.equals(retrievedResource.getLocation().toOSString()));
 	}
 
-	private void runTestForSimpleFolder(String folderName,
-			boolean projectIsImported) {
+	private void runTestForSimpleFolder(String folderName, boolean projectIsImported) {
 		IFolder folderInProject;
 		if (projectIsImported) {
-			folderInProject = this.fixture.project.getFolder("toto").getFolder(
-					folderName);
+			folderInProject = this.fixture.project.getFolder("toto").getFolder(folderName);
 		} else {
 			folderInProject = this.fixture.project.getFolder(folderName);
 		}
@@ -122,15 +124,13 @@ public class ResourceLocatorTest {
 
 	private void createFile(IFile file) {
 		try {
-			file.create(new ByteArrayInputStream(new byte[] { 1, 2, 3, 4 }),
-					true, null);
+			file.create(new ByteArrayInputStream(new byte[] { 1, 2, 3, 4 }), true, null);
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
 	}
 
-	private void runTestForComplexFile(IPath relativePath,
-			boolean projectisImported) {
+	private void runTestForComplexFile(IPath relativePath, boolean projectisImported) {
 		IFile fileInProject;
 
 		if (projectisImported) {
