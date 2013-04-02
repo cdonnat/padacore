@@ -16,7 +16,6 @@ Require-Bundle: org.padacore.core;bundle-version="1.0.0",
  org.padacore.test;bundle-version="1.0.0",
  org.eclipse.jface.text;bundle-version="3.8.0"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7,
- JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ClassPath: src/
 Import-Package: org.eclipse.ui

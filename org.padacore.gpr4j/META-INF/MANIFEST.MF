@@ -9,5 +9,4 @@ Bundle-ClassPath: lib/antlr-3.4-complete.jar,
 Export-Package: com.google.common.base,
  org.antlr.runtime,
  org.gpr4j.core
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7,
- JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7

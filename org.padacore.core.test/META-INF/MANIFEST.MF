@@ -11,8 +11,7 @@ Require-Bundle: org.eclipse.core.resources;bundle-version="3.8.0",
  org.padacore.core;bundle-version="1.0.0",
  org.padacore.gpr4j;bundle-version="1.0.0",
  org.padacore.test;bundle-version="1.0.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7,
- JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Export-Package: org.padacore.core.test.utils
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: src/
