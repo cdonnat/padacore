@@ -12,7 +12,14 @@ import org.eclipse.ui.dialogs.ListDialog;
 import org.padacore.core.project.IAdaProject;
 import org.padacore.core.project.PropertiesManager;
 
-//TODO add some tests (you lazy bastard!)
+/**
+ * This class selects which executable of a project to launch. It is either
+ * selected by default if there is only one executable in the project or
+ * requires user input when multiple executables exist.
+ * 
+ * @author RS
+ * 
+ */
 public class ExecutableSelector {
 
 	private IProject project;

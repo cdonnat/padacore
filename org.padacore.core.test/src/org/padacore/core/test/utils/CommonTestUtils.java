@@ -88,7 +88,7 @@ public class CommonTestUtils {
 
 		return project;
 	}
-
+	
 	public static Gpr CreateGprProject(String name, IPath rootDir, boolean isExecutable,
 			String[] executableNames) {
 		Gpr result = new Gpr(name, Paths.get(rootDir.toOSString()));
