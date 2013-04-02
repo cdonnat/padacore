@@ -69,7 +69,7 @@ public class AdaLaunchConfigurationShortcut implements ILaunchShortcut {
 					adaAppLauncher = this
 							.getApplicationLauncherFor(selectedFile
 									.getProject());
-					adaAppLauncher.performLaunchFromFile(selectedFile);
+					adaAppLauncher.performLaunchFromFile(selectedFile.getLocation());
 
 				} else if (selectedElt instanceof IProject) {
 					final IProject selectedProject = (IProject) selectedElt;
@@ -99,7 +99,7 @@ public class AdaLaunchConfigurationShortcut implements ILaunchShortcut {
 
 		IApplicationLauncher adaAppLauncher = this
 				.getApplicationLauncherFor(editedFile.getProject());
-		adaAppLauncher.performLaunchFromFile(editedFile);
+		adaAppLauncher.performLaunchFromFile(editedFile.getLocation());
 
 	}
 

@@ -123,7 +123,7 @@ public class AdaApplicationLauncherTest {
 
 		this.createFixture(execSourceFile, true, true);
 
-		this.fixture.sut.performLaunchFromFile(this.fixture.executableFile);
+		this.fixture.sut.performLaunchFromFile(this.fixture.executableFile.getLocation());
 
 		this.checkOnlyLaunchHasBeenPerformed();
 	}
@@ -152,7 +152,7 @@ public class AdaApplicationLauncherTest {
 		this.createFixture(execSourceFile, true, true);
 
 		this.fixture.sut.performLaunchFromFile(this.fixture.project
-				.getFile(execSourceFile));
+				.getFile(execSourceFile).getLocation());
 
 		this.checkOnlyLaunchHasBeenPerformed();
 	}
@@ -163,7 +163,7 @@ public class AdaApplicationLauncherTest {
 		this.createFixture(execSourceFile, false, false);
 
 		this.fixture.sut.performLaunchFromFile(this.fixture.project
-				.getFile(execSourceFile));
+				.getFile(execSourceFile).getLocation());
 
 		this.checkBothBuildAndLaunchHaveBeenPerformed();
 	}
@@ -174,7 +174,7 @@ public class AdaApplicationLauncherTest {
 		this.createFixture(execSourceFile, false, false, true);
 
 		this.fixture.sut.performLaunchFromFile(this.fixture.project
-				.getFile(execSourceFile));
+				.getFile(execSourceFile).getLocation());
 
 		this.checkOnlyBuildHasBeenPerformedAndExecutableFileDoesNotExist();
 	}

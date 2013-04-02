@@ -2,7 +2,6 @@ package org.padacore.ui.launch;
 
 import java.util.List;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
@@ -12,13 +11,12 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ListDialog;
 import org.padacore.core.project.IAdaProject;
 import org.padacore.core.project.PropertiesManager;
-import org.padacore.core.project.ResourceLocator;
 
 //TODO add some tests (you lazy bastard!)
 public class ExecutableSelector {
 
 	private IProject project;
-	private IFile selectedExecutable;
+	private IPath selectedExecutable;
 
 	public ExecutableSelector(IProject project) {
 		this.project = project;
@@ -36,13 +34,12 @@ public class ExecutableSelector {
 	 *            the IAdaProject associated to project.
 	 * @return the absolute path of the executable.
 	 */
-	private IFile getExecutableFromName(String executableName,
+	private IPath getExecutableFromName(String executableName,
 			IAdaProject adaProject) {
-		ResourceLocator resourceLocator = new ResourceLocator(this.project);
 		IPath executablePath = adaProject.getExecutableDirectoryPath().append(
 				executableName);
 
-		return (IFile) resourceLocator.findResourceFromPath(executablePath);
+		return executablePath;
 	}
 
 	/**
@@ -104,7 +101,7 @@ public class ExecutableSelector {
 	 * @pre an executable is selected in project.
 	 * @return the absolute path of the selected executable of project.
 	 */
-	public IFile getSelectedExecutable() {
+	public IPath getSelectedExecutable() {
 		Assert.isLegal(this.isExecutableSelected());
 
 		return this.selectedExecutable;

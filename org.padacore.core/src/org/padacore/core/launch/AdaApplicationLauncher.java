@@ -2,8 +2,6 @@ package org.padacore.core.launch;
 
 import java.util.List;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -35,30 +33,30 @@ public class AdaApplicationLauncher implements IApplicationLauncher {
 	}
 
 	@Override
-	public void performLaunchFromFile(IFile file) {
+	public void performLaunchFromFile(IPath filePath) {
 		Assert.isLegal(this.adaProject.getExecutableNames().contains(
-				file.getName())
+				filePath.lastSegment())
 				|| this.adaProject.getExecutableSourceNames().contains(
-						file.getName()));
+						filePath.lastSegment()));
 
 		boolean fileIsAnExecutable = this.adaProject.getExecutableNames()
-				.contains(file.getName());
+				.contains(filePath.lastSegment());
 		IPath executablePath;
 
 		if (fileIsAnExecutable) {
-			executablePath = file.getLocation();
+			executablePath = filePath;
 		} else {
 			String matchingExecutableName = this
-					.findExecutableNameCorrespondingToSource(file);
+					.findExecutableNameCorrespondingToSource(filePath);
 
-			executablePath = file.getLocation().removeLastSegments(1)
-					.append(matchingExecutableName);
+			executablePath = filePath.removeLastSegments(1).append(
+					matchingExecutableName);
 		}
 
-		this.launchExecutableAtPath(executablePath, file.getProject());
+		this.launchExecutableAtPath(executablePath);
 	}
 
-	private String findExecutableNameCorrespondingToSource(IFile file) {
+	private String findExecutableNameCorrespondingToSource(IPath filePath) {
 		boolean matchingExecutableFound = false;
 		List<String> executableNames = this.adaProject.getExecutableNames();
 		int execIndex = 0;
@@ -69,7 +67,8 @@ public class AdaApplicationLauncher implements IApplicationLauncher {
 					executableNames.get(execIndex)).removeFileExtension()
 					.toString();
 
-			if (file.getName().startsWith(executableNameWithoutExtension)) {
+			if (filePath.lastSegment().startsWith(
+					executableNameWithoutExtension)) {
 				matchingExecutableFound = true;
 			} else {
 				execIndex++;
@@ -96,8 +95,7 @@ public class AdaApplicationLauncher implements IApplicationLauncher {
 	 * @param absoluteExecPath
 	 *            absolute path of the executable to launch.
 	 */
-	private void launchExecutableAtPath(final IPath absoluteExecPath,
-			final IProject execProject) {
+	private void launchExecutableAtPath(final IPath absoluteExecPath) {
 		ILaunchConfiguration configForFile = this.launchConfigProvider
 				.getLaunchConfigurationFor(absoluteExecPath);
 		final Job launchingJob = this.factory.createLaunchingJobFor(
@@ -106,7 +104,8 @@ public class AdaApplicationLauncher implements IApplicationLauncher {
 		if (DoesExecutableExist(absoluteExecPath)) {
 			launchingJob.schedule();
 		} else {
-			Job buildingJob = this.factory.createBuildingJobFor(absoluteExecPath);
+			Job buildingJob = this.factory
+					.createBuildingJobFor(absoluteExecPath);
 			buildingJob.schedule();
 
 			buildingJob.addJobChangeListener(new JobChangeAdapter() {
