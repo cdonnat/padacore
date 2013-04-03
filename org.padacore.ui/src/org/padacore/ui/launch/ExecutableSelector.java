@@ -6,8 +6,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.window.Window;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ListDialog;
 import org.padacore.core.project.IAdaProject;
 import org.padacore.core.project.PropertiesManager;
@@ -24,10 +22,13 @@ public class ExecutableSelector {
 
 	private IProject project;
 	private IPath selectedExecutable;
+	private ExecutableSelectionDialogFactory execDialogFactory;
 
-	public ExecutableSelector(IProject project) {
+	public ExecutableSelector(IProject project,
+			ExecutableSelectionDialogFactory execDialogFactory) {
 		this.project = project;
 		this.selectedExecutable = null;
+		this.execDialogFactory = execDialogFactory;
 
 		this.selectExecutableOfProject();
 	}
@@ -61,8 +62,8 @@ public class ExecutableSelector {
 			this.selectedExecutable = this.getExecutableFromName(
 					executableNames.get(0), adaProject);
 		} else {
-			ListDialog listDialog = this
-					.createDialogForExecutableSelection(executableNames);
+			ListDialog listDialog = this.execDialogFactory
+					.createExecutableSelectionDialogFor(executableNames);
 			boolean executableIsSelected = listDialog.open() == Window.OK;
 
 			if (executableIsSelected) {
@@ -74,23 +75,6 @@ public class ExecutableSelector {
 
 		}
 
-	}
-
-	/**
-	 * Creates a dialog which enables the user to select one of the executables
-	 * of the project.
-	 * 
-	 * @param executableNames
-	 *            the names of the executables of the project.
-	 * @return a ListDialog which enables the user to select one of the
-	 *         executables of the project.
-	 */
-	private ListDialog createDialogForExecutableSelection(
-			List<String> executableNames) {
-		Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-				.getShell();
-
-		return new ExecutableSelectionDialog(shell, executableNames);
 	}
 
 	/**

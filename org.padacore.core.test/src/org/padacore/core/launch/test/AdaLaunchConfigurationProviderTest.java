@@ -55,13 +55,15 @@ public class AdaLaunchConfigurationProviderTest {
 		IFile fileWithExistingConfig = this.adaProject.getFile("existing_file");
 
 		try {
+			int initialNbLaunchConfigs = CommonTestUtils
+					.RetrieveAdaLaunchConfigurations().length;
 
 			this.checkRetrievedConfigCorrespondsToFile(fileWithExistingConfig,
 					"Existing Ada launch configuration retrieval");
 
 			assertTrue(
 					"No new Ada launch configuration has been created",
-					CommonTestUtils.RetrieveAdaLaunchConfigurations().length == 1);
+					CommonTestUtils.RetrieveAdaLaunchConfigurations().length == initialNbLaunchConfigs);
 
 		} catch (CoreException e) {
 			e.printStackTrace();
@@ -73,13 +75,15 @@ public class AdaLaunchConfigurationProviderTest {
 		IFile fileWithNoConfig = this.adaProject.getFile("new_file");
 
 		try {
+			int initialNbLaunchConfigs = CommonTestUtils
+					.RetrieveAdaLaunchConfigurations().length;
 
 			this.checkRetrievedConfigCorrespondsToFile(fileWithNoConfig,
 					"New Ada launch configuration creation");
 
 			assertTrue(
 					"A new Ada launch configuration has been created",
-					CommonTestUtils.RetrieveAdaLaunchConfigurations().length == 2);
+					CommonTestUtils.RetrieveAdaLaunchConfigurations().length == initialNbLaunchConfigs + 1);
 
 		} catch (CoreException e) {
 			e.printStackTrace();

@@ -75,7 +75,7 @@ public class AdaLaunchConfigurationShortcut implements ILaunchShortcut {
 					final IProject selectedProject = (IProject) selectedElt;
 
 					ExecutableSelector execSelector = new ExecutableSelector(
-							selectedProject);
+							selectedProject, new ExecutableSelectionDialogFactory());
 
 					if (execSelector.isExecutableSelected()) {
 						adaAppLauncher = this
