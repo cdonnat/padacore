@@ -23,7 +23,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
-import org.gpr4j.core.Gpr;
+import org.gpr4j.api.Gpr;
 import org.padacore.core.gnat.GnatAdaProject;
 import org.padacore.core.launch.AdaLaunchConstants;
 import org.padacore.core.project.AdaProjectNature;

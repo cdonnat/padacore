@@ -1,6 +1,6 @@
 package org.padacore.core.gnat;
 
-import org.gpr4j.core.Gpr;
+import org.gpr4j.api.Gpr;
 
 /**
  * Abstract class for a GPR project factory.

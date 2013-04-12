@@ -1,7 +1,7 @@
 package org.padacore.core.gnat;
 
 import org.eclipse.core.runtime.IPath;
-import org.gpr4j.core.Gpr;
+import org.gpr4j.api.Gpr;
 import org.padacore.core.project.IAdaProject;
 import org.padacore.core.project.IAdaProjectFactory;
 
