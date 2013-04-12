@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
-import org.gpr4j.core.Gpr;
+import org.gpr4j.api.Gpr;
 import org.junit.Before;
 import org.junit.Test;
 import org.padacore.core.gnat.GnatAdaProject;

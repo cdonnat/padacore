@@ -6,7 +6,7 @@ import java.util.List;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.gpr4j.core.Gpr;
+import org.gpr4j.api.Gpr;
 import org.padacore.core.project.IAdaProject;
 
 public class GnatAdaProject implements IAdaProject {

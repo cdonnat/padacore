@@ -12,6 +12,8 @@ null;
 
 for Object_Dir  use Project'Exec_Dir;
 
+type my_type is ("null");
+
 my_var := "My_Var";
 my_var2 : my_type := "My_Var2";
 Name      := my_var;

@@ -5,7 +5,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.gpr4j.core.Gpr;
+import org.gpr4j.api.Gpr;
 import org.padacore.core.project.ProjectBuilder;
 
 public class CreateProjectCmd extends Job {
