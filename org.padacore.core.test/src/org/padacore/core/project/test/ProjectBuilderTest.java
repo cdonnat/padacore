@@ -112,13 +112,14 @@ public class ProjectBuilderTest {
 	private void checkLinks(String projectName, IPath importedProjectFilePath) {
 		IProject importedProject = ResourcesPlugin.getWorkspace().getRoot()
 				.getProject(projectName);
+		String projectFileParentName = importedProjectFilePath.removeLastSegments(1).lastSegment();
 
-		IFolder toto = importedProject.getFolder("toto");
-		assertTrue("Toto folder should be created", toto.exists());
+		IFolder linkedFolder = importedProject.getFolder(projectFileParentName);
+		assertTrue(projectFileParentName + " folder should be created", linkedFolder.exists());
 		assertEquals(
-				"Toto folder should be link to folder containing ada project file",
+				"Folder should be linked to folder containing ada project file",
 				importedProjectFilePath.removeLastSegments(1),
-				toto.getLocation());
+				linkedFolder.getLocation());
 
 		IFile projectFile = importedProject.getFile(importedProjectFilePath
 				.lastSegment());

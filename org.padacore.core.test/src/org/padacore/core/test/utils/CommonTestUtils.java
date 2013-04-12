@@ -287,7 +287,7 @@ public class CommonTestUtils {
 
 		return (IAdaProject) sessionProperty;
 	}
-
+	
 	public static void RemoveAssociationToAdaProject(IProject project) {
 		SetAssociatedAdaProject(project, null);
 	}
@@ -364,7 +364,7 @@ public class CommonTestUtils {
 	public final static String IMPORTED_PROJECT = "imported";
 	public final static String CREATED_PROJECT = "created";
 
-	private static Object GetSessionPropertyName(IProject project, String name) {
+	private static Object GetSessionPropertyNamed(IProject project, String name) {
 		Object property = null;
 		try {
 			property = project.getSessionProperty(new QualifiedName("org.padacore", name));
@@ -374,7 +374,7 @@ public class CommonTestUtils {
 		return property;
 	}
 
-	private static Object GetPersistentPropertyName(IProject project, String name) {
+	private static Object GetPersistentPropertyNamed(IProject project, String name) {
 		Object property = null;
 		try {
 			property = project.getPersistentProperty(new QualifiedName("org.padacore", name));
@@ -387,11 +387,11 @@ public class CommonTestUtils {
 	public static void CheckAdaProjectIsSetInProperties(IProject project,
 			IAdaProject expectedAdaProject) {
 		assertEquals("AdaProject should be set", expectedAdaProject,
-				GetSessionPropertyName(project, "adaProject"));
+				GetSessionPropertyNamed(project, "adaProject"));
 	}
 
 	public static void CheckProjectKindIsSetInProperties(IProject project, String expectedKind) {
 		assertEquals("Project kind should be set", expectedKind,
-				GetPersistentPropertyName(project, "projectKind"));
+				GetPersistentPropertyNamed(project, "projectKind"));
 	}
 }

@@ -1,5 +1,7 @@
 package org.padacore.core.builder;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -59,20 +61,51 @@ public class GprbuildErrObserver implements Observer {
 
 		try {
 			IResource file = findResource(error.file());
-
+			
 			IMarker m = file.createMarker(IMarker.PROBLEM);
 			m.setAttribute(IMarker.LINE_NUMBER, error.line());
 			m.setAttribute(IMarker.MESSAGE, error.message());
 			m.setAttribute(IMarker.PRIORITY, IMarker.PRIORITY_HIGH);
 			m.setAttribute(IMarker.SEVERITY, error.severity());
+
 		} catch (CoreException e) {
 			ErrorLog.appendException(e);
 		}
 	}
 
 	/**
+	 * Collects all the referenced projects of the given project (in a recursive
+	 * way) and add them to referencedProjects list.
+	 * 
+	 * @param referencedProjects
+	 *            the list of recursively referenced projects.
+	 * @param project
+	 *            the project for which we want to collect referenced projects.
+	 */
+	private void collectAllReferencedProjects(
+			List<IProject> referencedProjects, IProject project) {
+		try {
+
+			if (!referencedProjects.contains(project)
+					&& project != this.project) {
+				referencedProjects.add(project);
+			}
+
+			for (IProject ownReferencedProject : project
+					.getReferencedProjects()) {
+				this.collectAllReferencedProjects(referencedProjects,
+						ownReferencedProject);
+			}
+
+		} catch (CoreException e) {
+			ErrorLog.appendException(e);
+		}
+
+	}
+
+	/**
 	 * Finds the resource corresponding to the given filename in all referenced
-	 * projects of current project.
+	 * projects of current project (traversed in a recursive way).
 	 * 
 	 * @param fileName
 	 *            the filename for which we want to retrieve a resource.
@@ -81,21 +114,18 @@ public class GprbuildErrObserver implements Observer {
 	 **/
 	private IResource findResource(String fileName) {
 		IResource file = this.findResourceInProject(fileName, this.project);
+		List<IProject> recursiveReferencedProjects;
+		recursiveReferencedProjects = new ArrayList<IProject>();
+		this.collectAllReferencedProjects(recursiveReferencedProjects,
+				this.project);
 
 		if (file == null) {
-			try {
-				IProject[] referencedProjects = this.project
-						.getReferencedProjects();
-				int project = 0;
+			int project = 0;
 
-				while (file == null && project < referencedProjects.length) {
-					file = this.findResourceInProject(fileName,
-							referencedProjects[project]);
-					project++;
-				}
-
-			} catch (CoreException e) {
-				e.printStackTrace();
+			while (file == null && project < recursiveReferencedProjects.size()) {
+				file = this.findResourceInProject(fileName,
+						recursiveReferencedProjects.get(project));
+				project++;
 			}
 		}
 

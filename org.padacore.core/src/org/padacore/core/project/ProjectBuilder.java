@@ -179,10 +179,10 @@ public class ProjectBuilder {
 	 */
 	private void createLinkToProjectFileParentFolder(IPath importedProjectFilePath) {
 		IPath projectFileParentFolderPath = importedProjectFilePath.removeLastSegments(1);
+		String projectFileParentFolderName = projectFileParentFolderPath.lastSegment();
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 
-		// TODO use the same name as GPR parent folder for linked folder
-		IFolder linkedFolder = this.eclipseProject.getFolder("toto");
+		IFolder linkedFolder = this.eclipseProject.getFolder(projectFileParentFolderName);
 
 		IStatus linkedFolderStatus = workspace.validateLinkLocation(linkedFolder,
 				projectFileParentFolderPath);

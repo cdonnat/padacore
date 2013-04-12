@@ -56,17 +56,16 @@ public class ResourceLocator {
 				.GetAssociatedAdaProject(this.project);
 
 		IPath projectRootPath = associatedAdaProject.getRootPath();
-
 		IPath relativePath = absolutePath.makeRelativeTo(projectRootPath);
-
-		if (this.isProjectAnImportedProject()) {
-			// TOOD change name of derived directory
-			relativePath = new Path("toto").append(relativePath);
+		String projectParentFolderName = projectRootPath.lastSegment();
+		
+		if(this.isProjectAnImportedProject()) {
+			relativePath = new Path(projectParentFolderName).append(relativePath);
 		}
 
 		return relativePath;
 	}
-
+	
 	/**
 	 * Checks if the project corresponds to an imported project (i.e. a project
 	 * which does not reside in workspace but is linked to an existing folder).
