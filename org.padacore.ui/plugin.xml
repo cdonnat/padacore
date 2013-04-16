@@ -162,5 +162,34 @@
          </description>
       </wizard>
    </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            allowMultiple="false"
+            category="org.padacore.views"
+            class="org.eclipse.ui.navigator.CommonNavigator"
+            id="org.padacore.ui.AdaProjectExplorer"
+            name="Ada Project Explorer"
+            restorable="true">
+      </view>
+      <category
+            id="org.padacore.views"
+            name="Ada">
+      </category>
+   </extension>
+   <extension
+         point="org.eclipse.ui.navigator.viewer">
+      <viewer
+            viewerId="org.padacore.ui.AdaProjectExplorer">
+      </viewer>
+      <viewerContentBinding
+            viewerId="org.padacore.ui.AdaProjectExplorer">
+         <includes>
+            <contentExtension
+                  pattern="org.eclipse.ui.navigator.resourceContent">
+            </contentExtension>
+         </includes>
+      </viewerContentBinding>
+   </extension>
 
 </plugin>
