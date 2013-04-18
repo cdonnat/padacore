@@ -103,7 +103,7 @@
      <or>
      	<and>
      	<instanceof value="org.eclipse.core.resources.IProject"/>
-     	<test property="org.padacore.isAdaProject"/>
+     	<test property="org.padacore.isExecutableAdaProject"/>
      	</and>
      	<and>
      	<instanceof value="org.eclipse.core.resources.IFile"/>
@@ -132,9 +132,9 @@
       </propertyTester>
       <propertyTester
             class="org.padacore.ui.launch.AdaLaunchConfigurationShortcutTester"
-            id="org.padacore.isAdaProject"
+            id="org.padacore.isExecutableAdaProject"
             namespace="org.padacore"
-            properties="isAdaProject"
+            properties="isExecutableAdaProject"
             type="org.eclipse.core.resources.IProject">
       </propertyTester>
        <propertyTester
@@ -188,8 +188,42 @@
             <contentExtension
                   pattern="org.eclipse.ui.navigator.resourceContent">
             </contentExtension>
+            <contentExtension
+                  pattern="org.eclipse.ui.navigator.resources.filters.workingSet">
+            </contentExtension>
+            <contentExtension
+                  pattern="org.padacore.ui.navigator.filters.*">
+            </contentExtension>
          </includes>
       </viewerContentBinding>
+      <viewerActionBinding
+            viewerId="org.padacore.ui.AdaProjectExplorer">
+         <includes>
+            <actionExtension
+                  pattern="org.eclipse.ui.navigator.resources.*">
+            </actionExtension>
+         </includes>
+      </viewerActionBinding>
+   </extension>
+   <extension
+         point="org.eclipse.ui.navigator.navigatorContent">
+      <commonFilter
+            activeByDefault="true"
+            description="Show only Eclipse projects which have an Ada nature."
+            id="org.padacore.ui.navigator.filters.showOnlyAdaProjects"
+            name="Show only Ada projects">
+         <filterExpression>
+         <not>
+               <adapt
+                     type="org.eclipse.core.resources.IProject">
+                  <test
+                        property="org.eclipse.core.resources.projectNature"
+                        value="org.padacore.core.adaProjectNature">
+                  </test>
+               </adapt>
+               </not>
+         </filterExpression>
+      </commonFilter>
    </extension>
 
 </plugin>
