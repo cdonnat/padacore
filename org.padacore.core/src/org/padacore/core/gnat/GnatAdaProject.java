@@ -6,14 +6,14 @@ import java.util.List;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.gpr4j.api.Gpr;
+import org.gpr4j.api.IGpr;
 import org.padacore.core.project.IAdaProject;
 
 public class GnatAdaProject implements IAdaProject {
 
-	private Gpr gprProject;
+	private IGpr gprProject;
 
-	public GnatAdaProject(Gpr gprProject) {
+	public GnatAdaProject(IGpr gprProject) {
 		this.gprProject = gprProject;
 	}
 
