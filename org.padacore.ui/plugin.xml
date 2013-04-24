@@ -166,14 +166,22 @@
          point="org.eclipse.ui.views">
       <view
             allowMultiple="false"
-            category="org.padacore.views"
+            category="org.padacore.ui.views.ada"
             class="org.eclipse.ui.navigator.CommonNavigator"
             id="org.padacore.ui.AdaProjectExplorer"
             name="Ada Project Explorer"
             restorable="true">
       </view>
+      <view
+            allowMultiple="false"
+            category="org.padacore.ui.views.ada"
+            class="org.padacore.ui.views.Scenario"
+            id="org.padacore.ui.views.scenario"
+            name="Scenario"
+            restorable="true">
+      </view>
       <category
-            id="org.padacore.views"
+            id="org.padacore.ui.views.ada"
             name="Ada">
       </category>
    </extension>

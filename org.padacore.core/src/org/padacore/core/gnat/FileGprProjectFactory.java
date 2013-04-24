@@ -5,9 +5,9 @@ import java.nio.file.Paths;
 import org.antlr.runtime.RecognitionException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
-import org.gpr4j.core.Factory;
-import org.gpr4j.core.Gpr;
-import org.gpr4j.core.ILoader;
+import org.gpr4j.api.Factory;
+import org.gpr4j.api.Gpr;
+import org.gpr4j.api.ILoader;
 import org.padacore.core.utils.ErrorLog;
 
 /**
