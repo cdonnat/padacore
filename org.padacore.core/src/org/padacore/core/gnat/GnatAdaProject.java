@@ -2,10 +2,12 @@ package org.padacore.core.gnat;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.gpr4j.api.ExternalVariable;
 import org.gpr4j.api.IGpr;
 import org.padacore.core.project.IAdaProject;
 
@@ -140,5 +142,9 @@ public class GnatAdaProject implements IAdaProject {
 	@Override
 	public List<String> getExecutableSourceNames() {
 		return this.gprProject.getExecutableSourceNames();
+	}
+	
+	public Set<ExternalVariable> getExternalVariables() {
+		return null;
 	}
 }
