@@ -20,6 +20,11 @@ public class GnatAdaProject implements IAdaProject {
 	}
 
 	@Override
+	public String getName() {
+		return this.gprProject.getName();
+	}
+	
+	@Override
 	public List<String> getExecutableNames() {
 		Assert.isLegal(this.isExecutable());
 

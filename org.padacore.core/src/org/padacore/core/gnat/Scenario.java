@@ -9,10 +9,18 @@ import org.gpr4j.api.ExternalVariable;
 
 import com.google.common.base.Preconditions;
 
+/**
+ * 
+ * Stores the value of the external variables defined for every projects.
+ * 
+ */
 public class Scenario {
 
 	private Map<ExternalVariable, String> values;
 
+	/**
+	 * Default constructor.
+	 */
 	public Scenario() {
 		this.values = new HashMap<>();
 	}
@@ -36,6 +44,14 @@ public class Scenario {
 		this.values.put(this.getExternalVariableFromName(project, variableName), value);
 	}
 
+	/**
+	 * Return an ordered set of external variable sort by name. External
+	 * variable from projects referenced by given project are are also returned.
+	 * 
+	 * @param project
+	 *            Project containing external variable.
+	 * @return An ordered set of external variable sort by name.
+	 */
 	public Set<ScenarioItem> getExternalVariablesFor(GnatAdaProject project) {
 		Set<ScenarioItem> res = new TreeSet<>();
 		for (ExternalVariable var : project.getExternalVariables()) {
@@ -50,6 +66,15 @@ public class Scenario {
 		return res;
 	}
 
+	/**
+	 * 
+	 * @param project
+	 *            Project containing the external variable.
+	 * @param variableName
+	 *            Name of the external variable to look for.
+	 * @return The external variable corresponding to given name or null if not
+	 *         found.
+	 */
 	private ExternalVariable getExternalVariableFromName(GnatAdaProject project, String variableName) {
 		ExternalVariable res = null;
 		for (ExternalVariable var : project.getExternalVariables()) {

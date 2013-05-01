@@ -19,10 +19,9 @@ import com.google.common.base.Preconditions;
 
 public class ScenarioView extends ViewPart implements Observer {
 
-	Scenario scenario;
-	GnatAdaProject currentProject;
-	Set<ExternalVariableViewer> viewers;
-	Composite parent;
+	private GnatAdaProject currentProject;
+	private Set<ExternalVariableViewer> viewers;
+	private Composite parent;
 
 	@Override
 	public void update(Observable o, Object arg) {
@@ -47,8 +46,10 @@ public class ScenarioView extends ViewPart implements Observer {
 	}
 
 	private void addExternalVariablesFromSelectedProject() {
-		for (ScenarioItem item : this.scenario.getExternalVariablesFor(this.currentProject)) {
-			this.viewers.add(new ExternalVariableViewer(this.parent, this.scenario, item));
+		Scenario scenario = org.padacore.core.Activator.getDefault().getScenario();
+		for (ScenarioItem item : scenario.getExternalVariablesFor(this.currentProject)) {
+			this.viewers.add(new ExternalVariableViewer(this.parent, this.currentProject, scenario,
+					item));
 		}
 	}
 
@@ -61,10 +62,9 @@ public class ScenarioView extends ViewPart implements Observer {
 	public void createPartControl(Composite parent) {
 		Activator.getDefault().getProjectSelectionListener().addObserver(this);
 
-		this.scenario = new Scenario();
 		this.viewers = new HashSet<>();
 		this.parent = parent;
-		
+
 		GridLayout layout = new GridLayout(2, false);
 		parent.setLayout(layout);
 	}
