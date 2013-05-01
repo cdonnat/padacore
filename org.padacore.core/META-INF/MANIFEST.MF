@@ -13,7 +13,8 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ClassPath: bin
 Import-Package: org.eclipse.ui.statushandlers
-Export-Package: org.padacore.core.builder,
+Export-Package: org.padacore.core,
+ org.padacore.core.builder,
  org.padacore.core.gnat,
  org.padacore.core.launch,
  org.padacore.core.project,

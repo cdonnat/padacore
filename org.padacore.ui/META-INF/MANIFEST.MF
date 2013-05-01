@@ -11,7 +11,8 @@ Require-Bundle: org.padacore.core;bundle-version="1.0.0",
  org.eclipse.ui.editors;bundle-version="3.7.0",
  org.eclipse.jface.text;bundle-version="3.7.2",
  org.eclipse.debug.ui;bundle-version="3.7.102",
- org.eclipse.ui.ide;bundle-version="3.8.0"
+ org.eclipse.ui.ide;bundle-version="3.8.0",
+ org.padacore.gpr4j;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Export-Package: org.padacore.ui;
@@ -53,3 +54,4 @@ Export-Package: org.padacore.ui;
    org.eclipse.swt.widgets"
 Bundle-ClassPath: bin/,
  .
+Import-Package: com.google.common.base
