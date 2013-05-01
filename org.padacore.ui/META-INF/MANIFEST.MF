@@ -4,42 +4,62 @@ Bundle-Name: org.padacore.ui
 Bundle-SymbolicName: org.padacore.ui;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.padacore.ui.Activator
-Require-Bundle: org.padacore.gpr4j;bundle-version="1.0.0",
- org.padacore.core;bundle-version="1.0.0",
+Require-Bundle: org.padacore.core;bundle-version="1.0.0",
  org.eclipse.core.runtime;bundle-version="3.8.0",
  org.eclipse.core.expressions;bundle-version="3.4.400",
  org.eclipse.ui,
  org.eclipse.ui.editors;bundle-version="3.7.0",
- org.eclipse.ui.workbench.texteditor;bundle-version="3.7.0",
  org.eclipse.jface.text;bundle-version="3.7.2",
  org.eclipse.debug.ui;bundle-version="3.7.102",
  org.eclipse.ui.ide;bundle-version="3.8.0",
+<<<<<<< HEAD
  org.eclipse.ui.console;bundle-version="3.5.100",
  org.eclipse.ui.navigator.resources;bundle-version="3.4.400",
  org.eclipse.ui.navigator;bundle-version="3.5.200"
+=======
+ org.padacore.gpr4j;bundle-version="1.0.0"
+>>>>>>> branch 'master' of local repository
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Export-Package: org.padacore.ui;
-  uses:="org.eclipse.osgi.util,
-   org.padacore.editor.scanners,
-   org.eclipse.core.resources,
+  uses:="org.padacore.ui.editor.scanners,
+   org.eclipse.osgi.util,
    org.eclipse.ui.plugin,
    org.osgi.framework",
- org.padacore.ui.editor.rules,
+ org.padacore.ui.editor;
+  uses:="org.eclipse.jface.text,
+   org.eclipse.jface.text.source,
+   org.eclipse.core.filebuffers,
+   org.eclipse.jface.text.presentation,
+   org.eclipse.ui.editors.text",
+ org.padacore.ui.editor.rules;uses:="org.eclipse.jface.text.rules",
+ org.padacore.ui.editor.scanners;uses:="org.eclipse.jface.text.rules",
  org.padacore.ui.launch;
   uses:="org.eclipse.debug.core,
    org.eclipse.debug.ui,
+   org.eclipse.core.runtime,
    org.eclipse.core.expressions,
-   org.eclipse.ui,
-   org.eclipse.jface.viewers,
-   org.eclipse.swt.widgets",
- org.padacore.ui.wizards;
-  uses:="org.eclipse.ui.wizards.datatransfer,
-   org.eclipse.jface.wizard,
    org.eclipse.ui,
    org.eclipse.core.resources,
    org.eclipse.jface.viewers,
    org.eclipse.ui.dialogs,
+   org.eclipse.swt.widgets",
+ org.padacore.ui.preferences;
+  uses:="org.eclipse.jface.preference,
+   org.eclipse.jface.resource,
+   org.eclipse.ui,
+   org.eclipse.swt.graphics,
+   org.eclipse.swt.widgets",
+ org.padacore.ui.views;uses:="org.eclipse.ui.part,org.eclipse.swt.widgets",
+ org.padacore.ui.wizards;
+  uses:="org.eclipse.jface.wizard,
+   org.eclipse.ui,
+   org.eclipse.jface.viewers,
+   org.eclipse.ui.dialogs,
+   org.padacore.ui,
    org.eclipse.swt.widgets"
 Bundle-ClassPath: bin/,
  .
+Import-Package: com.google.common.base
+Bundle-Version: 1.0.0
+Bundle-SymbolicName: org.padacore.ui

@@ -6,6 +6,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;
 import org.padacore.core.gnat.GnatAdaProjectAssociationManager;
+import org.padacore.core.gnat.Scenario;
 import org.padacore.core.project.ProjectOpeningListener;
 
 /**
@@ -15,10 +16,10 @@ public class Activator extends Plugin {
 
 	public static final String PLUGIN_ID = "org.padacore.core"; //$NON-NLS-1$
 
-	@SuppressWarnings("unused")
 	private static Activator plugin;
 	private GnatAdaProjectAssociationManager gnatAdaProjectAssociationManager;
 	private IResourceChangeListener projectOpeningListener;
+	private Scenario scenario;
 
 	public Activator() {
 
@@ -26,14 +27,23 @@ public class Activator extends Plugin {
 		this.projectOpeningListener = new ProjectOpeningListener(
 				this.gnatAdaProjectAssociationManager);
 
-		ResourcesPlugin.getWorkspace().addResourceChangeListener(
-				projectOpeningListener, IResourceChangeEvent.POST_CHANGE);
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(projectOpeningListener,
+				IResourceChangeEvent.POST_CHANGE);
+	}
+
+	/**
+	 * Returns the shared instance
+	 * 
+	 * @return the shared instance
+	 */
+	public static Activator getDefault() {
+		return plugin;
 	}
 
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-
+		plugin = this;
 		this.gnatAdaProjectAssociationManager
 				.performAssociationToAdaProjectForAllProjectsWithAdaNatureOf(ResourcesPlugin
 						.getWorkspace());
@@ -41,9 +51,15 @@ public class Activator extends Plugin {
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		ResourcesPlugin.getWorkspace().removeResourceChangeListener(
-				this.projectOpeningListener);
+		ResourcesPlugin.getWorkspace().removeResourceChangeListener(this.projectOpeningListener);
 
 		super.stop(context);
+	}
+
+	public Scenario getScenario() {
+		if (this.scenario == null) {
+			this.scenario = new Scenario();
+		}
+		return this.scenario;
 	}
 }

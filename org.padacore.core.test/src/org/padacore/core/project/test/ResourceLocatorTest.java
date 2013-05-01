@@ -33,8 +33,13 @@ public class ResourceLocatorTest {
 	public TemporaryFolder testFolder = new TemporaryFolder();
 
 	public void createFixture(boolean projectIsImported) {
-		IPath projectPath = new Path(this.testFolder.getRoot()
-				.getAbsolutePath());
+		IPath projectPath = null;
+		try {
+			projectPath = new Path(this.testFolder.getRoot()
+					.getCanonicalPath());
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 		this.project = CommonTestUtils.CreateAdaProjectAt(projectPath);
 		IAdaProject adaProject = mock(IAdaProject.class);
 		when(adaProject.getRootPath()).thenReturn(projectPath);
