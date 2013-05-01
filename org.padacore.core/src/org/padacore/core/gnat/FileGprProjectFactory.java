@@ -6,7 +6,7 @@ import org.antlr.runtime.RecognitionException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.gpr4j.api.Factory;
-import org.gpr4j.api.Gpr;
+import org.gpr4j.api.IGpr;
 import org.gpr4j.api.ILoader;
 import org.padacore.core.utils.ErrorLog;
 
@@ -25,7 +25,7 @@ public class FileGprProjectFactory extends AbstractGprProjectFactory {
 	}
 
 	@Override
-	public Gpr createGprProject() {
+	public IGpr createGprProject() {
 
 		ILoader loader = Factory.CreateLoader();
 		try {

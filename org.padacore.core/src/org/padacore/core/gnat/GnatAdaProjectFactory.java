@@ -1,13 +1,13 @@
 package org.padacore.core.gnat;
 
 import org.eclipse.core.runtime.IPath;
-import org.gpr4j.api.Gpr;
+import org.gpr4j.api.IGpr;
 import org.padacore.core.project.IAdaProject;
 import org.padacore.core.project.IAdaProjectFactory;
 
 public class GnatAdaProjectFactory implements IAdaProjectFactory {
 
-	private Gpr gprProject;
+	private IGpr gprProject;
 
 	public GnatAdaProjectFactory(IPath gprFilePath) {
 		FileGprProjectFactory gprFactory = new FileGprProjectFactory(

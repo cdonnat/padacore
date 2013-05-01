@@ -7,6 +7,13 @@ import org.eclipse.core.runtime.IPath;
 public interface IAdaProject {
 
 	/**
+	 * Return the name of the Ada project.
+	 * 
+	 * @return The name of the Ada project
+	 */
+	public abstract String getName();
+
+	/**
 	 * Returns the names of executables of the given project.
 	 * 
 	 * @return a list of String corresponding to the names of executables of the
