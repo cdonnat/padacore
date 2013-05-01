@@ -50,7 +50,7 @@ public class ScenarioTest {
 	}
 
 	@Test
-	public void testExternalVariableFromAProject() {
+	public void testSetExternalVariableValueFor() {
 		this.createFixture();
 
 		GnatAdaProject project1 = mock(GnatAdaProject.class);
@@ -59,12 +59,15 @@ public class ScenarioTest {
 		ExternalVariable var1 = new ExternalVariable("var1", "default", null);
 		ExternalVariable var2 = new ExternalVariable("var2", "default2", null);
 
-		AddExternalVariable(project1, var1);
+		AddExternalVariable(project1, new ExternalVariable("var1", "default", null));
+		AddExternalVariable(project1, new ExternalVariable("var1", "default", null));
 		AddExternalVariable(project1, var2);
 		AddExternalVariable(project2, var1);
 
 		this.sut.setExternalVariableValueFor(project1, "var1", "var1 new value");
-		
+
+		assertEquals(2, this.sut.getExternalVariablesFor(project1).size());
+
 		this.checkExternalVariableIn(project1, "var1", "var1 new value", true, "var1 for project1");
 		this.checkExternalVariableIn(project1, "var2", "default2", true, "var2 for project1");
 		this.checkExternalVariableIn(project2, "var1", "var1 new value", true, "var1 for project2");
@@ -73,11 +76,33 @@ public class ScenarioTest {
 
 		this.checkExternalVariableIn(project1, "var1", "", false, "var1 for project1 after");
 		this.checkExternalVariableIn(project1, "var2", "default2", true, "var2 for project1 after");
-		this.checkExternalVariableIn(project2, "var1", "var1 new value", true, "var1 for project2 after");
+		this.checkExternalVariableIn(project2, "var1", "var1 new value", true,
+				"var1 for project2 after");
 
 		this.sut.setExternalVariableValueFor(project1, "var2", "newValue");
 
 		this.checkExternalVariableIn(project1, "var2", "newValue", true,
 				"var2 for project1 after renaming");
+	}
+	
+	@Test
+	public void testGetIsOrdered() {
+		this.createFixture();
+
+		GnatAdaProject project1 = mock(GnatAdaProject.class);
+
+		ExternalVariable var1 = new ExternalVariable("var1", "default", null);
+		ExternalVariable var2 = new ExternalVariable("var2", "default2", null);
+
+		AddExternalVariable(project1, var1);
+		AddExternalVariable(project1, var2);
+		
+		String[] expected = {"var1", "var2"};
+		int i = 0;
+		
+		for (ScenarioItem var : this.sut.getExternalVariablesFor(project1)) {
+			assertEquals("Check order", expected[i], var.getName());
+			i++;
+		}
 	}
 }

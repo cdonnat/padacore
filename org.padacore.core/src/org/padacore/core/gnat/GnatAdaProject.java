@@ -145,6 +145,6 @@ public class GnatAdaProject implements IAdaProject {
 	}
 	
 	public Set<ExternalVariable> getExternalVariables() {
-		return null;
+		return this.gprProject.getExternalVariables();
 	}
 }

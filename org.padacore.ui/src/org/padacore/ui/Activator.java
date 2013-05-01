@@ -1,11 +1,13 @@
 package org.padacore.ui;
 
+import java.util.Observable;
+
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
-
 import org.padacore.ui.editor.scanners.AdaCodeScanner;
 import org.padacore.ui.editor.scanners.AdaCommentScanner;
 import org.padacore.ui.editor.scanners.AdaPartitionScanner;
+import org.padacore.ui.views.ProjectSelectionListener;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -21,6 +23,7 @@ public class Activator extends AbstractUIPlugin {
 	private AdaPartitionScanner adaPartitionScanner;
 	private AdaCodeScanner adaScanner;
 	private AdaCommentScanner adaCommentScanner;
+	private Observable projectSelectionListener;
 
 	/**
 	 * The constructor
@@ -74,12 +77,18 @@ public class Activator extends AbstractUIPlugin {
 		}
 		return adaScanner;
 	}
-	
+
 	public AdaCommentScanner getAdaCommentScanner() {
 		if (adaCommentScanner == null) {
 			adaCommentScanner = new AdaCommentScanner();
 		}
 		return adaCommentScanner;
 	}
-	
+
+	public Observable getProjectSelectionListener() {
+		if (projectSelectionListener == null) {
+			projectSelectionListener = new ProjectSelectionListener();
+		}
+		return projectSelectionListener;
+	}
 }
