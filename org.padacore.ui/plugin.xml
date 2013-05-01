@@ -60,6 +60,12 @@
             id="org.padacore.preferences"
             name="Ada">
       </page>
+      <page
+            category="org.padacore.preferences"
+            class="org.padacore.ui.preferences.NavigatorPreferencePage"
+            id="org.padacore.ui.preferences.NavigatorPreferencePage"
+            name="Project Explorer">
+      </page>
    </extension>
    <extension
          point="org.eclipse.ui.ide.projectNatureImages">
@@ -217,7 +223,7 @@
          point="org.eclipse.ui.navigator.navigatorContent">
       <commonFilter
             activeByDefault="true"
-            description="Show only Eclipse projects which have an Ada nature."
+            description="Only display Eclipse projects which have an Ada nature."
             id="org.padacore.ui.navigator.filters.showOnlyAdaProjects"
             name="Show only Ada projects"
             visibleInUI="true">
@@ -243,6 +249,19 @@
          </not>
          </filterExpression>
       </commonFilter>
+      <commonFilter
+            activeByDefault="true"
+            class="org.padacore.ui.navigator.FileExtensionFilter"
+            description="Only display files which extension matches one of the user-defined ones"
+            id="org.padacore.ui.navigator.filters.showOnlySomeExtensions"
+            name="Show only files with user-defined extensions">
+      </commonFilter>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.padacore.ui.preferences.PreferenceInitializer">
+      </initializer>
    </extension>
 
 </plugin>

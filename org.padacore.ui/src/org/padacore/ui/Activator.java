@@ -19,7 +19,7 @@ public class Activator extends AbstractUIPlugin {
 
 	// The shared instance
 	private static Activator plugin;
-
+	
 	private AdaPartitionScanner adaPartitionScanner;
 	private AdaCodeScanner adaScanner;
 	private AdaCommentScanner adaCommentScanner;
