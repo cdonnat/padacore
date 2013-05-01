@@ -219,7 +219,8 @@
             activeByDefault="true"
             description="Show only Eclipse projects which have an Ada nature."
             id="org.padacore.ui.navigator.filters.showOnlyAdaProjects"
-            name="Show only Ada projects">
+            name="Show only Ada projects"
+            visibleInUI="true">
          <filterExpression>
          <not>
                <adapt
@@ -230,6 +231,16 @@
                   </test>
                </adapt>
                </not>
+         <not>
+            <adapt
+                  type="org.eclipse.core.resources.IFolder">
+            </adapt>
+         </not>
+         <not>
+            <adapt
+                  type="org.eclipse.core.resources.IFile">
+            </adapt>
+         </not>
          </filterExpression>
       </commonFilter>
    </extension>
