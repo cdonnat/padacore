@@ -1,4 +1,4 @@
-package org.padacore.ui.views;
+package org.padacore.ui.views.extvar;
 
 import java.util.Observable;
 import java.util.Observer;
@@ -20,7 +20,7 @@ import org.padacore.core.gnat.ScenarioItem;
 import org.padacore.core.project.PropertiesManager;
 import org.padacore.ui.Activator;
 
-public class ExternalVariablesView extends ViewPart implements Observer {
+public class View extends ViewPart implements Observer {
 
 	private TableViewer viewer;
 
@@ -41,7 +41,7 @@ public class ExternalVariablesView extends ViewPart implements Observer {
 		this.viewer.getTable().setLinesVisible(true);
 		this.viewer.getTable().setHeaderVisible(true);
 
-		this.viewer.setContentProvider(new ExternalVariablesContentProvider(
+		this.viewer.setContentProvider(new ContentProvider(
 				org.padacore.core.Activator.getDefault().getScenario()));
 
 		final TableViewerColumn nameViewerColumn = new TableViewerColumn(this.viewer, SWT.LEFT);
@@ -49,7 +49,7 @@ public class ExternalVariablesView extends ViewPart implements Observer {
 		nameColumn.setText("Name");
 		nameColumn.setWidth(200);
 		nameColumn.setResizable(true);
-		nameViewerColumn.setLabelProvider(new ExternalVariablesLabelProvider());
+		nameViewerColumn.setLabelProvider(new NameLabelProvider());
 		layout.setColumnData(nameColumn, new ColumnWeightData(2, ColumnWeightData.MINIMUM_WIDTH,
 				true));
 
@@ -58,7 +58,7 @@ public class ExternalVariablesView extends ViewPart implements Observer {
 		valueColumn.setText("Value");
 		valueColumn.setWidth(200);
 		valueColumn.setResizable(true);
-		valueViewerColumn.setEditingSupport(new ExternalVariablesEditingSupport(this.viewer,
+		valueViewerColumn.setEditingSupport(new ValueEditingSupport(this.viewer,
 				org.padacore.core.Activator.getDefault().getScenario()));
 		valueViewerColumn.setLabelProvider(new ColumnLabelProvider() {
 			@Override

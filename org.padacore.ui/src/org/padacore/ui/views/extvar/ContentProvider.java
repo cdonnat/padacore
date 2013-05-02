@@ -1,17 +1,17 @@
-package org.padacore.ui.views;
+package org.padacore.ui.views.extvar;
 
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.padacore.core.gnat.GnatAdaProject;
 import org.padacore.core.gnat.Scenario;
 
-public class ExternalVariablesContentProvider implements IStructuredContentProvider {
+public class ContentProvider implements IStructuredContentProvider {
 
 	private Scenario scenario;
 	private GnatAdaProject project;
 	private Object[] nothing;
 
-	public ExternalVariablesContentProvider(Scenario scenario) {
+	public ContentProvider(Scenario scenario) {
 		this.scenario = scenario;
 		this.nothing = new Object[0];
 	}

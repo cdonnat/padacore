@@ -1,6 +1,7 @@
-package org.padacore.ui.views;
+package org.padacore.ui.views.extvar;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.jface.viewers.CellEditor;
@@ -14,12 +15,12 @@ import org.padacore.core.gnat.GnatAdaProject;
 import org.padacore.core.gnat.Scenario;
 import org.padacore.core.gnat.ScenarioItem;
 
-public class ExternalVariablesEditingSupport extends EditingSupport {
+public class ValueEditingSupport extends EditingSupport {
 
 	private final TableViewer viewer;
 	private final Scenario scenario;
 
-	public ExternalVariablesEditingSupport(TableViewer viewer, Scenario scenario) {
+	public ValueEditingSupport(TableViewer viewer, Scenario scenario) {
 		super(viewer);
 		this.viewer = viewer;
 		this.scenario = scenario;
@@ -29,14 +30,14 @@ public class ExternalVariablesEditingSupport extends EditingSupport {
 	protected CellEditor getCellEditor(Object element) {
 		Composite parent = (Composite) this.viewer.getTable();
 		ScenarioItem var = (ScenarioItem) element;
+		CellEditor res;
 		if (var.isTyped()) {
-			Set<String> values = var.getType().getValues();
-			String[] res = new String[values.size()];
-			values.toArray(res);
-			return new ComboBoxCellEditor(parent, res, SWT.READ_ONLY | SWT.BORDER);
+			res = new ComboBoxCellEditor(parent, this.getValuesAsArray(var), SWT.READ_ONLY
+					| SWT.BORDER);
 		} else {
-			return new TextCellEditor(parent);
+			res = new TextCellEditor(parent);
 		}
+		return res;
 	}
 
 	@Override
@@ -47,12 +48,13 @@ public class ExternalVariablesEditingSupport extends EditingSupport {
 	@Override
 	protected Object getValue(Object element) {
 		ScenarioItem var = (ScenarioItem) element;
+		Object res;
 		if (var.isTyped()) {
-			return new ArrayList<>(var.getType().getValues()).indexOf(var.getValue());
+			res = this.getValues(var).indexOf(var.getValue());
 		} else {
-			return ((ScenarioItem) element).getValue();
+			res = var.getValue();
 		}
-
+		return res;
 	}
 
 	@Override
@@ -61,14 +63,26 @@ public class ExternalVariablesEditingSupport extends EditingSupport {
 		String valueToSet;
 
 		if (var.isTyped()) {
-			valueToSet = (String) var.getType().getValues().toArray()[(int) value];
+			valueToSet = (String) this.getValues(var).get((int) value);
 		} else {
 			valueToSet = (String) value;
 		}
-		this.scenario.setExternalVariableValueFor((GnatAdaProject) this.viewer.getInput(),
-				var.getName(), valueToSet);
-
+		this.scenario.setExternalVariableValueFor(this.getProject(), var.getName(), valueToSet);
 		this.viewer.refresh();
-		//this.viewer.update(element, null);
+	}
+
+	private GnatAdaProject getProject() {
+		return (GnatAdaProject) this.viewer.getInput();
+	}
+
+	private List<String> getValues(ScenarioItem var) {
+		return new ArrayList<>(var.getType().getValues());
+	}
+
+	private String[] getValuesAsArray(ScenarioItem var) {
+		Set<String> values = var.getType().getValues();
+		String[] res = new String[values.size()];
+		values.toArray(res);
+		return res;
 	}
 }
