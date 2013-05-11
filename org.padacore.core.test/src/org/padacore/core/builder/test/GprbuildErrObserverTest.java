@@ -37,7 +37,6 @@ public class GprbuildErrObserverTest {
 	private IFile setupProjectWithFileUnderRoot(String nameOfFileWithError) {
 		this.project = CommonTestUtils.CreateAdaProject();
 		List<IPath> sourceDirs = new ArrayList<IPath>();
-		sourceDirs.add(this.project.getLocation());
 		
 		IAdaProject adaProject = mock(IAdaProject.class);
 		when(adaProject.getRootPath()).thenReturn(this.project.getLocation());
