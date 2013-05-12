@@ -4,11 +4,11 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.gpr4j.api.Gpr;
 import org.padacore.core.project.ProjectBuilder;
+import org.padacore.core.utils.PadacoreJob;
 
-public class CreateProjectCmd extends Job {
+public class CreateProjectCmd extends PadacoreJob {
 
 	private IPath projectPath;
 	private String projectName;

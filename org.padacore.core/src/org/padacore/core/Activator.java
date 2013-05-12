@@ -4,10 +4,13 @@ import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.core.runtime.jobs.IJobManager;
+import org.eclipse.core.runtime.jobs.Job;
 import org.osgi.framework.BundleContext;
 import org.padacore.core.gnat.GnatAdaProjectAssociationManager;
 import org.padacore.core.gnat.Scenario;
 import org.padacore.core.project.ProjectOpeningListener;
+import org.padacore.core.utils.PadacoreJob;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -52,6 +55,9 @@ public class Activator extends Plugin {
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		ResourcesPlugin.getWorkspace().removeResourceChangeListener(this.projectOpeningListener);
+		IJobManager jobManager = Job.getJobManager();
+		jobManager.cancel(PadacoreJob.PADACORE_JOB_FAMILY);
+		jobManager.join(PadacoreJob.PADACORE_JOB_FAMILY, null);
 
 		super.stop(context);
 	}

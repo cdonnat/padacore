@@ -8,9 +8,9 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.padacore.core.Activator;
 import org.padacore.core.utils.ErrorLog;
+import org.padacore.core.utils.PadacoreJob;
 
 /**
  * This class defines a job whose purpose is to build a project so that one of
@@ -19,7 +19,7 @@ import org.padacore.core.utils.ErrorLog;
  * @author RS
  * 
  */
-public class BuildingJob extends Job {
+public class BuildingJob extends PadacoreJob {
 	private IProject launchedProject;
 	private IPath absoluteExecPath;
 
