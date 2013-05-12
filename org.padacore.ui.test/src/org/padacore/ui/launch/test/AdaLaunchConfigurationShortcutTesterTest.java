@@ -50,7 +50,7 @@ public class AdaLaunchConfigurationShortcutTesterTest {
 	private void checkProjectPropertyTestIsPassed(boolean isPassed,
 			IProject project, String comment) {
 		assertTrue(comment,
-				this.sut.test(project, "isAdaProject", null, null) == isPassed);
+				this.sut.test(project, "isExecutableAdaProject", null, null) == isPassed);
 	}
 
 	private void checkFilePropertyTestIsPassed(boolean isPassed, IFile file,
