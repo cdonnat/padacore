@@ -57,45 +57,35 @@ public class ProjectAndDirectoriesFilter extends ViewerFilter {
 
 		IResource resource = (IResource) element;
 
-		try {
-			if (resource.getProject().isOpen()
-					&& resource.getProject().hasNature(
-							AdaProjectNature.NATURE_ID)) {
+		if (resource.getType() == IResource.PROJECT) {
+			elementShallBeDisplayed = this
+					.isProjectAnAdaProject((IProject) resource);
+		} else {
+			IAdaProject adaProject = this.getAdaProjectFor(resource);
+			ProjectDirectoryFilteringInfoProvider sourceDirInfoProvider = new SourceDirectoryFilteringInfoProvider(
+					adaProject);
+			ProjectDirectoryFilteringInfoProvider objectDirInfoProvider = new ObjectDirectoryFilteringInfoProvider(
+					adaProject);
+			ProjectDirectoryFilteringInfoProvider executableDirInfoProvider = new ExecutableDirectoryFilteringInfoProvider(
+					adaProject);
 
-				IAdaProject adaProject = this.getAdaProjectFor(resource);
-				ProjectDirectoryFilteringInfoProvider sourceDirInfoProvider = new SourceDirectoryFilteringInfoProvider(
-						adaProject);
-				ProjectDirectoryFilteringInfoProvider objectDirInfoProvider = new ObjectDirectoryFilteringInfoProvider(
-						adaProject);
-				ProjectDirectoryFilteringInfoProvider executableDirInfoProvider = new ExecutableDirectoryFilteringInfoProvider(
-						adaProject);
+			switch (resource.getType()) {
+				case IResource.FOLDER:
+					IFolder folder = (IFolder) resource;
 
-				switch (resource.getType()) {
-					case IResource.FOLDER:
-						IFolder folder = (IFolder) resource;
+					elementShallBeDisplayed = this.shallFolderBeDisplayed(
+							sourceDirInfoProvider, objectDirInfoProvider,
+							executableDirInfoProvider, folder);
+					break;
 
-						elementShallBeDisplayed = this.shallFolderBeDisplayed(
-								sourceDirInfoProvider, objectDirInfoProvider,
-								executableDirInfoProvider, folder);
-						break;
+				case IResource.FILE:
+					IFile file = (IFile) resource;
 
-					case IResource.FILE:
-						IFile file = (IFile) resource;
-
-						elementShallBeDisplayed = this.shallFileBeDisplayed(
-								sourceDirInfoProvider, objectDirInfoProvider,
-								executableDirInfoProvider, file);
-						break;
-
-					case IResource.PROJECT:
-						elementShallBeDisplayed = this
-								.isProjectAnAdaProject((IProject) resource);
-
-						break;
-				}
+					elementShallBeDisplayed = this.shallFileBeDisplayed(
+							sourceDirInfoProvider, objectDirInfoProvider,
+							executableDirInfoProvider, file);
+					break;
 			}
-		} catch (CoreException e) {
-			ErrorLog.appendException(e);
 		}
 
 		return elementShallBeDisplayed;
