@@ -12,24 +12,33 @@ import org.padacore.core.project.IAdaProject;
 import org.padacore.ui.Activator;
 
 /**
- * This class enables to retrieve information for Ada project directory (which
- * type is either source, object or executable).
+ * This class enables to retrieve filtering information for Ada project
+ * directory (i.e. source, object or executable directory).
  * 
  * @author RS
  * 
  */
-public abstract class ProjectDirectoryInfoProvider {
+public abstract class ProjectDirectoryFilteringInfoProvider {
 
 	protected IAdaProject adaProject;
 	protected IPreferenceStore preferenceStore;
 
 	private final static String EXTENSION_WILDCARD = "*";
 
-	public ProjectDirectoryInfoProvider(IAdaProject adaProject) {
+	public ProjectDirectoryFilteringInfoProvider(IAdaProject adaProject) {
 		this.adaProject = adaProject;
 		this.preferenceStore = Activator.getDefault().getPreferenceStore();
 	}
 
+	/**
+	 * Checks if the given file extension shall be displayed in the project
+	 * directory according to user preferences.
+	 * 
+	 * @pre fileExtension is not null
+	 * @param fileExtension
+	 *            the extension of file
+	 * @return true if and only if the given file extension shall be displayed.
+	 */
 	private boolean doesfileExtensionShallBeDisplayedForProjectDirectory(
 			String fileExtension) {
 		Assert.isNotNull(fileExtension);
@@ -51,6 +60,14 @@ public abstract class ProjectDirectoryInfoProvider {
 		return extensionShallBeDisplayed;
 	}
 
+	/**
+	 * Checks if the given file is contained in the project directory.
+	 * 
+	 * @param file
+	 *            the file we want to check
+	 * @return true if and only if the file is contained in the project
+	 *         directory.
+	 */
 	private boolean isFileContainedInProjectDirectory(IFile file) {
 		Iterator<IPath> projectDirIt = this.getProjectDirectoryPaths()
 				.iterator();
@@ -67,7 +84,17 @@ public abstract class ProjectDirectoryInfoProvider {
 		return fileIsContainedInProjectDirectory;
 	}
 
-	public boolean shallFileBeDisplayedInProjectDirectory(IFile file) {
+	/**
+	 * Checks if the file belongs to project directory and shall be displayed
+	 * according to its extension.
+	 * 
+	 * @pre file has an extension
+	 * @param file
+	 *            the file to check
+	 * @return true if and only if the file belongs to project directory and
+	 *         shall be displayed.
+	 */
+	public boolean isFileADisplayableFileOfProjectDirectory(IFile file) {
 		String fileExtension = file.getFileExtension();
 		Assert.isNotNull(fileExtension);
 
@@ -75,6 +102,15 @@ public abstract class ProjectDirectoryInfoProvider {
 				&& this.doesfileExtensionShallBeDisplayedForProjectDirectory(fileExtension);
 	}
 
+	/**
+	 * Checks if the given folder is an ancestor of the project directory
+	 * (either itself or a parent).
+	 * 
+	 * @param folder
+	 *            the folder to check
+	 * @return true if and only if the folder is an ancestor of project
+	 *         directory.
+	 */
 	public boolean isFolderAnAncestorOfProjectDirectory(IFolder folder) {
 		Iterator<IPath> projectDirectoryIt = this.getProjectDirectoryPaths()
 				.iterator();

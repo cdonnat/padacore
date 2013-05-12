@@ -14,10 +14,10 @@ import org.padacore.ui.preferences.IPreferenceConstants;
  * @author RS
  * 
  */
-public class ExecutableDirectoryInfoProvider extends
-		ProjectDirectoryInfoProvider {
+public class ExecutableDirectoryFilteringInfoProvider extends
+		ProjectDirectoryFilteringInfoProvider {
 
-	public ExecutableDirectoryInfoProvider(IAdaProject adaProject) {
+	public ExecutableDirectoryFilteringInfoProvider(IAdaProject adaProject) {
 		super(adaProject);
 	}
 

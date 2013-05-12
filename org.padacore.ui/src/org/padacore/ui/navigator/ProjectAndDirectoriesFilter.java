@@ -4,6 +4,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.Viewer;
@@ -51,73 +52,130 @@ public class ProjectAndDirectoriesFilter extends ViewerFilter {
 
 	@Override
 	public boolean select(Viewer viewer, Object parentElement, Object element) {
-		boolean elementIsAResource = element instanceof IResource;
+		Assert.isLegal(element instanceof IResource);
 		boolean elementShallBeDisplayed = false;
 
-		if (elementIsAResource) {
-			IResource resource = (IResource) element;
+		IResource resource = (IResource) element;
 
-			try {
-				if (resource.getProject().isOpen()
-						&& resource.getProject().hasNature(
-								AdaProjectNature.NATURE_ID)) {
+		try {
+			if (resource.getProject().isOpen()
+					&& resource.getProject().hasNature(
+							AdaProjectNature.NATURE_ID)) {
 
-					IAdaProject adaProject = this.getAdaProjectFor(resource);
-					ProjectDirectoryInfoProvider sourceDirInfoProvider = new SourceDirectoryInfoProvider(
-							adaProject);
-					ProjectDirectoryInfoProvider objectDirInfoProvider = new ObjectDirectoryInfoProvider(
-							adaProject);
-					ProjectDirectoryInfoProvider executableDirInfoProvider = new ExecutableDirectoryInfoProvider(
-							adaProject);
+				IAdaProject adaProject = this.getAdaProjectFor(resource);
+				ProjectDirectoryFilteringInfoProvider sourceDirInfoProvider = new SourceDirectoryFilteringInfoProvider(
+						adaProject);
+				ProjectDirectoryFilteringInfoProvider objectDirInfoProvider = new ObjectDirectoryFilteringInfoProvider(
+						adaProject);
+				ProjectDirectoryFilteringInfoProvider executableDirInfoProvider = new ExecutableDirectoryFilteringInfoProvider(
+						adaProject);
 
-					switch (resource.getType()) {
-						case IResource.FOLDER:
-							IFolder folder = (IFolder) resource;
+				switch (resource.getType()) {
+					case IResource.FOLDER:
+						IFolder folder = (IFolder) resource;
 
-							elementShallBeDisplayed = sourceDirInfoProvider
-									.isFolderAnAncestorOfProjectDirectory(folder)
-									|| objectDirInfoProvider
-											.isFolderAnAncestorOfProjectDirectory(folder)
-									|| executableDirInfoProvider
-											.isFolderAnAncestorOfProjectDirectory(folder);
-							break;
+						elementShallBeDisplayed = this.shallFolderBeDisplayed(
+								sourceDirInfoProvider, objectDirInfoProvider,
+								executableDirInfoProvider, folder);
+						break;
 
-						case IResource.FILE:
-							IFile file = (IFile) resource;
-							String fileExtension = file.getFileExtension();
+					case IResource.FILE:
+						IFile file = (IFile) resource;
 
-							if (fileExtension != null) {
-								elementShallBeDisplayed = sourceDirInfoProvider
-										.shallFileBeDisplayedInProjectDirectory(file)
-										|| objectDirInfoProvider
-												.shallFileBeDisplayedInProjectDirectory(file)
-										|| executableDirInfoProvider
-												.shallFileBeDisplayedInProjectDirectory(file)
-										|| this.isFileTheAdaProjectFile(file);
+						elementShallBeDisplayed = this.shallFileBeDisplayed(
+								sourceDirInfoProvider, objectDirInfoProvider,
+								executableDirInfoProvider, file);
+						break;
 
-							} else {
-								elementShallBeDisplayed = this
-										.doesUserWantsToDisplayFilesWithoutExtensions();
-							}
-							break;
+					case IResource.PROJECT:
+						elementShallBeDisplayed = this
+								.isProjectAnAdaProject((IProject) resource);
 
-						case IResource.PROJECT:
-							elementShallBeDisplayed = this
-									.isProjectAnAdaProject((IProject) resource);
-
-							break;
-					}
+						break;
 				}
-			} catch (CoreException e) {
-				ErrorLog.appendException(e);
 			}
-
+		} catch (CoreException e) {
+			ErrorLog.appendException(e);
 		}
 
 		return elementShallBeDisplayed;
 	}
 
-	private boolean isFileTheAdaProjectFile(IFile file) {
+	/**
+	 * Checks if the given file shall be displayed.
+	 * 
+	 * @param sourceDirInfoProvider
+	 *            filtering information provider for source directories
+	 * @param objectDirInfoProvider
+	 *            filtering information provider for object directory
+	 * @param executableDirInfoProvider
+	 *            filtering information provider for executable directory
+	 * @param file
+	 *            the file to check
+	 * @return true if and only if given file shall be displayed
+	 */
+	private boolean shallFileBeDisplayed(
+			ProjectDirectoryFilteringInfoProvider sourceDirInfoProvider,
+			ProjectDirectoryFilteringInfoProvider objectDirInfoProvider,
+			ProjectDirectoryFilteringInfoProvider executableDirInfoProvider,
+			IFile file) {
+
+		boolean fileShallBeDisplayed;
+		String fileExtension = file.getFileExtension();
+
+		if (fileExtension != null) {
+			fileShallBeDisplayed = sourceDirInfoProvider
+					.isFileADisplayableFileOfProjectDirectory(file)
+					|| objectDirInfoProvider
+							.isFileADisplayableFileOfProjectDirectory(file)
+					|| executableDirInfoProvider
+							.isFileADisplayableFileOfProjectDirectory(file)
+					|| this.isFileTheGnatProjectFile(file);
+
+		} else {
+			fileShallBeDisplayed = this
+					.doesUserWantsToDisplayFilesWithoutExtensions();
+		}
+		return fileShallBeDisplayed;
+	}
+
+	/**
+	 * Checks if the given folder shall be displayed.
+	 * 
+	 * @param sourceDirInfoProvider
+	 *            filtering information provider for source directories
+	 * @param objectDirInfoProvider
+	 *            filtering information provider for object directory
+	 * @param executableDirInfoProvider
+	 *            filtering information provider for executable directory
+	 * @param folder
+	 *            the folder to check
+	 * @return true if and only if folder shall be displayed.
+	 */
+	private boolean shallFolderBeDisplayed(
+			ProjectDirectoryFilteringInfoProvider sourceDirInfoProvider,
+			ProjectDirectoryFilteringInfoProvider objectDirInfoProvider,
+			ProjectDirectoryFilteringInfoProvider executableDirInfoProvider,
+			IFolder folder) {
+
+		return sourceDirInfoProvider
+				.isFolderAnAncestorOfProjectDirectory(folder)
+				|| objectDirInfoProvider
+						.isFolderAnAncestorOfProjectDirectory(folder)
+				|| executableDirInfoProvider
+						.isFolderAnAncestorOfProjectDirectory(folder);
+	}
+
+	/**
+	 * Checks if the given file corresponds to the GNAT project file of project.
+	 * 
+	 * @param file
+	 *            the file to check
+	 * @return true if and only if given file corresponds to the GNAT project
+	 *         file (i.e. it has a .gpr extension and is at the root of the
+	 *         project).
+	 */
+	private boolean isFileTheGnatProjectFile(IFile file) {
 		IAdaProject adaProject = this.getAdaProjectFor(file);
 
 		return file.getParent().getLocation().equals(adaProject.getRootPath())
