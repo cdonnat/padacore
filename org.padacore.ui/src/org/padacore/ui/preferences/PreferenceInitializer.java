@@ -8,8 +8,16 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
 	@Override
 	public void initializeDefaultPreferences() {
-		IPreferenceStore preferenceStore = Activator.getDefault().getPreferenceStore();
-		preferenceStore.setDefault(IPreferenceConstants.NAVIGATOR_EXTENSIONS_PREF, "ads;adb");
+		IPreferenceStore preferenceStore = Activator.getDefault()
+				.getPreferenceStore();
+		preferenceStore.setDefault(
+				IPreferenceConstants.NAVIGATOR_SOURCE_EXTENSIONS, "ads;adb");
+		preferenceStore.setDefault(
+				IPreferenceConstants.NAVIGATOR_OBJECT_EXTENSIONS, "obj;ali");
+		preferenceStore.setDefault(
+				IPreferenceConstants.NAVIGATOR_EXEC_EXTENSIONS, "exe");
+		preferenceStore.setDefault(
+				IPreferenceConstants.NAVIGATOR_FILE_WITHOUT_EXTENSION, false);
 	}
 
 }

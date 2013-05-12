@@ -150,6 +150,13 @@
             properties="isAdaExecutableEditor"
             type="org.eclipse.ui.IEditorPart">
       </propertyTester>
+       <propertyTester
+             class="org.padacore.ui.navigator.AdaProjectDirectoryPropertyTester"
+             id="org.padacore.ui.navigator.directoryPropertyTester"
+             namespace="org.padacore"
+             properties="isASourceDirectory"
+             type="org.eclipse.core.resources.IFolder">
+       </propertyTester>
    </extension>
    <extension
          point="org.eclipse.ui.importWizards">
@@ -208,6 +215,9 @@
             <contentExtension
                   pattern="org.padacore.ui.navigator.filters.*">
             </contentExtension>
+            <contentExtension
+                  pattern="org.padacore.ui.navigator.sourceDirectories">
+            </contentExtension>
          </includes>
       </viewerContentBinding>
       <viewerActionBinding
@@ -221,40 +231,36 @@
    </extension>
    <extension
          point="org.eclipse.ui.navigator.navigatorContent">
+      <navigatorContent
+            activeByDefault="false"
+            contentProvider="org.padacore.ui.navigator.AdaDirectoryContentProvider"
+            id="org.padacore.ui.navigator.sourceDirectories"
+            labelProvider="org.padacore.ui.navigator.AdaDirectoryLabelProvider"
+            name="Source directories"
+            priority="lowest">
+         <triggerPoints>
+            <instanceof
+                  value="org.eclipse.core.resources.IProject">
+            </instanceof>
+         </triggerPoints>
+         <possibleChildren>
+            <and>
+               <instanceof
+                     value="org.eclipse.core.resources.IFolder">
+               </instanceof>
+               <test
+                     property="org.padacore.isASourceDirectory">
+               </test>
+            </and>
+         </possibleChildren>
+      </navigatorContent>
       <commonFilter
             activeByDefault="true"
-            description="Only display Eclipse projects which have an Ada nature."
-            id="org.padacore.ui.navigator.filters.showOnlyAdaProjects"
-            name="Show only Ada projects"
+            class="org.padacore.ui.navigator.ProjectAndDirectoriesFilter"
+            description="Only display folders of Ada project which belong to source, object or executable directories."
+            id="org.padacore.ui.navigator.filters.sourceObjectExecutableDirs"
+            name="Show only source, object and executable directories"
             visibleInUI="true">
-         <filterExpression>
-         <not>
-               <adapt
-                     type="org.eclipse.core.resources.IProject">
-                  <test
-                        property="org.eclipse.core.resources.projectNature"
-                        value="org.padacore.core.adaProjectNature">
-                  </test>
-               </adapt>
-               </not>
-         <not>
-            <adapt
-                  type="org.eclipse.core.resources.IFolder">
-            </adapt>
-         </not>
-         <not>
-            <adapt
-                  type="org.eclipse.core.resources.IFile">
-            </adapt>
-         </not>
-         </filterExpression>
-      </commonFilter>
-      <commonFilter
-            activeByDefault="true"
-            class="org.padacore.ui.navigator.FileExtensionFilter"
-            description="Only display files which extension matches one of the user-defined ones"
-            id="org.padacore.ui.navigator.filters.showOnlySomeExtensions"
-            name="Show only files with user-defined extensions">
       </commonFilter>
    </extension>
    <extension
