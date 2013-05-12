@@ -56,50 +56,60 @@ public class ProjectAndDirectoriesFilter extends ViewerFilter {
 
 		if (elementIsAResource) {
 			IResource resource = (IResource) element;
-			IAdaProject adaProject = this.getAdaProjectFor(resource);
-			ProjectDirectoryInfoProvider sourceDirInfoProvider = new SourceDirectoryInfoProvider(
-					adaProject);
-			ProjectDirectoryInfoProvider objectDirInfoProvider = new ObjectDirectoryInfoProvider(
-					adaProject);
-			ProjectDirectoryInfoProvider executableDirInfoProvider = new ExecutableDirectoryInfoProvider(
-					adaProject);
 
-			switch (resource.getType()) {
-				case IResource.FOLDER:
-					IFolder folder = (IFolder) resource;
+			try {
+				if (resource.getProject().isOpen()
+						&& resource.getProject().hasNature(
+								AdaProjectNature.NATURE_ID)) {
 
-					elementShallBeDisplayed = sourceDirInfoProvider
-							.isFolderAnAncestorOfProjectDirectory(folder)
-							|| objectDirInfoProvider
+					IAdaProject adaProject = this.getAdaProjectFor(resource);
+					ProjectDirectoryInfoProvider sourceDirInfoProvider = new SourceDirectoryInfoProvider(
+							adaProject);
+					ProjectDirectoryInfoProvider objectDirInfoProvider = new ObjectDirectoryInfoProvider(
+							adaProject);
+					ProjectDirectoryInfoProvider executableDirInfoProvider = new ExecutableDirectoryInfoProvider(
+							adaProject);
+
+					switch (resource.getType()) {
+						case IResource.FOLDER:
+							IFolder folder = (IFolder) resource;
+
+							elementShallBeDisplayed = sourceDirInfoProvider
 									.isFolderAnAncestorOfProjectDirectory(folder)
-							|| executableDirInfoProvider
-									.isFolderAnAncestorOfProjectDirectory(folder);
-					break;
+									|| objectDirInfoProvider
+											.isFolderAnAncestorOfProjectDirectory(folder)
+									|| executableDirInfoProvider
+											.isFolderAnAncestorOfProjectDirectory(folder);
+							break;
 
-				case IResource.FILE:
-					IFile file = (IFile) resource;
-					String fileExtension = file.getFileExtension();
+						case IResource.FILE:
+							IFile file = (IFile) resource;
+							String fileExtension = file.getFileExtension();
 
-					if (fileExtension != null) {
-						elementShallBeDisplayed = sourceDirInfoProvider
-								.shallFileBeDisplayedInProjectDirectory(file)
-								|| objectDirInfoProvider
+							if (fileExtension != null) {
+								elementShallBeDisplayed = sourceDirInfoProvider
 										.shallFileBeDisplayedInProjectDirectory(file)
-								|| executableDirInfoProvider
-										.shallFileBeDisplayedInProjectDirectory(file)
-								|| this.isFileTheAdaProjectFile(file);
+										|| objectDirInfoProvider
+												.shallFileBeDisplayedInProjectDirectory(file)
+										|| executableDirInfoProvider
+												.shallFileBeDisplayedInProjectDirectory(file)
+										|| this.isFileTheAdaProjectFile(file);
 
-					} else {
-						elementShallBeDisplayed = this
-								.doesUserWantsToDisplayFilesWithoutExtensions();
+							} else {
+								elementShallBeDisplayed = this
+										.doesUserWantsToDisplayFilesWithoutExtensions();
+							}
+							break;
+
+						case IResource.PROJECT:
+							elementShallBeDisplayed = this
+									.isProjectAnAdaProject((IProject) resource);
+
+							break;
 					}
-					break;
-
-				case IResource.PROJECT:
-					elementShallBeDisplayed = this
-							.isProjectAnAdaProject((IProject) resource);
-
-					break;
+				}
+			} catch (CoreException e) {
+				ErrorLog.appendException(e);
 			}
 
 		}

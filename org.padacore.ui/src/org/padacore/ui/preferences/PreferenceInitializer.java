@@ -13,7 +13,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		preferenceStore.setDefault(
 				IPreferenceConstants.NAVIGATOR_SOURCE_EXTENSIONS, "ads;adb");
 		preferenceStore.setDefault(
-				IPreferenceConstants.NAVIGATOR_OBJECT_EXTENSIONS, "obj;ali");
+				IPreferenceConstants.NAVIGATOR_OBJECT_EXTENSIONS, "o;ali");
 		preferenceStore.setDefault(
 				IPreferenceConstants.NAVIGATOR_EXEC_EXTENSIONS, "exe");
 		preferenceStore.setDefault(
