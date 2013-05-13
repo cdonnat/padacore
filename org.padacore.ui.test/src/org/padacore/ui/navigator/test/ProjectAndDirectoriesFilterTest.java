@@ -1,0 +1,131 @@
+package org.padacore.ui.navigator.test;
+
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.padacore.core.project.AdaProjectNature;
+import org.padacore.core.project.IAdaProject;
+import org.padacore.core.test.utils.CommonTestUtils;
+import org.padacore.ui.Activator;
+import org.padacore.ui.navigator.ProjectAndDirectoriesFilter;
+import org.padacore.ui.preferences.IPreferenceConstants;
+
+public class ProjectAndDirectoriesFilterTest {
+
+	private ProjectAndDirectoriesFilter sut = new ProjectAndDirectoriesFilter();
+
+	@BeforeClass
+	public static void setup() {
+		IPreferenceStore preferenceStore = Activator.getDefault()
+				.getPreferenceStore();
+		preferenceStore.setValue(
+				IPreferenceConstants.NAVIGATOR_SOURCE_EXTENSIONS, "src");
+		preferenceStore.setValue(
+				IPreferenceConstants.NAVIGATOR_OBJECT_EXTENSIONS, "obj");
+		preferenceStore.setValue(
+				IPreferenceConstants.NAVIGATOR_EXEC_EXTENSIONS, "exe");
+		preferenceStore.setValue(
+				IPreferenceConstants.NAVIGATOR_FILE_WITHOUT_EXTENSION, false);
+	}
+
+	private void checkResourceIsSelected(boolean isSelected,
+			IResource resource, String comment) {
+		assertTrue(comment, this.sut.select(null, null, resource) == isSelected);
+	}
+
+	@Test
+	public void testProjectFilter() {
+		IProject project = mock(IProject.class);
+		when(project.getType()).thenReturn(IResource.PROJECT);
+		when(project.isOpen()).thenReturn(false);
+
+		this.checkResourceIsSelected(true, project, "Closed project");
+
+		when(project.isOpen()).thenReturn(true);
+
+		this.checkResourceIsSelected(false, project, "Opened non-Ada project");
+
+		try {
+			when(project.hasNature(AdaProjectNature.NATURE_ID))
+					.thenReturn(true);
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+
+		this.checkResourceIsSelected(true, project, "Opened Ada project");
+	}
+
+	@Test
+	public void testSourceFolderFilter() {
+
+		// source folders hierarchy:
+		// starred folders shall be displayed
+		// project
+		// |--- src*
+		// |-----|--- src*
+		// |--- not_src*
+		// |-------|--- src*
+		// |-------|--- not_src*
+		// |---------------|--- src*
+		// |-------|--- not_src
+
+		IProject project = CommonTestUtils.CreateAdaProject();
+
+		IAdaProject adaProject = mock(IAdaProject.class);
+		List<IPath> sourceDirs = new ArrayList<>();
+
+		IFolder firstLevelSrcFolder = project.getFolder("src");
+		IFolder secondLevelSrcFolderInSrc = firstLevelSrcFolder
+				.getFolder("src_inside_src");
+		IFolder firstLevelNotSrcFolder = project.getFolder("not_src");
+		IFolder secondLevelSrcFolderInNotSrc = firstLevelNotSrcFolder
+				.getFolder("src_inside_not_src");
+		IFolder secondLevelNotSrcFolderInNotSrc = firstLevelNotSrcFolder
+				.getFolder("not_src_inside_not_src");
+		IFolder thirdLevelSrcFolderInNotSrc = secondLevelNotSrcFolderInNotSrc
+				.getFolder("src_inside_not_src_inside_not_src");
+		IFolder secondLevelNotSrcFolderInNotSrc2 = firstLevelNotSrcFolder
+				.getFolder("not_src_inside_not_src2");
+
+		when(adaProject.getSourceDirectoriesPaths()).thenReturn(sourceDirs);
+		sourceDirs.add(firstLevelSrcFolder.getLocation());
+		sourceDirs.add(secondLevelSrcFolderInSrc.getLocation());
+		sourceDirs.add(secondLevelSrcFolderInNotSrc.getLocation());
+		sourceDirs.add(thirdLevelSrcFolderInNotSrc.getLocation());
+
+		when(adaProject.getObjectDirectoryPath()).thenReturn(
+				project.getLocation());
+		when(adaProject.getExecutableDirectoryPath()).thenReturn(
+				project.getLocation());
+
+		CommonTestUtils.SetAssociatedAdaProject(project, adaProject);
+
+		this.checkResourceIsSelected(true, firstLevelSrcFolder,
+				"First level source folder");
+		this.checkResourceIsSelected(true, secondLevelSrcFolderInSrc,
+				"Second level source folder in source folder");
+		this.checkResourceIsSelected(true, firstLevelNotSrcFolder,
+				"First level not source folder");
+		this.checkResourceIsSelected(true, secondLevelSrcFolderInNotSrc,
+				"Second level source folder in not source folder");
+		this.checkResourceIsSelected(true, secondLevelNotSrcFolderInNotSrc,
+				"Second level not source folder in not source folder");
+		this.checkResourceIsSelected(true, thirdLevelSrcFolderInNotSrc,
+				"Third level source folder in not source folder");
+		this.checkResourceIsSelected(false, secondLevelNotSrcFolderInNotSrc2,
+				"Second level not source folder in not source folder - 2");
+	}
+
+}
