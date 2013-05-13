@@ -72,14 +72,13 @@ public class ProjectAndDirectoriesFilterTest {
 
 		// source folders hierarchy:
 		// starred folders shall be displayed
-		// project
 		// |--- src*
-		// |-----|--- src*
+		// ------|--- src*
 		// |--- not_src*
-		// |-------|--- src*
-		// |-------|--- not_src*
-		// |---------------|--- src*
-		// |-------|--- not_src
+		// --------|--- src*
+		// --------|--- not_src*
+		// ----------------|--- src*
+		// --------|--- not_src
 
 		IProject project = CommonTestUtils.CreateAdaProject();
 
@@ -88,16 +87,16 @@ public class ProjectAndDirectoriesFilterTest {
 
 		IFolder firstLevelSrcFolder = project.getFolder("src");
 		IFolder secondLevelSrcFolderInSrc = firstLevelSrcFolder
-				.getFolder("src_inside_src");
+				.getFolder("src");
 		IFolder firstLevelNotSrcFolder = project.getFolder("not_src");
 		IFolder secondLevelSrcFolderInNotSrc = firstLevelNotSrcFolder
-				.getFolder("src_inside_not_src");
+				.getFolder("src");
 		IFolder secondLevelNotSrcFolderInNotSrc = firstLevelNotSrcFolder
-				.getFolder("not_src_inside_not_src");
+				.getFolder("not_src");
 		IFolder thirdLevelSrcFolderInNotSrc = secondLevelNotSrcFolderInNotSrc
-				.getFolder("src_inside_not_src_inside_not_src");
+				.getFolder("src");
 		IFolder secondLevelNotSrcFolderInNotSrc2 = firstLevelNotSrcFolder
-				.getFolder("not_src_inside_not_src2");
+				.getFolder("not_src2");
 
 		when(adaProject.getSourceDirectoriesPaths()).thenReturn(sourceDirs);
 		sourceDirs.add(firstLevelSrcFolder.getLocation());
@@ -128,4 +127,44 @@ public class ProjectAndDirectoriesFilterTest {
 				"Second level not source folder in not source folder - 2");
 	}
 
+	@Test
+	public void testObjFolderFilter() {
+		// folders hierarchy:
+		// starred folders shall be displayed
+		// project
+		// |--- not_obj*
+		// -------|--- not_obj*
+		// ---------------|--- obj*
+		// ---------------|--- not_obj
+
+		IProject project = CommonTestUtils.CreateAdaProject();
+
+		IAdaProject adaProject = mock(IAdaProject.class);
+		List<IPath> sourceDirs = new ArrayList<>();
+
+		IFolder firstLevelNotObjFolder = project.getFolder("not_obj");
+		IFolder secondLevelNotObjFolder = firstLevelNotObjFolder
+				.getFolder("not_obj");
+		IFolder thirdLevelObjFolder = secondLevelNotObjFolder.getFolder("obj");
+		IFolder thirdLevelNotObjFolder = secondLevelNotObjFolder
+				.getFolder("not_obj");
+
+		when(adaProject.getSourceDirectoriesPaths()).thenReturn(sourceDirs);
+		when(adaProject.getObjectDirectoryPath()).thenReturn(
+				thirdLevelObjFolder.getLocation());
+		when(adaProject.getExecutableDirectoryPath()).thenReturn(
+				project.getLocation());
+		
+		CommonTestUtils.SetAssociatedAdaProject(project, adaProject);
+
+		this.checkResourceIsSelected(true, firstLevelNotObjFolder,
+				"First level not object folder");
+		this.checkResourceIsSelected(true, secondLevelNotObjFolder,
+				"Second level not object folder");
+		this.checkResourceIsSelected(true, thirdLevelObjFolder,
+				"Third level object folder");
+		this.checkResourceIsSelected(false, thirdLevelNotObjFolder,
+				"Third level not object folder");
+
+	}
 }
