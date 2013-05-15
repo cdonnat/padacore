@@ -126,7 +126,7 @@ public class ProjectAndDirectoriesFilterTest {
 		this.checkResourceIsSelected(false, secondLevelNotSrcFolderInNotSrc2,
 				"Second level not source folder in not source folder - 2");
 	}
-
+	
 	@Test
 	public void testObjFolderFilter() {
 		// folders hierarchy:
