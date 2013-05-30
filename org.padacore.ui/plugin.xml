@@ -260,7 +260,7 @@
             description="Only display folders of Ada project which belong to source, object or executable directories."
             id="org.padacore.ui.navigator.filters.sourceObjectExecutableDirs"
             name="Show only source, object and executable directories"
-            visibleInUI="true">
+            visibleInUI="false">
       </commonFilter>
    </extension>
    <extension

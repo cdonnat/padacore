@@ -165,6 +165,48 @@ public class ProjectAndDirectoriesFilterTest {
 				"Third level object folder");
 		this.checkResourceIsSelected(false, thirdLevelNotObjFolder,
 				"Third level not object folder");
-
 	}
+	
+	@Test
+	public void testExeFolderFilter() {
+		// folders hierarchy:
+		// starred folders shall be displayed
+		// project
+		// |--- not_exe*
+		// -------|--- not_exe*
+		// ---------------|--- exe*
+		// ---------------|--- not_exe
+
+		IProject project = CommonTestUtils.CreateAdaProject();
+
+		IAdaProject adaProject = mock(IAdaProject.class);
+		List<IPath> sourceDirs = new ArrayList<>();
+
+		IFolder firstLevelNotExeFolder = project.getFolder("not_exe");
+		IFolder secondLevelNotExeFolder = firstLevelNotExeFolder
+				.getFolder("not_exe");
+		IFolder thirdLevelExeFolder = secondLevelNotExeFolder.getFolder("exe");
+		IFolder thirdLevelNotExeFolder = secondLevelNotExeFolder
+				.getFolder("not_exe");
+
+		when(adaProject.isExecutable()).thenReturn(true);
+		when(adaProject.getSourceDirectoriesPaths()).thenReturn(sourceDirs);
+		when(adaProject.getObjectDirectoryPath()).thenReturn(project.getLocation());
+		when(adaProject.getExecutableDirectoryPath()).thenReturn(
+				thirdLevelExeFolder.getLocation());
+		
+		CommonTestUtils.SetAssociatedAdaProject(project, adaProject);
+
+		this.checkResourceIsSelected(true, firstLevelNotExeFolder,
+				"First level not executable folder");
+		this.checkResourceIsSelected(true, secondLevelNotExeFolder,
+				"Second level not executable folder");
+		this.checkResourceIsSelected(true, thirdLevelExeFolder,
+				"Third level executable folder");
+		this.checkResourceIsSelected(false, thirdLevelNotExeFolder,
+				"Third level not executable folder");
+	}
+	
+	//TODO add tests for files
+	
 }
