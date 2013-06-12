@@ -16,7 +16,7 @@ import org.padacore.core.project.PropertiesManager;
 public class AdaLaunchConfigurationShortcutTester extends PropertyTester {
 
 	private final static String BELONGS_TO_ADA_PROJECT = "belongsToAdaProject";
-	private final static String IS_ADA_PROJECT = "isAdaProject";
+	private final static String IS_EXECUTABLE_ADA_PROJECT = "isExecutableAdaProject";
 	private final static String IS_ADA_EDITOR = "isAdaExecutableEditor";
 
 	@Override
@@ -28,7 +28,7 @@ public class AdaLaunchConfigurationShortcutTester extends PropertyTester {
 		if (property.equals(BELONGS_TO_ADA_PROJECT)) {
 			Assert.isLegal(receiver instanceof IFile);
 			testPassed = this.isFileAnExecutableInAdaProject((IFile) receiver);
-		} else if (property.equals(IS_ADA_PROJECT)) {
+		} else if (property.equals(IS_EXECUTABLE_ADA_PROJECT)) {
 			Assert.isLegal(receiver instanceof IProject);
 			testPassed = this
 					.isProjectAnExecutableAdaProject((IProject) receiver);

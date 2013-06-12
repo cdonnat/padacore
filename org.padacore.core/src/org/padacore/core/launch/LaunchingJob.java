@@ -5,11 +5,11 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
 import org.padacore.core.Activator;
 import org.padacore.core.utils.ErrorLog;
+import org.padacore.core.utils.PadacoreJob;
 
 /**
  * This class defines a job whose purpose is to run the given launch
@@ -18,7 +18,7 @@ import org.padacore.core.utils.ErrorLog;
  * @author RS
  * 
  */
-public class LaunchingJob extends Job {
+public class LaunchingJob extends PadacoreJob {
 
 	private ILaunchConfiguration launchConfig;
 
