@@ -19,12 +19,12 @@ import org.padacore.core.project.AdaProjectNature;
 import org.padacore.core.project.IAdaProject;
 import org.padacore.core.test.utils.CommonTestUtils;
 import org.padacore.ui.Activator;
-import org.padacore.ui.navigator.ProjectAndDirectoriesFilter;
+import org.padacore.ui.navigator.ProjectDirectoriesFilter;
 import org.padacore.ui.preferences.IPreferenceConstants;
 
 public class ProjectAndDirectoriesFilterTest {
 
-	private ProjectAndDirectoriesFilter sut = new ProjectAndDirectoriesFilter();
+	private ProjectDirectoriesFilter sut = new ProjectDirectoriesFilter();
 
 	@BeforeClass
 	public static void setup() {

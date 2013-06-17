@@ -5,14 +5,11 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
-import org.padacore.core.project.AdaProjectNature;
 import org.padacore.core.project.IAdaProject;
 import org.padacore.core.project.PropertiesManager;
-import org.padacore.core.utils.ErrorLog;
 import org.padacore.ui.Activator;
 import org.padacore.ui.preferences.IPreferenceConstants;
 
@@ -23,12 +20,12 @@ import org.padacore.ui.preferences.IPreferenceConstants;
  * @author RS
  * 
  */
-public class ProjectAndDirectoriesFilter extends ViewerFilter {
+public class ProjectDirectoriesFilter extends ViewerFilter {
 
 	private final static String GNAT_PROJECT_EXTENSION = "gpr";
 	private IPreferenceStore preferenceStore;
 
-	public ProjectAndDirectoriesFilter() {
+	public ProjectDirectoriesFilter() {
 		super();
 		this.preferenceStore = Activator.getDefault().getPreferenceStore();
 	}
@@ -53,14 +50,12 @@ public class ProjectAndDirectoriesFilter extends ViewerFilter {
 	@Override
 	public boolean select(Viewer viewer, Object parentElement, Object element) {
 		Assert.isLegal(element instanceof IResource);
-		boolean elementShallBeDisplayed = false;
+		boolean elementShallBeDisplayed = true;
 
 		IResource resource = (IResource) element;
 
-		if (resource.getType() == IResource.PROJECT) {
-			elementShallBeDisplayed = this
-					.isProjectAnAdaProject((IProject) resource);
-		} else {
+		if (resource.getType() == IResource.FOLDER
+				|| resource.getType() == IResource.FILE) {
 			IAdaProject adaProject = this.getAdaProjectFor(resource);
 			ProjectDirectoryFilteringInfoProvider sourceDirInfoProvider = new SourceDirectoryFilteringInfoProvider(
 					adaProject);
@@ -170,32 +165,6 @@ public class ProjectAndDirectoriesFilter extends ViewerFilter {
 
 		return file.getParent().getLocation().equals(adaProject.getRootPath())
 				&& GNAT_PROJECT_EXTENSION.equals(file.getFileExtension());
-	}
-
-	/**
-	 * Checks if the given project shall be considered as an Ada project.
-	 * 
-	 * @param project
-	 *            the project ot check
-	 * @return true if and only if the project is open and has an Ada nature or
-	 *         the project is closed.
-	 */
-	private boolean isProjectAnAdaProject(IProject project) {
-		boolean isAnAdaProject = false;
-
-		if (project.isOpen()) {
-			try {
-				isAnAdaProject = project.hasNature(AdaProjectNature.NATURE_ID);
-			} catch (CoreException e) {
-				ErrorLog.appendException(e);
-			}
-		} else {
-			// since we don't know the nature of project, assume it
-			// might be an Ada project
-			isAnAdaProject = true;
-		}
-
-		return isAnAdaProject;
 	}
 
 	/**

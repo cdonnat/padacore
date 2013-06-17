@@ -254,14 +254,22 @@
             </and>
          </possibleChildren>
       </navigatorContent>
-      <commonFilter
+            <commonFilter
             activeByDefault="true"
-            class="org.padacore.ui.navigator.ProjectAndDirectoriesFilter"
-            description="Only display folders of Ada project which belong to source, object or executable directories."
-            id="org.padacore.ui.navigator.filters.sourceObjectExecutableDirs"
-            name="Show only source, object and executable directories"
+            class="org.padacore.ui.navigator.AdaProjectsFilter"
+            description="Hide projects which do not have an Ada nature"
+            id="org.padacore.ui.navigator.filters.adaProjects"
+            name="Hide non-Ada projects"
             visibleInUI="false">
       </commonFilter>
+            <commonFilter
+                  activeByDefault="true"
+                  class="org.padacore.ui.navigator.ProjectDirectoriesFilter"
+                  description="Only display source, object and executable directories"
+                  id="org.padacore.ui.navigator.filters.projectDirectories"
+                  name="Show only projects directories"
+                  visibleInUI="false">
+            </commonFilter>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
