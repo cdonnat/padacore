@@ -188,7 +188,7 @@
       <view
             allowMultiple="false"
             category="org.padacore.ui.views.ada"
-            class="org.padacore.ui.views.ScenarioView"
+            class="org.padacore.ui.views.extvar.View"
             id="org.padacore.ui.views.scenario"
             name="Scenario"
             restorable="true">
