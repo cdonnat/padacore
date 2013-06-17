@@ -256,7 +256,7 @@
       </navigatorContent>
             <commonFilter
             activeByDefault="true"
-            class="org.padacore.ui.navigator.AdaProjectsFilter"
+            class="org.padacore.ui.navigator.filters.AdaProjectsFilter"
             description="Hide projects which do not have an Ada nature"
             id="org.padacore.ui.navigator.filters.adaProjects"
             name="Hide non-Ada projects"
@@ -264,11 +264,27 @@
       </commonFilter>
             <commonFilter
                   activeByDefault="true"
-                  class="org.padacore.ui.navigator.ProjectDirectoriesFilter"
+                  class="org.padacore.ui.navigator.filters.ProjectDirectoriesFilter"
                   description="Only display source, object and executable directories"
                   id="org.padacore.ui.navigator.filters.projectDirectories"
                   name="Show only projects directories"
                   visibleInUI="false">
+            </commonFilter>
+            <commonFilter
+                  activeByDefault="true"
+                  class="org.padacore.ui.navigator.filters.ObjectDirectoryFilter"
+                  description="Hide object directory of Ada project"
+                  id="org.padacore.ui.navigator.filters.objectDirectory"
+                  name="Hide object directory"
+                  visibleInUI="true">
+            </commonFilter>
+            <commonFilter
+                  activeByDefault="true"
+                  class="org.padacore.ui.navigator.filters.ExecutableDirectoryFilter"
+                  description="Hide executable directory of Ada project"
+                  id="org.padacore.ui.navigator.filters.executableDirectory"
+                  name="Hide executable directory"
+                  visibleInUI="true">
             </commonFilter>
    </extension>
    <extension

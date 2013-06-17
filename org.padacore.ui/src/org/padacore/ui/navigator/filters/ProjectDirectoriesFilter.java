@@ -1,15 +1,18 @@
-package org.padacore.ui.navigator;
+package org.padacore.ui.navigator.filters;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.padacore.core.project.AdaProjectNature;
 import org.padacore.core.project.IAdaProject;
 import org.padacore.core.project.PropertiesManager;
+import org.padacore.core.utils.ErrorLog;
 import org.padacore.ui.Activator;
 import org.padacore.ui.preferences.IPreferenceConstants;
 
@@ -30,6 +33,19 @@ public class ProjectDirectoriesFilter extends ViewerFilter {
 		this.preferenceStore = Activator.getDefault().getPreferenceStore();
 	}
 
+	private boolean belongsToAnAdaProject(IResource resource) {
+		boolean hasAnAdaNature = false;
+
+		try {
+			hasAnAdaNature = resource.getProject().hasNature(
+					AdaProjectNature.NATURE_ID);
+		} catch (CoreException e) {
+			ErrorLog.appendException(e);
+		}
+
+		return hasAnAdaNature;
+	}
+
 	/**
 	 * Returns the IAdaProject for the project which contains the given
 	 * resource.
@@ -40,6 +56,8 @@ public class ProjectDirectoriesFilter extends ViewerFilter {
 	 *         resource.
 	 */
 	private IAdaProject getAdaProjectFor(IResource resource) {
+		Assert.isLegal(this.belongsToAnAdaProject(resource));
+
 		IProject enclosingProject = resource.getProject();
 		PropertiesManager propertiesManager = new PropertiesManager(
 				enclosingProject);
@@ -56,30 +74,32 @@ public class ProjectDirectoriesFilter extends ViewerFilter {
 
 		if (resource.getType() == IResource.FOLDER
 				|| resource.getType() == IResource.FILE) {
-			IAdaProject adaProject = this.getAdaProjectFor(resource);
-			ProjectDirectoryFilteringInfoProvider sourceDirInfoProvider = new SourceDirectoryFilteringInfoProvider(
-					adaProject);
-			ProjectDirectoryFilteringInfoProvider objectDirInfoProvider = new ObjectDirectoryFilteringInfoProvider(
-					adaProject);
-			ProjectDirectoryFilteringInfoProvider executableDirInfoProvider = new ExecutableDirectoryFilteringInfoProvider(
-					adaProject);
+			if (this.belongsToAnAdaProject(resource)) {
+				IAdaProject adaProject = this.getAdaProjectFor(resource);
+				ProjectDirectoryFilteringInfoProvider sourceDirInfoProvider = new SourceDirectoriesFilteringInfoProvider(
+						adaProject);
+				ProjectDirectoryFilteringInfoProvider objectDirInfoProvider = new ObjectDirectoryFilteringInfoProvider(
+						adaProject);
+				ProjectDirectoryFilteringInfoProvider executableDirInfoProvider = new ExecutableDirectoryFilteringInfoProvider(
+						adaProject);
 
-			switch (resource.getType()) {
-				case IResource.FOLDER:
-					IFolder folder = (IFolder) resource;
+				switch (resource.getType()) {
+					case IResource.FOLDER:
+						IFolder folder = (IFolder) resource;
 
-					elementShallBeDisplayed = this.shallFolderBeDisplayed(
-							sourceDirInfoProvider, objectDirInfoProvider,
-							executableDirInfoProvider, folder);
-					break;
+						elementShallBeDisplayed = this.shallFolderBeDisplayed(
+								sourceDirInfoProvider, objectDirInfoProvider,
+								executableDirInfoProvider, folder);
+						break;
 
-				case IResource.FILE:
-					IFile file = (IFile) resource;
+					case IResource.FILE:
+						IFile file = (IFile) resource;
 
-					elementShallBeDisplayed = this.shallFileBeDisplayed(
-							sourceDirInfoProvider, objectDirInfoProvider,
-							executableDirInfoProvider, file);
-					break;
+						elementShallBeDisplayed = this.shallFileBeDisplayed(
+								sourceDirInfoProvider, objectDirInfoProvider,
+								executableDirInfoProvider, file);
+						break;
+				}
 			}
 		}
 

@@ -1,4 +1,4 @@
-package org.padacore.ui.navigator.test;
+package org.padacore.ui.navigator.filters.test;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -10,19 +10,17 @@ import java.util.List;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.padacore.core.project.AdaProjectNature;
 import org.padacore.core.project.IAdaProject;
 import org.padacore.core.test.utils.CommonTestUtils;
 import org.padacore.ui.Activator;
-import org.padacore.ui.navigator.ProjectDirectoriesFilter;
+import org.padacore.ui.navigator.filters.ProjectDirectoriesFilter;
 import org.padacore.ui.preferences.IPreferenceConstants;
 
-public class ProjectAndDirectoriesFilterTest {
+public class ProjectDirectoriesFilterTest {
 
 	private ProjectDirectoriesFilter sut = new ProjectDirectoriesFilter();
 
@@ -43,28 +41,6 @@ public class ProjectAndDirectoriesFilterTest {
 	private void checkResourceIsSelected(boolean isSelected,
 			IResource resource, String comment) {
 		assertTrue(comment, this.sut.select(null, null, resource) == isSelected);
-	}
-
-	@Test
-	public void testProjectFilter() {
-		IProject project = mock(IProject.class);
-		when(project.getType()).thenReturn(IResource.PROJECT);
-		when(project.isOpen()).thenReturn(false);
-
-		this.checkResourceIsSelected(true, project, "Closed project");
-
-		when(project.isOpen()).thenReturn(true);
-
-		this.checkResourceIsSelected(false, project, "Opened non-Ada project");
-
-		try {
-			when(project.hasNature(AdaProjectNature.NATURE_ID))
-					.thenReturn(true);
-		} catch (CoreException e) {
-			e.printStackTrace();
-		}
-
-		this.checkResourceIsSelected(true, project, "Opened Ada project");
 	}
 
 	@Test
@@ -126,7 +102,7 @@ public class ProjectAndDirectoriesFilterTest {
 		this.checkResourceIsSelected(false, secondLevelNotSrcFolderInNotSrc2,
 				"Second level not source folder in not source folder - 2");
 	}
-	
+
 	@Test
 	public void testObjFolderFilter() {
 		// folders hierarchy:
@@ -154,7 +130,7 @@ public class ProjectAndDirectoriesFilterTest {
 				thirdLevelObjFolder.getLocation());
 		when(adaProject.getExecutableDirectoryPath()).thenReturn(
 				project.getLocation());
-		
+
 		CommonTestUtils.SetAssociatedAdaProject(project, adaProject);
 
 		this.checkResourceIsSelected(true, firstLevelNotObjFolder,
@@ -166,7 +142,7 @@ public class ProjectAndDirectoriesFilterTest {
 		this.checkResourceIsSelected(false, thirdLevelNotObjFolder,
 				"Third level not object folder");
 	}
-	
+
 	@Test
 	public void testExeFolderFilter() {
 		// folders hierarchy:
@@ -191,10 +167,11 @@ public class ProjectAndDirectoriesFilterTest {
 
 		when(adaProject.isExecutable()).thenReturn(true);
 		when(adaProject.getSourceDirectoriesPaths()).thenReturn(sourceDirs);
-		when(adaProject.getObjectDirectoryPath()).thenReturn(project.getLocation());
+		when(adaProject.getObjectDirectoryPath()).thenReturn(
+				project.getLocation());
 		when(adaProject.getExecutableDirectoryPath()).thenReturn(
 				thirdLevelExeFolder.getLocation());
-		
+
 		CommonTestUtils.SetAssociatedAdaProject(project, adaProject);
 
 		this.checkResourceIsSelected(true, firstLevelNotExeFolder,
@@ -206,7 +183,7 @@ public class ProjectAndDirectoriesFilterTest {
 		this.checkResourceIsSelected(false, thirdLevelNotExeFolder,
 				"Third level not executable folder");
 	}
-	
-	//TODO add tests for files
-	
+
+	// FIXME add tests for files
+
 }

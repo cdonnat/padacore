@@ -1,10 +1,11 @@
-package org.padacore.ui.navigator;
+package org.padacore.ui.navigator.filters;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.IPath;
 import org.padacore.core.project.IAdaProject;
+import org.padacore.ui.navigator.filters.ProjectDirectoryFilteringInfoProvider;
 import org.padacore.ui.preferences.IPreferenceConstants;
 
 /**

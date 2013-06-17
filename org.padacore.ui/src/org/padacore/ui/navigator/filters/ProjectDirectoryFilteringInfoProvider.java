@@ -1,4 +1,4 @@
-package org.padacore.ui.navigator;
+package org.padacore.ui.navigator.filters;
 
 import java.util.Iterator;
 import java.util.List;
