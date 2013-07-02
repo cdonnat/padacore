@@ -66,8 +66,7 @@ public class AdaLaunchConfigurationShortcutTester extends PropertyTester {
 	}
 
 	/**
-	 * Checks if the given project has an Ada nature, is open and is
-	 * executable.
+	 * Checks if the given project has an Ada nature, is open and is executable.
 	 * 
 	 * @param selectedProject
 	 *            the selected project which is tested.
@@ -113,11 +112,11 @@ public class AdaLaunchConfigurationShortcutTester extends PropertyTester {
 				.isProjectAnExecutableAdaProject(selectedFile.getProject());
 		boolean selectedFileIsAnExecutableOfProject = false;
 
-		PropertiesManager propertiesManager = new PropertiesManager(
-				selectedFile.getProject());
-		IAdaProject adaProject = propertiesManager.getAdaProject();
-
 		if (belongsToExecutableAdaProject) {
+			PropertiesManager propertiesManager = new PropertiesManager(
+					selectedFile.getProject());
+			IAdaProject adaProject = propertiesManager.getAdaProject();
+
 			selectedFileIsAnExecutableOfProject = adaProject
 					.getExecutableNames().contains(selectedFile.getName())
 					|| adaProject.getExecutableSourceNames().contains(
