@@ -183,8 +183,17 @@ public class ProjectDirectoriesFilter extends ViewerFilter {
 	private boolean isFileTheGnatProjectFile(IFile file) {
 		IAdaProject adaProject = this.getAdaProjectFor(file);
 
-		return file.getParent().getLocation().equals(adaProject.getRootPath())
-				&& GNAT_PROJECT_EXTENSION.equals(file.getFileExtension());
+		StringBuilder expectedGnatProjectFilename = new StringBuilder(file
+				.getProject().getName());
+		expectedGnatProjectFilename.append('.');
+		expectedGnatProjectFilename.append(GNAT_PROJECT_EXTENSION);
+
+		boolean hasTheSameNameAsProject = file.getName().equals(
+				expectedGnatProjectFilename.toString());
+		boolean isAtProjectRoot = file.getParent().getLocation()
+				.equals(adaProject.getRootPath());
+
+		return isAtProjectRoot && hasTheSameNameAsProject;
 	}
 
 	/**

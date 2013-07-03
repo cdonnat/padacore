@@ -13,7 +13,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 import org.padacore.core.project.IAdaProject;
 import org.padacore.core.test.utils.CommonTestUtils;
@@ -23,20 +23,13 @@ import org.padacore.ui.preferences.IPreferenceConstants;
 
 public class ProjectDirectoriesFilterTest {
 
-	private ProjectDirectoriesFilter sut = new ProjectDirectoriesFilter();
+	private IProject project;
+	private ProjectDirectoriesFilter sut;
 
-	@BeforeClass
-	public static void setup() {
-		IPreferenceStore preferenceStore = Activator.getDefault()
-				.getPreferenceStore();
-		preferenceStore.setValue(
-				IPreferenceConstants.NAVIGATOR_SOURCE_EXTENSIONS, "src");
-		preferenceStore.setValue(
-				IPreferenceConstants.NAVIGATOR_OBJECT_EXTENSIONS, "obj");
-		preferenceStore.setValue(
-				IPreferenceConstants.NAVIGATOR_EXEC_EXTENSIONS, "exe");
-		preferenceStore.setValue(
-				IPreferenceConstants.NAVIGATOR_FILE_WITHOUT_EXTENSION, false);
+	@Before
+	public void createFixture() {
+		this.project = CommonTestUtils.CreateAdaProject();
+		this.sut = new ProjectDirectoriesFilter();
 	}
 
 	private void setStringPreferenceTo(String prefName, String prefValue) {
@@ -78,8 +71,8 @@ public class ProjectDirectoriesFilterTest {
 		assertTrue(comment, this.sut.select(null, null, resource) == isSelected);
 	}
 
-	private void configureProjectDirectories(IProject project,
-			IFolder[] sourceDirs, IFolder objDir, IFolder exeDir) {
+	private void configureProjectDirectories(IFolder[] sourceDirs,
+			IFolder objDir, IFolder exeDir) {
 		IAdaProject adaProject = mock(IAdaProject.class);
 		List<IPath> sourceDirLocations;
 
@@ -97,7 +90,7 @@ public class ProjectDirectoriesFilterTest {
 
 		if (objDir == null) {
 			when(adaProject.getObjectDirectoryPath()).thenReturn(
-					project.getLocation());
+					this.project.getLocation());
 		} else {
 			when(adaProject.getObjectDirectoryPath()).thenReturn(
 					objDir.getLocation());
@@ -105,13 +98,14 @@ public class ProjectDirectoriesFilterTest {
 
 		if (exeDir == null) {
 			when(adaProject.getExecutableDirectoryPath()).thenReturn(
-					project.getLocation());
+					this.project.getLocation());
 		} else {
+			when(adaProject.isExecutable()).thenReturn(true);
 			when(adaProject.getExecutableDirectoryPath()).thenReturn(
 					exeDir.getLocation());
 		}
 
-		CommonTestUtils.SetAssociatedAdaProject(project, adaProject);
+		CommonTestUtils.SetAssociatedAdaProject(this.project, adaProject);
 	}
 
 	@Test
@@ -127,18 +121,16 @@ public class ProjectDirectoriesFilterTest {
 		// ----------------|--- src4*
 		// --------|--- not_src3
 
-		IProject project = CommonTestUtils.CreateAdaProject();
-
-		IFolder src1 = project.getFolder("src1");
+		IFolder src1 = this.project.getFolder("src1");
 		IFolder src2 = src1.getFolder("src2");
-		IFolder not_src1 = project.getFolder("not_src1");
+		IFolder not_src1 = this.project.getFolder("not_src1");
 		IFolder src3 = not_src1.getFolder("src3");
 		IFolder not_src2 = not_src1.getFolder("not_src2");
 		IFolder src4 = not_src2.getFolder("src4");
 		IFolder not_src3 = not_src1.getFolder("not_src3");
 
-		this.configureProjectDirectories(project, new IFolder[] { src1, src2,
-				src3, src4 }, null, null);
+		this.configureProjectDirectories(
+				new IFolder[] { src1, src2, src3, src4 }, null, null);
 
 		this.checkResourceSelection(new IResource[] { src1, src2, not_src1,
 				src3, not_src2, src4 }, new IResource[] { not_src3 });
@@ -163,8 +155,6 @@ public class ProjectDirectoriesFilterTest {
 				break;
 		}
 
-		IProject project = CommonTestUtils.CreateAdaProject();
-
 		IFolder not_ObjOrExe1 = project.getFolder("not_" + folderNamePrefix
 				+ "1");
 		IFolder not_ObjOrExe2 = not_ObjOrExe1.getFolder("not_"
@@ -173,7 +163,7 @@ public class ProjectDirectoriesFilterTest {
 		IFolder not_objOrExe3 = not_ObjOrExe2.getFolder("not_"
 				+ folderNamePrefix + "3");
 
-		this.configureProjectDirectories(project, null, objOrExe, null);
+		this.configureProjectDirectories(null, objOrExe, null);
 
 		this.checkResourceSelection(new IResource[] { not_ObjOrExe1,
 				not_ObjOrExe2, objOrExe }, new IResource[] { not_objOrExe3 });
@@ -208,38 +198,77 @@ public class ProjectDirectoriesFilterTest {
 
 	@Test
 	public void testSrcFileFilter() {
+		this.setStringPreferenceTo(
+				IPreferenceConstants.NAVIGATOR_SOURCE_EXTENSIONS, "ads;adb");
 
+		IFolder srcFolder = this.project.getFolder("src");
+		IFile adaSpec = srcFolder.getFile("mySpec.ads");
+		IFile adaBody = srcFolder.getFile("myBody.adb");
+		IFile nonSelected = srcFolder.getFile("notAnAdaFile.c");
+
+		this.configureProjectDirectories(new IFolder[] { srcFolder }, null,
+				null);
+
+		this.checkResourceSelection(new IResource[] { adaSpec, adaBody },
+				new IResource[] { nonSelected });
 	}
 
 	@Test
 	public void testObjFileFilter() {
+		this.setStringPreferenceTo(
+				IPreferenceConstants.NAVIGATOR_OBJECT_EXTENSIONS, "o;ali");
 
+		IFolder objFolder = this.project.getFolder("obj");
+		IFile aliFile = objFolder.getFile("mySource.ali");
+		IFile objectFile = objFolder.getFile("mySource.o");
+		IFile srcFile = objFolder.getFile("mySource.ads");
+
+		this.configureProjectDirectories(null, objFolder, null);
+
+		this.checkResourceSelection(new IResource[] { aliFile, objectFile },
+				new IResource[] { srcFile });
 	}
 
 	@Test
 	public void testExeFileFilter() {
+		this.setStringPreferenceTo(
+				IPreferenceConstants.NAVIGATOR_EXEC_EXTENSIONS, "exe");
 
+		IFolder exeFolder = this.project.getFolder("exe");
+		IFile binaryFile = exeFolder.getFile("myMain.exe");
+		IFile objFile = exeFolder.getFile("mySource.o");
+
+		this.configureProjectDirectories(null, null, exeFolder);
+
+		this.checkResourceSelection(new IResource[] { binaryFile },
+				new IResource[] { objFile });
 	}
 
 	@Test
 	public void testGnatProjectFileIsSelected() {
+		IFile gnatProjectFileOfProject = this.project.getFile(this.project
+				.getName() + ".gpr");
+		IFile anotherGnatProjectFile = this.project
+				.getFile("anotherGnatProject.gpr");
 
+		this.checkResourceIsSelected(true, gnatProjectFileOfProject,
+				"GNAT project file of project");
+		this.checkResourceIsSelected(false, anotherGnatProjectFile,
+				"Another GNAT project file");
 	}
 
 	@Test
 	public void testFileWithoutExtension() {
-		IProject project = CommonTestUtils.CreateAdaProject();
-
-		IFolder srcFolder = project.getFolder("src");
+		IFolder srcFolder = this.project.getFolder("src");
 		IFile noExtensionInSrc = srcFolder.getFile("inSrc");
 
-		IFolder objFolder = project.getFolder("obj");
+		IFolder objFolder = this.project.getFolder("obj");
 		IFile noExtensionInObj = objFolder.getFile("inObj");
 
-		IFolder exeFolder = project.getFolder("bin");
+		IFolder exeFolder = this.project.getFolder("bin");
 		IFile noExtensionInExe = exeFolder.getFile("inBin");
 
-		this.configureProjectDirectories(project, new IFolder[] { srcFolder },
+		this.configureProjectDirectories(new IFolder[] { srcFolder },
 				objFolder, exeFolder);
 
 		boolean displayFilesWithoutExtensions = false;
