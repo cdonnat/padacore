@@ -218,6 +218,9 @@
             <contentExtension
                   pattern="org.padacore.ui.navigator.sourceDirectories">
             </contentExtension>
+            <contentExtension
+                  pattern="org.eclipse.ui.navigator.resources.filters.closedProject">
+            </contentExtension>
          </includes>
       </viewerContentBinding>
       <viewerActionBinding
@@ -257,9 +260,9 @@
             <commonFilter
             activeByDefault="true"
             class="org.padacore.ui.navigator.filters.AdaProjectsFilter"
-            description="Hide projects which do not have an Ada nature"
+            description="Hides projects which do not have an Ada nature"
             id="org.padacore.ui.navigator.filters.adaProjects"
-            name="Hide non-Ada projects"
+            name="Non-Ada projects"
             visibleInUI="false">
       </commonFilter>
             <commonFilter
@@ -273,17 +276,17 @@
             <commonFilter
                   activeByDefault="true"
                   class="org.padacore.ui.navigator.filters.ObjectDirectoryFilter"
-                  description="Hide object directory of Ada project"
+                  description="Hides object directory of Ada project"
                   id="org.padacore.ui.navigator.filters.objectDirectory"
-                  name="Hide object directory"
+                  name="Object directory"
                   visibleInUI="true">
             </commonFilter>
             <commonFilter
                   activeByDefault="true"
                   class="org.padacore.ui.navigator.filters.ExecutableDirectoryFilter"
-                  description="Hide executable directory of Ada project"
+                  description="Hides executable directory of Ada project"
                   id="org.padacore.ui.navigator.filters.executableDirectory"
-                  name="Hide executable directory"
+                  name="Executable directory"
                   visibleInUI="true">
             </commonFilter>
    </extension>
