@@ -5,10 +5,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -40,12 +39,37 @@ public class ProjectDirectoriesFilterTest {
 				IPreferenceConstants.NAVIGATOR_FILE_WITHOUT_EXTENSION, false);
 	}
 
-	private void checkResourceSelection(
-			Map<IResource, Boolean> resourceSelection) {
-		for (Map.Entry<IResource, Boolean> mapEntry : resourceSelection
-				.entrySet()) {
-			this.checkResourceIsSelected(mapEntry.getValue(),
-					mapEntry.getKey(), mapEntry.getKey().getName());
+	private void setStringPreferenceTo(String prefName, String prefValue) {
+		IPreferenceStore preferenceStore = Activator.getDefault()
+				.getPreferenceStore();
+		preferenceStore.setValue(prefName, prefValue);
+	}
+
+	private void setBooleanPreferenceTo(String prefName, boolean prefValue) {
+		IPreferenceStore preferenceStore = Activator.getDefault()
+				.getPreferenceStore();
+		preferenceStore.setValue(prefName, prefValue);
+	}
+
+	private void checkAllResourcesAreSelected(IResource[] resources) {
+		this.checkResourceSelection(resources, new IResource[] {});
+	}
+
+	private void checkNoResourceIsSelected(IResource[] resources) {
+		this.checkResourceSelection(new IResource[] {}, resources);
+	}
+
+	private void checkResourceSelection(IResource[] expectedSelectedResources,
+			IResource[] expectedNotSelectedResources) {
+
+		for (IResource selectedRes : expectedSelectedResources) {
+			this.checkResourceIsSelected(true, selectedRes,
+					selectedRes.getName());
+		}
+
+		for (IResource notSelectedRes : expectedNotSelectedResources) {
+			this.checkResourceIsSelected(false, notSelectedRes,
+					notSelectedRes.getName());
 		}
 	}
 
@@ -55,14 +79,14 @@ public class ProjectDirectoriesFilterTest {
 	}
 
 	private void configureProjectDirectories(IProject project,
-			List<IFolder> sourceDirs, IFolder objDir, IFolder exeDir) {
+			IFolder[] sourceDirs, IFolder objDir, IFolder exeDir) {
 		IAdaProject adaProject = mock(IAdaProject.class);
 		List<IPath> sourceDirLocations;
 
 		if (sourceDirs == null) {
 			sourceDirLocations = new ArrayList<IPath>(0);
 		} else {
-			sourceDirLocations = new ArrayList<IPath>(sourceDirs.size());
+			sourceDirLocations = new ArrayList<IPath>(sourceDirs.length);
 			for (IFolder sourceDir : sourceDirs) {
 				sourceDirLocations.add(sourceDir.getLocation());
 			}
@@ -103,7 +127,6 @@ public class ProjectDirectoriesFilterTest {
 		// ----------------|--- src4*
 		// --------|--- not_src3
 
-		// Setup
 		IProject project = CommonTestUtils.CreateAdaProject();
 
 		IFolder src1 = project.getFolder("src1");
@@ -114,25 +137,11 @@ public class ProjectDirectoriesFilterTest {
 		IFolder src4 = not_src2.getFolder("src4");
 		IFolder not_src3 = not_src1.getFolder("not_src3");
 
-		List<IFolder> sourceDirs = new ArrayList<IFolder>();
-		sourceDirs.add(src1);
-		sourceDirs.add(src2);
-		sourceDirs.add(src3);
-		sourceDirs.add(src4);
+		this.configureProjectDirectories(project, new IFolder[] { src1, src2,
+				src3, src4 }, null, null);
 
-		this.configureProjectDirectories(project, sourceDirs, null, null);
-
-		// Exercize & check
-		Map<IResource, Boolean> expectedResourceSelection = new HashMap<>();
-		expectedResourceSelection.put(src1, true);
-		expectedResourceSelection.put(src2, true);
-		expectedResourceSelection.put(not_src1, true);
-		expectedResourceSelection.put(src3, true);
-		expectedResourceSelection.put(not_src2, true);
-		expectedResourceSelection.put(src4, true);
-		expectedResourceSelection.put(not_src3, false);
-
-		this.checkResourceSelection(expectedResourceSelection);
+		this.checkResourceSelection(new IResource[] { src1, src2, not_src1,
+				src3, not_src2, src4 }, new IResource[] { not_src3 });
 
 	}
 
@@ -154,7 +163,6 @@ public class ProjectDirectoriesFilterTest {
 				break;
 		}
 
-		// Setup
 		IProject project = CommonTestUtils.CreateAdaProject();
 
 		IFolder not_ObjOrExe1 = project.getFolder("not_" + folderNamePrefix
@@ -167,14 +175,8 @@ public class ProjectDirectoriesFilterTest {
 
 		this.configureProjectDirectories(project, null, objOrExe, null);
 
-		// Exercize & check
-		Map<IResource, Boolean> expectedResourceSelection = new HashMap<>();
-		expectedResourceSelection.put(not_ObjOrExe1, true);
-		expectedResourceSelection.put(not_ObjOrExe2, true);
-		expectedResourceSelection.put(objOrExe, true);
-		expectedResourceSelection.put(not_objOrExe3, false);
-
-		this.checkResourceSelection(expectedResourceSelection);
+		this.checkResourceSelection(new IResource[] { not_ObjOrExe1,
+				not_ObjOrExe2, objOrExe }, new IResource[] { not_objOrExe3 });
 	}
 
 	@Test
@@ -201,6 +203,60 @@ public class ProjectDirectoriesFilterTest {
 		// ---------------|--- not_exe3
 
 		this.runTestCaseForSimpleProjectDir(ProjectDirKind.EXE_DIR);
+
+	}
+
+	@Test
+	public void testSrcFileFilter() {
+
+	}
+
+	@Test
+	public void testObjFileFilter() {
+
+	}
+
+	@Test
+	public void testExeFileFilter() {
+
+	}
+
+	@Test
+	public void testGnatProjectFileIsSelected() {
+
+	}
+
+	@Test
+	public void testFileWithoutExtension() {
+		IProject project = CommonTestUtils.CreateAdaProject();
+
+		IFolder srcFolder = project.getFolder("src");
+		IFile noExtensionInSrc = srcFolder.getFile("inSrc");
+
+		IFolder objFolder = project.getFolder("obj");
+		IFile noExtensionInObj = objFolder.getFile("inObj");
+
+		IFolder exeFolder = project.getFolder("bin");
+		IFile noExtensionInExe = exeFolder.getFile("inBin");
+
+		this.configureProjectDirectories(project, new IFolder[] { srcFolder },
+				objFolder, exeFolder);
+
+		boolean displayFilesWithoutExtensions = false;
+
+		this.setBooleanPreferenceTo(
+				IPreferenceConstants.NAVIGATOR_FILE_WITHOUT_EXTENSION,
+				displayFilesWithoutExtensions);
+		this.checkNoResourceIsSelected(new IResource[] { noExtensionInSrc,
+				noExtensionInObj, noExtensionInExe });
+
+		displayFilesWithoutExtensions = true;
+
+		this.setBooleanPreferenceTo(
+				IPreferenceConstants.NAVIGATOR_FILE_WITHOUT_EXTENSION,
+				displayFilesWithoutExtensions);
+		this.checkAllResourcesAreSelected(new IResource[] { noExtensionInSrc,
+				noExtensionInObj, noExtensionInExe });
 
 	}
 
