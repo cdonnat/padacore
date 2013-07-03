@@ -5,7 +5,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -38,9 +40,54 @@ public class ProjectDirectoriesFilterTest {
 				IPreferenceConstants.NAVIGATOR_FILE_WITHOUT_EXTENSION, false);
 	}
 
+	private void checkResourceSelection(
+			Map<IResource, Boolean> resourceSelection) {
+		for (Map.Entry<IResource, Boolean> mapEntry : resourceSelection
+				.entrySet()) {
+			this.checkResourceIsSelected(mapEntry.getValue(),
+					mapEntry.getKey(), mapEntry.getKey().getName());
+		}
+	}
+
 	private void checkResourceIsSelected(boolean isSelected,
 			IResource resource, String comment) {
 		assertTrue(comment, this.sut.select(null, null, resource) == isSelected);
+	}
+
+	private void configureProjectDirectories(IProject project,
+			List<IFolder> sourceDirs, IFolder objDir, IFolder exeDir) {
+		IAdaProject adaProject = mock(IAdaProject.class);
+		List<IPath> sourceDirLocations;
+
+		if (sourceDirs == null) {
+			sourceDirLocations = new ArrayList<IPath>(0);
+		} else {
+			sourceDirLocations = new ArrayList<IPath>(sourceDirs.size());
+			for (IFolder sourceDir : sourceDirs) {
+				sourceDirLocations.add(sourceDir.getLocation());
+			}
+		}
+
+		when(adaProject.getSourceDirectoriesPaths()).thenReturn(
+				sourceDirLocations);
+
+		if (objDir == null) {
+			when(adaProject.getObjectDirectoryPath()).thenReturn(
+					project.getLocation());
+		} else {
+			when(adaProject.getObjectDirectoryPath()).thenReturn(
+					objDir.getLocation());
+		}
+
+		if (exeDir == null) {
+			when(adaProject.getExecutableDirectoryPath()).thenReturn(
+					project.getLocation());
+		} else {
+			when(adaProject.getExecutableDirectoryPath()).thenReturn(
+					exeDir.getLocation());
+		}
+
+		CommonTestUtils.SetAssociatedAdaProject(project, adaProject);
 	}
 
 	@Test
@@ -48,59 +95,86 @@ public class ProjectDirectoriesFilterTest {
 
 		// source folders hierarchy:
 		// starred folders shall be displayed
-		// |--- src*
-		// ------|--- src*
-		// |--- not_src*
-		// --------|--- src*
-		// --------|--- not_src*
-		// ----------------|--- src*
-		// --------|--- not_src
+		// |--- src1*
+		// ------|--- src2*
+		// |--- not_src1*
+		// --------|--- src3*
+		// --------|--- not_src2*
+		// ----------------|--- src4*
+		// --------|--- not_src3
 
+		// Setup
 		IProject project = CommonTestUtils.CreateAdaProject();
 
-		IAdaProject adaProject = mock(IAdaProject.class);
-		List<IPath> sourceDirs = new ArrayList<>();
+		IFolder src1 = project.getFolder("src1");
+		IFolder src2 = src1.getFolder("src2");
+		IFolder not_src1 = project.getFolder("not_src1");
+		IFolder src3 = not_src1.getFolder("src3");
+		IFolder not_src2 = not_src1.getFolder("not_src2");
+		IFolder src4 = not_src2.getFolder("src4");
+		IFolder not_src3 = not_src1.getFolder("not_src3");
 
-		IFolder firstLevelSrcFolder = project.getFolder("src");
-		IFolder secondLevelSrcFolderInSrc = firstLevelSrcFolder
-				.getFolder("src");
-		IFolder firstLevelNotSrcFolder = project.getFolder("not_src");
-		IFolder secondLevelSrcFolderInNotSrc = firstLevelNotSrcFolder
-				.getFolder("src");
-		IFolder secondLevelNotSrcFolderInNotSrc = firstLevelNotSrcFolder
-				.getFolder("not_src");
-		IFolder thirdLevelSrcFolderInNotSrc = secondLevelNotSrcFolderInNotSrc
-				.getFolder("src");
-		IFolder secondLevelNotSrcFolderInNotSrc2 = firstLevelNotSrcFolder
-				.getFolder("not_src2");
+		List<IFolder> sourceDirs = new ArrayList<IFolder>();
+		sourceDirs.add(src1);
+		sourceDirs.add(src2);
+		sourceDirs.add(src3);
+		sourceDirs.add(src4);
 
-		when(adaProject.getSourceDirectoriesPaths()).thenReturn(sourceDirs);
-		sourceDirs.add(firstLevelSrcFolder.getLocation());
-		sourceDirs.add(secondLevelSrcFolderInSrc.getLocation());
-		sourceDirs.add(secondLevelSrcFolderInNotSrc.getLocation());
-		sourceDirs.add(thirdLevelSrcFolderInNotSrc.getLocation());
+		this.configureProjectDirectories(project, sourceDirs, null, null);
 
-		when(adaProject.getObjectDirectoryPath()).thenReturn(
-				project.getLocation());
-		when(adaProject.getExecutableDirectoryPath()).thenReturn(
-				project.getLocation());
+		// Exercize & check
+		Map<IResource, Boolean> expectedResourceSelection = new HashMap<>();
+		expectedResourceSelection.put(src1, true);
+		expectedResourceSelection.put(src2, true);
+		expectedResourceSelection.put(not_src1, true);
+		expectedResourceSelection.put(src3, true);
+		expectedResourceSelection.put(not_src2, true);
+		expectedResourceSelection.put(src4, true);
+		expectedResourceSelection.put(not_src3, false);
 
-		CommonTestUtils.SetAssociatedAdaProject(project, adaProject);
+		this.checkResourceSelection(expectedResourceSelection);
 
-		this.checkResourceIsSelected(true, firstLevelSrcFolder,
-				"First level source folder");
-		this.checkResourceIsSelected(true, secondLevelSrcFolderInSrc,
-				"Second level source folder in source folder");
-		this.checkResourceIsSelected(true, firstLevelNotSrcFolder,
-				"First level not source folder");
-		this.checkResourceIsSelected(true, secondLevelSrcFolderInNotSrc,
-				"Second level source folder in not source folder");
-		this.checkResourceIsSelected(true, secondLevelNotSrcFolderInNotSrc,
-				"Second level not source folder in not source folder");
-		this.checkResourceIsSelected(true, thirdLevelSrcFolderInNotSrc,
-				"Third level source folder in not source folder");
-		this.checkResourceIsSelected(false, secondLevelNotSrcFolderInNotSrc2,
-				"Second level not source folder in not source folder - 2");
+	}
+
+	private enum ProjectDirKind {
+		OBJ_DIR, EXE_DIR;
+	}
+
+	private void runTestCaseForSimpleProjectDir(ProjectDirKind projectDirKind) {
+		String folderNamePrefix = "";
+
+		switch (projectDirKind) {
+			case OBJ_DIR:
+				folderNamePrefix = "obj";
+				break;
+			case EXE_DIR:
+				folderNamePrefix = "exe";
+				break;
+			default:
+				break;
+		}
+
+		// Setup
+		IProject project = CommonTestUtils.CreateAdaProject();
+
+		IFolder not_ObjOrExe1 = project.getFolder("not_" + folderNamePrefix
+				+ "1");
+		IFolder not_ObjOrExe2 = not_ObjOrExe1.getFolder("not_"
+				+ folderNamePrefix + "2");
+		IFolder objOrExe = not_ObjOrExe2.getFolder(folderNamePrefix);
+		IFolder not_objOrExe3 = not_ObjOrExe2.getFolder("not_"
+				+ folderNamePrefix + "3");
+
+		this.configureProjectDirectories(project, null, objOrExe, null);
+
+		// Exercize & check
+		Map<IResource, Boolean> expectedResourceSelection = new HashMap<>();
+		expectedResourceSelection.put(not_ObjOrExe1, true);
+		expectedResourceSelection.put(not_ObjOrExe2, true);
+		expectedResourceSelection.put(objOrExe, true);
+		expectedResourceSelection.put(not_objOrExe3, false);
+
+		this.checkResourceSelection(expectedResourceSelection);
 	}
 
 	@Test
@@ -108,39 +182,12 @@ public class ProjectDirectoriesFilterTest {
 		// folders hierarchy:
 		// starred folders shall be displayed
 		// project
-		// |--- not_obj*
-		// -------|--- not_obj*
+		// |--- not_obj1*
+		// -------|--- not_obj2*
 		// ---------------|--- obj*
-		// ---------------|--- not_obj
+		// ---------------|--- not_obj3
 
-		IProject project = CommonTestUtils.CreateAdaProject();
-
-		IAdaProject adaProject = mock(IAdaProject.class);
-		List<IPath> sourceDirs = new ArrayList<>();
-
-		IFolder firstLevelNotObjFolder = project.getFolder("not_obj");
-		IFolder secondLevelNotObjFolder = firstLevelNotObjFolder
-				.getFolder("not_obj");
-		IFolder thirdLevelObjFolder = secondLevelNotObjFolder.getFolder("obj");
-		IFolder thirdLevelNotObjFolder = secondLevelNotObjFolder
-				.getFolder("not_obj");
-
-		when(adaProject.getSourceDirectoriesPaths()).thenReturn(sourceDirs);
-		when(adaProject.getObjectDirectoryPath()).thenReturn(
-				thirdLevelObjFolder.getLocation());
-		when(adaProject.getExecutableDirectoryPath()).thenReturn(
-				project.getLocation());
-
-		CommonTestUtils.SetAssociatedAdaProject(project, adaProject);
-
-		this.checkResourceIsSelected(true, firstLevelNotObjFolder,
-				"First level not object folder");
-		this.checkResourceIsSelected(true, secondLevelNotObjFolder,
-				"Second level not object folder");
-		this.checkResourceIsSelected(true, thirdLevelObjFolder,
-				"Third level object folder");
-		this.checkResourceIsSelected(false, thirdLevelNotObjFolder,
-				"Third level not object folder");
+		this.runTestCaseForSimpleProjectDir(ProjectDirKind.OBJ_DIR);
 	}
 
 	@Test
@@ -148,40 +195,13 @@ public class ProjectDirectoriesFilterTest {
 		// folders hierarchy:
 		// starred folders shall be displayed
 		// project
-		// |--- not_exe*
-		// -------|--- not_exe*
+		// |--- not_exe1*
+		// -------|--- not_exe2*
 		// ---------------|--- exe*
-		// ---------------|--- not_exe
+		// ---------------|--- not_exe3
 
-		IProject project = CommonTestUtils.CreateAdaProject();
+		this.runTestCaseForSimpleProjectDir(ProjectDirKind.EXE_DIR);
 
-		IAdaProject adaProject = mock(IAdaProject.class);
-		List<IPath> sourceDirs = new ArrayList<>();
-
-		IFolder firstLevelNotExeFolder = project.getFolder("not_exe");
-		IFolder secondLevelNotExeFolder = firstLevelNotExeFolder
-				.getFolder("not_exe");
-		IFolder thirdLevelExeFolder = secondLevelNotExeFolder.getFolder("exe");
-		IFolder thirdLevelNotExeFolder = secondLevelNotExeFolder
-				.getFolder("not_exe");
-
-		when(adaProject.isExecutable()).thenReturn(true);
-		when(adaProject.getSourceDirectoriesPaths()).thenReturn(sourceDirs);
-		when(adaProject.getObjectDirectoryPath()).thenReturn(
-				project.getLocation());
-		when(adaProject.getExecutableDirectoryPath()).thenReturn(
-				thirdLevelExeFolder.getLocation());
-
-		CommonTestUtils.SetAssociatedAdaProject(project, adaProject);
-
-		this.checkResourceIsSelected(true, firstLevelNotExeFolder,
-				"First level not executable folder");
-		this.checkResourceIsSelected(true, secondLevelNotExeFolder,
-				"Second level not executable folder");
-		this.checkResourceIsSelected(true, thirdLevelExeFolder,
-				"Third level executable folder");
-		this.checkResourceIsSelected(false, thirdLevelNotExeFolder,
-				"Third level not executable folder");
 	}
 
 	// FIXME add tests for files
