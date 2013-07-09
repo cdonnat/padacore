@@ -24,8 +24,8 @@ public class ExternalProcess implements IExternalProcess {
 	 * @param errStreamObservers
 	 *            Error stream observers.
 	 */
-	public ExternalProcess(String processName, IConsole console, Observer[] outStreamObservers,
-			Observer[] errStreamObservers) {
+	public ExternalProcess(String processName, IConsole console,
+			Observer[] outStreamObservers, Observer[] errStreamObservers) {
 		this.info = new ExternalProcessInfo(processName, console);
 		this.threads = new ArrayList<Thread>(3);
 		this.outStreamObservers = outStreamObservers;
@@ -36,28 +36,29 @@ public class ExternalProcess implements IExternalProcess {
 	public void run(String[] cmdWithArgs, IProgressMonitor monitor) {
 		ProcessBuilder processBuilder = new ProcessBuilder(cmdWithArgs);
 
+		this.info.start(cmdWithArgs);
 		try {
-			this.info.start(cmdWithArgs);
 			this.run(monitor, processBuilder);
-			this.info.finish(isSuccessful());
 		} catch (IOException e) {
-			ErrorLog.appendMessage("Error while launching external command: " + cmdWithArgs[0],
-					IStatus.ERROR);
+			ErrorLog.appendException(e, IStatus.ERROR);
+		} finally {
+			this.info.finish(this.isSuccessful());
 		}
 	}
 
-	private void runCmd(IProgressMonitor monitor, ProcessBuilder processBuilder) {
+	private void runCmd(IProgressMonitor monitor, ProcessBuilder processBuilder)
+			throws IOException {
 		try {
 			this.process = processBuilder.start();
-		} catch (IOException e) {
-			ErrorLog.appendException(e, IStatus.WARNING);
-		}
 
-		this.threads
-				.add(new Thread(new StreamReader(process.getInputStream(), outStreamObservers)));
-		this.threads
-				.add(new Thread(new StreamReader(process.getErrorStream(), errStreamObservers)));
-		this.threads.add(new ExternalProcessCanceler(this, monitor));
+			this.threads.add(new Thread(new StreamReader(process
+					.getInputStream(), outStreamObservers)));
+			this.threads.add(new Thread(new StreamReader(process
+					.getErrorStream(), errStreamObservers)));
+			this.threads.add(new ExternalProcessCanceler(this, monitor));
+		} catch (IOException e) {
+			throw e;
+		}
 	}
 
 	private void startThreads() {
@@ -77,10 +78,15 @@ public class ExternalProcess implements IExternalProcess {
 		}
 	}
 
-	private void run(IProgressMonitor monitor, ProcessBuilder processBuilder) throws IOException {
-		this.runCmd(monitor, processBuilder);
-		this.startThreads();
-		this.waitUntilTheEndOfTheCmd();
+	private void run(IProgressMonitor monitor, ProcessBuilder processBuilder)
+			throws IOException {
+		try {
+			this.runCmd(monitor, processBuilder);
+			this.startThreads();
+			this.waitUntilTheEndOfTheCmd();
+		} catch (IOException e) {
+			throw e;
+		}
 	}
 
 	@Override
@@ -100,6 +106,6 @@ public class ExternalProcess implements IExternalProcess {
 	}
 
 	private boolean isSuccessful() {
-		return process.exitValue() == 0;
+		return this.process != null && this.process.exitValue() == 0;
 	}
 }

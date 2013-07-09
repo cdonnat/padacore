@@ -10,6 +10,7 @@ import org.eclipse.core.runtime.Path;
 import org.gpr4j.api.ExternalVariable;
 import org.gpr4j.api.IGpr;
 import org.padacore.core.project.IAdaProject;
+import org.padacore.core.utils.SystemUtils;
 
 public class GnatAdaProject implements IAdaProject {
 
@@ -23,15 +24,16 @@ public class GnatAdaProject implements IAdaProject {
 	public String getName() {
 		return this.gprProject.getName();
 	}
-	
+
 	@Override
 	public List<String> getExecutableNames() {
 		Assert.isLegal(this.isExecutable());
 
-		List<String> execNames = new ArrayList<String>(this.gprProject.getExecutableSourceNames()
-				.size());
-		boolean isWindowsSystem = isWindowsSystem();
-		List<String> execSourceNames = this.gprProject.getExecutableSourceNames();
+		List<String> execNames = new ArrayList<String>(this.gprProject
+				.getExecutableSourceNames().size());
+		boolean isWindowsSystem = SystemUtils.IsWindowsSystem();
+		List<String> execSourceNames = this.gprProject
+				.getExecutableSourceNames();
 
 		for (String execSourceName : execSourceNames) {
 
@@ -72,17 +74,6 @@ public class GnatAdaProject implements IAdaProject {
 	}
 
 	/**
-	 * Returns true if and only if current system is Windows.
-	 * 
-	 * @return true if current system is Windows, false otherwise.
-	 */
-	private static boolean isWindowsSystem() {
-		String osName = System.getProperty("os.name");
-
-		return osName.contains("win") || osName.contains("Win");
-	}
-
-	/**
 	 * Removes the extension from given filename if there is one, does nothing
 	 * otherwise.
 	 * 
@@ -94,7 +85,8 @@ public class GnatAdaProject implements IAdaProject {
 		String fileNameWithoutExtension = filename;
 
 		if (filename.indexOf('.') != -1) {
-			fileNameWithoutExtension = filename.substring(0, filename.lastIndexOf('.'));
+			fileNameWithoutExtension = filename.substring(0,
+					filename.lastIndexOf('.'));
 		}
 
 		return fileNameWithoutExtension;
@@ -123,7 +115,8 @@ public class GnatAdaProject implements IAdaProject {
 		if (relativeObjectDirectory == null) {
 			relativeObjectDirectory = ".";
 		}
-		IPath absoluteObjectDirectory = this.convertToAbsolutePath(relativeObjectDirectory);
+		IPath absoluteObjectDirectory = this
+				.convertToAbsolutePath(relativeObjectDirectory);
 
 		return absoluteObjectDirectory;
 	}
@@ -136,7 +129,8 @@ public class GnatAdaProject implements IAdaProject {
 	 * @return an absolute path equivalent to given relative path.
 	 */
 	private IPath convertToAbsolutePath(String projectRelativePath) {
-		return new Path(this.gprProject.getRootDirPath().toString()).append(projectRelativePath);
+		return new Path(this.gprProject.getRootDirPath().toString())
+				.append(projectRelativePath);
 	}
 
 	@Override
@@ -148,7 +142,7 @@ public class GnatAdaProject implements IAdaProject {
 	public List<String> getExecutableSourceNames() {
 		return this.gprProject.getExecutableSourceNames();
 	}
-	
+
 	public Set<ExternalVariable> getExternalVariables() {
 		return this.gprProject.getExternalVariables();
 	}

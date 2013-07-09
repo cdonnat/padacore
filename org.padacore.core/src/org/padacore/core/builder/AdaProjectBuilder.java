@@ -3,7 +3,6 @@ package org.padacore.core.builder;
 import java.util.Map;
 import java.util.Observer;
 
-import org.padacore.core.Activator;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
@@ -12,6 +11,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
+import org.padacore.core.Activator;
 import org.padacore.core.gnat.GnatAdaProject;
 import org.padacore.core.project.PropertiesManager;
 import org.padacore.core.utils.Console;
@@ -37,8 +37,10 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 	 *         (command followed by arguments).
 	 */
 	private String[] buildCommand() {
-		AdaProjectBuilderCmds cmd = new AdaProjectBuilderCmds(Activator.getDefault().getScenario(),
-				(GnatAdaProject) new PropertiesManager(this.getProject()).getAdaProject());
+		AdaProjectBuilderCmds cmd = new AdaProjectBuilderCmds(Activator
+				.getDefault().getScenario(),
+				(GnatAdaProject) new PropertiesManager(this.getProject())
+						.getAdaProject());
 		return cmd.build();
 	}
 
@@ -49,8 +51,10 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 	 *         (command followed by arguments).
 	 */
 	private String[] cleanCommand() {
-		AdaProjectBuilderCmds cmd = new AdaProjectBuilderCmds(Activator.getDefault().getScenario(),
-				(GnatAdaProject) new PropertiesManager(this.getProject()).getAdaProject());
+		AdaProjectBuilderCmds cmd = new AdaProjectBuilderCmds(Activator
+				.getDefault().getScenario(),
+				(GnatAdaProject) new PropertiesManager(this.getProject())
+						.getAdaProject());
 		return cmd.clean();
 	}
 
@@ -64,27 +68,32 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 	 *             if the resources of the project cannot be retrieved.
 	 */
 	private void build(int kind, IProgressMonitor monitor) throws CoreException {
-		Assert.isLegal(kind == FULL_BUILD || kind == INCREMENTAL_BUILD || kind == AUTO_BUILD);
+		Assert.isLegal(kind == FULL_BUILD || kind == INCREMENTAL_BUILD
+				|| kind == AUTO_BUILD);
 
 		Console console = new Console();
 		SubMonitor submonitor = SubMonitor.convert(monitor);
 
-		String message = "Building of " + getProject().getName();
+		StringBuilder messageBuilder = new StringBuilder("Building of ");
+		messageBuilder.append(this.getProject().getName());
 
-		ExternalProcess process = new ExternalProcess(message, console,
-				new Observer[] { new GprbuildObserver(submonitor, console) }, new Observer[] {
-						new GprbuildErrObserver(this.getProject(), new GprbuildOutput()),
+		ExternalProcess process = new ExternalProcess(
+				messageBuilder.toString(), console,
+				new Observer[] { new GprbuildObserver(submonitor, console) },
+				new Observer[] {
+						new GprbuildErrObserver(this.getProject(),
+								new GprbuildOutput()),
 						new ExternalProcessOutput(console) });
 
-		submonitor.beginTask(message, 100);
-		process.run(buildCommand(), monitor);
+		submonitor.beginTask(messageBuilder.toString(), 100);
+		process.run(this.buildCommand(), monitor);
 		submonitor.done();
-		refreshBuiltProject();
+		this.refreshBuiltProject();
 	}
 
 	@Override
-	protected IProject[] build(int kind, Map<String, String> args, IProgressMonitor monitor)
-			throws CoreException {
+	protected IProject[] build(int kind, Map<String, String> args,
+			IProgressMonitor monitor) throws CoreException {
 
 		this.build(kind, monitor);
 
@@ -110,7 +119,8 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 	 */
 	private void refreshBuiltProject() {
 		try {
-			getProject().refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
+			getProject().refreshLocal(IResource.DEPTH_INFINITE,
+					new NullProgressMonitor());
 		} catch (CoreException e) {
 			ErrorLog.appendException(e);
 		}
