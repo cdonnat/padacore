@@ -33,14 +33,15 @@ public class ExternalProcess implements IExternalProcess {
 	}
 
 	@Override
-	public void run(String[] cmdWithArgs, IProgressMonitor monitor) {
+	public void run(String[] cmdWithArgs, IProgressMonitor monitor)
+			throws ProgramNotFoundException {
 		ProcessBuilder processBuilder = new ProcessBuilder(cmdWithArgs);
 
 		this.info.start(cmdWithArgs);
 		try {
 			this.run(monitor, processBuilder);
 		} catch (IOException e) {
-			ErrorLog.appendException(e, IStatus.ERROR);
+			throw new ProgramNotFoundException(cmdWithArgs[0], e);
 		} finally {
 			this.info.finish(this.isSuccessful());
 		}

@@ -9,6 +9,7 @@ import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.padacore.core.Activator;
@@ -18,6 +19,7 @@ import org.padacore.core.utils.Console;
 import org.padacore.core.utils.ErrorLog;
 import org.padacore.core.utils.ExternalProcess;
 import org.padacore.core.utils.ExternalProcessOutput;
+import org.padacore.core.utils.ProgramNotFoundException;
 
 /**
  * This class implements an Ada incremental project build using gprbuild.
@@ -86,9 +88,28 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 						new ExternalProcessOutput(console) });
 
 		submonitor.beginTask(messageBuilder.toString(), 100);
-		process.run(this.buildCommand(), monitor);
+		try {
+			process.run(this.buildCommand(), monitor);
+		} catch (ProgramNotFoundException e) {
+			this.warnUserThatGnatIsNotInSystemPath(e);
+		}
 		submonitor.done();
 		this.refreshBuiltProject();
+	}
+
+	/**
+	 * Appends a message to error log to inform user that GNAT is not found in
+	 * system path.
+	 * 
+	 * @param e
+	 *            the ProgramNotFoundException that was thrown when trying to
+	 *            execute the GNAT command.
+	 */
+	private void warnUserThatGnatIsNotInSystemPath(ProgramNotFoundException e) {
+		StringBuilder errorMessageBuilder = new StringBuilder(e.getMessage());
+		errorMessageBuilder.append(" is not in system path.");
+
+		ErrorLog.appendMessage(errorMessageBuilder.toString(), IStatus.ERROR);
 	}
 
 	@Override
@@ -110,7 +131,11 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 				new Observer[] { new ExternalProcessOutput(console) },
 				new Observer[] { new ExternalProcessOutput(console) });
 
-		process.run(cleanCommand(), monitor);
+		try {
+			process.run(cleanCommand(), monitor);
+		} catch (ProgramNotFoundException e) {
+			this.warnUserThatGnatIsNotInSystemPath(e);
+		}
 		refreshBuiltProject();
 	}
 

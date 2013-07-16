@@ -51,7 +51,7 @@ public class Activator extends Plugin {
 		super.start(context);
 
 		if (!this.areSystemRequirementsMet()) {
-			this.manageSystemRequirementsNotMet();
+			this.warnUserThatSystemRequirementsAreNotMet();
 		}
 
 		plugin = this;
@@ -92,7 +92,7 @@ public class Activator extends Plugin {
 	 * 
 	 * @pre Is called when system requirements are not met.
 	 */
-	private void manageSystemRequirementsNotMet() {
+	private void warnUserThatSystemRequirementsAreNotMet() {
 		Assert.isLegal(!this.areSystemRequirementsMet());
 
 		StringBuilder titleBuilder = new StringBuilder();

@@ -32,7 +32,7 @@ public class ErrorLog {
 	 *            severity of the message, one of IStatus.ERROR,
 	 *            IStatus.WARNING, IStatus.CANCEL.
 	 */
-	public static void appendException(Exception e, int severity) {
+	public static void appendException(Throwable e, int severity) {
 		Assert.isLegal(severity == IStatus.ERROR || severity == IStatus.WARNING
 				|| severity == IStatus.CANCEL);
 

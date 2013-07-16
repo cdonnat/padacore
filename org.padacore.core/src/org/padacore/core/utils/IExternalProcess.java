@@ -13,8 +13,12 @@ public interface IExternalProcess {
 	 *            Command to run
 	 * @param monitor
 	 *            Progress monitor to display external process progress
+	 * @throws ProgramNotFoundException
+	 *             if command given in parameter does not identify an existing
+	 *             command.
 	 */
-	public void run(String[] cmdWithArgs, IProgressMonitor monitor);
+	public void run(String[] cmdWithArgs, IProgressMonitor monitor)
+			throws ProgramNotFoundException;
 
 	/**
 	 * Stop the external process.
