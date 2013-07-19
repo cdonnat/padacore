@@ -117,6 +117,8 @@ public class GprbuildErrObserverTest {
 		this.checkMarkerOfFileIsCorrect(fileWithError, errorOnFile);
 
 	}
+	
+	//TODO add test when error file has an absolute path
 
 	@Test
 	public void testFileInAReferencedProject() {

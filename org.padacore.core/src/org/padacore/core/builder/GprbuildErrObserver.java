@@ -137,7 +137,8 @@ public class GprbuildErrObserver implements Observer {
 
 	/**
 	 * Returns the absolute file path for the given file contained in the given
-	 * folder.
+	 * folder. If fileName already denotes an absolute path, it is returned
+	 * unchanged.
 	 * 
 	 * @param fileName
 	 *            name of the file
@@ -146,14 +147,25 @@ public class GprbuildErrObserver implements Observer {
 	 * @return the absolute file path for the given file contained in the given
 	 *         folder.
 	 */
-	private IPath buildAbsolutePathFromFileName(String fileName,
+	private IPath getAbsolutePathFromFileName(String fileName,
 			IPath containingFolder) {
-		StringBuilder stringBuilder = new StringBuilder(
-				containingFolder.toString());
-		stringBuilder.append(System.getProperty("file.separator"));
-		stringBuilder.append(fileName);
 
-		return new Path(stringBuilder.toString());
+		IPath currentPath = new Path(fileName);
+		IPath absolutePath;
+
+		if (!currentPath.isAbsolute()) {
+			StringBuilder absolutePathBuilder = new StringBuilder(
+					containingFolder.toString());
+			absolutePathBuilder.append(System.getProperty("file.separator"));
+			absolutePathBuilder.append(fileName);
+
+			absolutePath = new Path(absolutePathBuilder.toString());
+
+		} else {
+			absolutePath = currentPath;
+		}
+
+		return absolutePath;
 	}
 
 	/**
@@ -172,15 +184,14 @@ public class GprbuildErrObserver implements Observer {
 				.GetAssociatedAdaProject(project);
 
 		int srcDir = 0;
-		IPath absoluteFilePath;
+		IPath absoluteFilePath = this.getAbsolutePathFromFileName(fileName,
+				adaProject.getRootPath());
 
-		file = resourceLocator.findResourceFromPath(this
-				.buildAbsolutePathFromFileName(fileName,
-						adaProject.getRootPath()));
+		file = resourceLocator.findResourceFromPath(absoluteFilePath);
 
 		while (file == null
 				&& srcDir < adaProject.getSourceDirectoriesPaths().size()) {
-			absoluteFilePath = this.buildAbsolutePathFromFileName(fileName,
+			absoluteFilePath = this.getAbsolutePathFromFileName(fileName,
 					adaProject.getSourceDirectoriesPaths().get(srcDir));
 
 			file = resourceLocator.findResourceFromPath(absoluteFilePath);
