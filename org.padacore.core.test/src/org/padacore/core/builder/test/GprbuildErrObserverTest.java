@@ -14,9 +14,11 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.junit.Test;
 import org.padacore.core.builder.Error;
 import org.padacore.core.builder.GprbuildErrObserver;
@@ -37,14 +39,30 @@ public class GprbuildErrObserverTest {
 	private IFile setupProjectWithFileUnderRoot(String nameOfFileWithError) {
 		this.project = CommonTestUtils.CreateAdaProject();
 		List<IPath> sourceDirs = new ArrayList<IPath>();
-		
+
 		IAdaProject adaProject = mock(IAdaProject.class);
 		when(adaProject.getRootPath()).thenReturn(this.project.getLocation());
 		when(adaProject.getSourceDirectoriesPaths()).thenReturn(sourceDirs);
-		
+
 		CommonTestUtils.SetAssociatedAdaProject(this.project, adaProject);
 
 		IFile fileWithError = this.project.getFile(nameOfFileWithError);
+		this.createAndFillWithDummyContents(fileWithError);
+
+		return fileWithError;
+	}
+
+	private IFile setupProjectWithAbsolutePath(String nameOfFileWithError) {
+		List<IPath> sourceDirs = new ArrayList<IPath>();
+
+		IAdaProject adaProject = mock(IAdaProject.class);
+		when(adaProject.getRootPath()).thenReturn(this.project.getLocation());
+		when(adaProject.getSourceDirectoriesPaths()).thenReturn(sourceDirs);
+
+		CommonTestUtils.SetAssociatedAdaProject(this.project, adaProject);
+
+		IFile fileWithError = ResourcesPlugin.getWorkspace().getRoot()
+				.getFileForLocation(new Path(nameOfFileWithError));
 		this.createAndFillWithDummyContents(fileWithError);
 
 		return fileWithError;
@@ -104,6 +122,24 @@ public class GprbuildErrObserverTest {
 	}
 
 	@Test
+	public void testFileWithAbsolutePath() {
+		this.project = CommonTestUtils.CreateAdaProject();
+
+		String nameOfFileWithError = this.project.getFile("absolute.ads")
+				.getLocation().toOSString();
+		Error errorOnFile = new Error(nameOfFileWithError, 1, 1,
+				Error.SEVERITY_ERROR, "absolutePath");
+
+		IFile fileWithError = this
+				.setupProjectWithAbsolutePath(nameOfFileWithError);
+
+		this.createFixture(errorOnFile);
+		this.exercize();
+		this.checkMarkerOfFileIsCorrect(fileWithError, errorOnFile);
+
+	}
+
+	@Test
 	public void testFileInOneOfSourceDirectories() {
 		String nameOfFileWithError = "another.ads";
 		Error errorOnFile = new Error(nameOfFileWithError, 5, 11,
@@ -117,17 +153,16 @@ public class GprbuildErrObserverTest {
 		this.checkMarkerOfFileIsCorrect(fileWithError, errorOnFile);
 
 	}
-	
-	//TODO add test when error file has an absolute path
 
 	@Test
 	public void testFileInAReferencedProject() {
 		String nameOfFileWithError = "outtaProject";
 		Error errorOnFile = new Error(nameOfFileWithError, 10, 12,
 				Error.SEVERITY_ERROR, "inAReferencedProject");
-		
-		IFile fileWithError = this.setupProjectWithFileInAReferencedProject(nameOfFileWithError);
-		
+
+		IFile fileWithError = this
+				.setupProjectWithFileInAReferencedProject(nameOfFileWithError);
+
 		this.createFixture(errorOnFile);
 		this.exercize();
 		this.checkMarkerOfFileIsCorrect(fileWithError, errorOnFile);
@@ -135,23 +170,25 @@ public class GprbuildErrObserverTest {
 
 	private IFile setupProjectWithFileInAReferencedProject(
 			String nameOfFileWithError) {
-		IProject referencedProject = CommonTestUtils.CreateAdaProject(); 
-		IFolder folderInRefProject = this.createSourceDirsFor(referencedProject);
-		
+		IProject referencedProject = CommonTestUtils.CreateAdaProject();
+		IFolder folderInRefProject = this
+				.createSourceDirsFor(referencedProject);
+
 		this.project = CommonTestUtils.CreateAdaProject();
 		try {
 			IProjectDescription projectDesc = this.project.getDescription();
-			projectDesc.setReferencedProjects(new IProject[] {referencedProject});
+			projectDesc
+					.setReferencedProjects(new IProject[] { referencedProject });
 			this.project.setDescription(projectDesc, null);
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
-		
+
 		this.createSourceDirsFor(this.project);
-		
+
 		IFile fileWithError = folderInRefProject.getFile(nameOfFileWithError);
 		this.createAndFillWithDummyContents(fileWithError);
-		
+
 		return fileWithError;
 
 	}
@@ -170,15 +207,14 @@ public class GprbuildErrObserverTest {
 
 				when(adaProject.getSourceDirectoriesPaths()).thenReturn(
 						sourceDirPaths);
-				when(adaProject.getRootPath()).thenReturn(
-						project.getLocation());
-				CommonTestUtils.SetAssociatedAdaProject(project,
-						adaProject);
+				when(adaProject.getRootPath())
+						.thenReturn(project.getLocation());
+				CommonTestUtils.SetAssociatedAdaProject(project, adaProject);
 			}
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
-		
+
 		return srcFolder;
 
 	}
