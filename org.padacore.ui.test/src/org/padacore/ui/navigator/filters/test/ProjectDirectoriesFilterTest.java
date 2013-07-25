@@ -289,6 +289,4 @@ public class ProjectDirectoriesFilterTest {
 
 	}
 
-	// FIXME add tests for files
-
 }
