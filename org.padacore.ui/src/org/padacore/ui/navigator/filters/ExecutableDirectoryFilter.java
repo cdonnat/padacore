@@ -7,8 +7,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.padacore.core.project.IAdaProject;
 
 /**
- * This class defines a filter which hides executable object directory of Ada
- * project.
+ * This class defines a filter which hides executable directory of Ada project.
  * 
  * @author RS
  * 
