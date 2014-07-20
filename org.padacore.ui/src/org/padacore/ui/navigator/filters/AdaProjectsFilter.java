@@ -20,16 +20,16 @@ public class AdaProjectsFilter extends ViewerFilter {
 	@Override
 	public boolean select(Viewer viewer, Object parentElement, Object element) {
 		Assert.isLegal(element instanceof IResource);
-		boolean elementShallBeDisplayed = true;
+		boolean elementShallBeHidden = false;
 
 		IResource resource = (IResource) element;
 
 		if (resource.getType() == IResource.PROJECT) {
-			elementShallBeDisplayed = this
+			elementShallBeHidden = !this
 					.isProjectAnAdaProject((IProject) resource);
 		}
 
-		return elementShallBeDisplayed;
+		return !elementShallBeHidden;
 	}
 
 	/**

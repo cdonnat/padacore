@@ -29,8 +29,7 @@ Export-Package: org.padacore.ui;
    org.eclipse.jface.viewers,
    org.eclipse.ui.dialogs,
    org.eclipse.swt.widgets",
- org.padacore.ui.navigator,
- org.padacore.ui.navigator.filters,
+  org.padacore.ui.navigator.filters,
  org.padacore.ui.preferences;
   uses:="org.eclipse.jface.preference,
    org.eclipse.jface.resource,

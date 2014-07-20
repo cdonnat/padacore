@@ -234,36 +234,13 @@
    </extension>
    <extension
          point="org.eclipse.ui.navigator.navigatorContent">
-      <navigatorContent
-            activeByDefault="false"
-            contentProvider="org.padacore.ui.navigator.AdaDirectoryContentProvider"
-            id="org.padacore.ui.navigator.sourceDirectories"
-            labelProvider="org.padacore.ui.navigator.AdaDirectoryLabelProvider"
-            name="Source directories"
-            priority="lowest">
-         <triggerPoints>
-            <instanceof
-                  value="org.eclipse.core.resources.IProject">
-            </instanceof>
-         </triggerPoints>
-         <possibleChildren>
-            <and>
-               <instanceof
-                     value="org.eclipse.core.resources.IFolder">
-               </instanceof>
-               <test
-                     property="org.padacore.isASourceDirectory">
-               </test>
-            </and>
-         </possibleChildren>
-      </navigatorContent>
             <commonFilter
             activeByDefault="true"
             class="org.padacore.ui.navigator.filters.AdaProjectsFilter"
             description="Hides projects which do not have an Ada nature"
             id="org.padacore.ui.navigator.filters.adaProjects"
             name="Non-Ada projects"
-            visibleInUI="false">
+            visibleInUI="true">
       </commonFilter>
             <commonFilter
                   activeByDefault="true"
@@ -289,6 +266,30 @@
                   name="Executable directory"
                   visibleInUI="true">
             </commonFilter>
+            <commonWizard
+                  menuGroupId="org.padacore.ui"
+                  type="new"
+                  wizardId="org.padacore.wizards.NewGnatProjectWizard">
+               <enablement></enablement>
+            </commonWizard>
+            <commonWizard
+                  menuGroupId="org.padacore.ui"
+                  type="import"
+                  wizardId="org.padacore.ui.wizards.AdaProjectFromGprWizard">
+               <enablement></enablement>
+            </commonWizard>
+            <commonWizard
+                  menuGroupId="org.padacore.ui"
+                  type="new"
+                  wizardId="org.padacore.wizards.NewAdaSpecificationWizard">
+               <enablement></enablement>
+            </commonWizard>
+            <commonWizard
+                  menuGroupId="org.padacore.ui"
+                  type="new"
+                  wizardId="org.padacore.wizards.NewAdaImplementationWizard">
+               <enablement></enablement>
+            </commonWizard>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
