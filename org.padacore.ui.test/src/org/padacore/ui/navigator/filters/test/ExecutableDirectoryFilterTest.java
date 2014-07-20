@@ -73,11 +73,11 @@ public class ExecutableDirectoryFilterTest {
 		 * |_obj
 		 * |_src
 		 */
+		IPath objectDirLocation = PROJECT_LOCATION.append(new Path("/obj"));
 		IPath execDirLocation = PROJECT_LOCATION.append(new Path("/exe"));
 		when(adaProject.getExecutableDirectoryPath()).thenReturn(
 				execDirLocation);
-		when(adaProject.getObjectDirectoryPath()).thenReturn(
-				PROJECT_LOCATION.append(new Path("/obj")));
+		when(adaProject.getObjectDirectoryPath()).thenReturn(objectDirLocation);
 
 		List<IPath> sourceDirs = new ArrayList<IPath>();
 		sourceDirs.add(PROJECT_LOCATION.append(new Path("/src")));
