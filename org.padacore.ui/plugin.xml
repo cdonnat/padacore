@@ -105,15 +105,20 @@
     <or>
     <with variable="selection">
      <count value="1"/>
-     <iterate>
+     <iterate
+           operator="and">
      <or>
      	<and>
      	<instanceof value="org.eclipse.core.resources.IProject"/>
-     	<test property="org.padacore.isExecutableAdaProject"/>
+     	<test
+            forcePluginActivation="true"
+            property="org.padacore.isExecutableAdaProject"/>
      	</and>
      	<and>
      	<instanceof value="org.eclipse.core.resources.IFile"/>
-     	<test property="org.padacore.belongsToAdaProject"/>
+     	<test
+            forcePluginActivation="true"
+            property="org.padacore.isExecutableInAdaProject"/>
      	</and>
      </or>
      </iterate>
@@ -127,35 +132,35 @@
          </contextualLaunch>
       </shortcut>
    </extension>
-   <extension
+  <extension
          point="org.eclipse.core.expressions.propertyTesters">
       <propertyTester
-            class="org.padacore.ui.launch.AdaLaunchConfigurationShortcutTester"
-            id="org.padacore.belongsToAdaProject"
+            class="org.padacore.ui.ResourcePropertyTester"
+            id="org.padacore.isExecutableInAdaProject"
             namespace="org.padacore"
-            properties="belongsToAdaProject"
+            properties="isExecutableInAdaProject"
             type="org.eclipse.core.resources.IFile">
       </propertyTester>
       <propertyTester
-            class="org.padacore.ui.launch.AdaLaunchConfigurationShortcutTester"
+            class="org.padacore.ui.ResourcePropertyTester"
             id="org.padacore.isExecutableAdaProject"
             namespace="org.padacore"
             properties="isExecutableAdaProject"
             type="org.eclipse.core.resources.IProject">
       </propertyTester>
        <propertyTester
-            class="org.padacore.ui.launch.AdaLaunchConfigurationShortcutTester"
+            class="org.padacore.ui.ResourcePropertyTester"
             id="org.padacore.isAdaExecutableEditor"
             namespace="org.padacore"
             properties="isAdaExecutableEditor"
             type="org.eclipse.ui.IEditorPart">
       </propertyTester>
        <propertyTester
-             class="org.padacore.ui.navigator.AdaProjectDirectoryPropertyTester"
-             id="org.padacore.ui.navigator.directoryPropertyTester"
+             class="org.padacore.ui.ResourcePropertyTester"
+             id="org.padacore.isInAdaProject"
              namespace="org.padacore"
-             properties="isASourceDirectory"
-             type="org.eclipse.core.resources.IFolder">
+             properties="isInAdaProject"
+             type="org.eclipse.core.resources.IResource">
        </propertyTester>
    </extension>
    <extension
@@ -180,14 +185,6 @@
       <view
             allowMultiple="false"
             category="org.padacore.ui.views.ada"
-            class="org.eclipse.ui.navigator.CommonNavigator"
-            id="org.padacore.ui.AdaProjectExplorer"
-            name="Ada Project Explorer"
-            restorable="true">
-      </view>
-      <view
-            allowMultiple="false"
-            category="org.padacore.ui.views.ada"
             class="org.padacore.ui.views.extvar.View"
             id="org.padacore.ui.views.scenario"
             name="Scenario"
@@ -199,45 +196,11 @@
       </category>
    </extension>
    <extension
-         point="org.eclipse.ui.navigator.viewer">
-      <viewer
-            viewerId="org.padacore.ui.AdaProjectExplorer">
-      </viewer>
-      <viewerContentBinding
-            viewerId="org.padacore.ui.AdaProjectExplorer">
-         <includes>
-            <contentExtension
-                  pattern="org.eclipse.ui.navigator.resourceContent">
-            </contentExtension>
-            <contentExtension
-                  pattern="org.eclipse.ui.navigator.resources.filters.workingSet">
-            </contentExtension>
-            <contentExtension
-                  pattern="org.padacore.ui.navigator.filters.*">
-            </contentExtension>
-            <contentExtension
-                  pattern="org.padacore.ui.navigator.sourceDirectories">
-            </contentExtension>
-            <contentExtension
-                  pattern="org.eclipse.ui.navigator.resources.filters.closedProject">
-            </contentExtension>
-         </includes>
-      </viewerContentBinding>
-      <viewerActionBinding
-            viewerId="org.padacore.ui.AdaProjectExplorer">
-         <includes>
-            <actionExtension
-                  pattern="org.eclipse.ui.navigator.resources.*">
-            </actionExtension>
-         </includes>
-      </viewerActionBinding>
-   </extension>
-   <extension
          point="org.eclipse.ui.navigator.navigatorContent">
             <commonFilter
-            activeByDefault="true"
+            activeByDefault="false"
             class="org.padacore.ui.navigator.filters.AdaProjectsFilter"
-            description="Hides projects which do not have an Ada nature"
+            description="Hides all projects without Ada nature"
             id="org.padacore.ui.navigator.filters.adaProjects"
             name="Non-Ada projects"
             visibleInUI="true">
@@ -245,17 +208,17 @@
             <commonFilter
                   activeByDefault="true"
                   class="org.padacore.ui.navigator.filters.ProjectDirectoriesFilter"
-                  description="Only display source, object and executable directories"
+                  description="Hides directories in Ada project which belong neither to source, object or executable directories"
                   id="org.padacore.ui.navigator.filters.projectDirectories"
-                  name="Show only projects directories"
-                  visibleInUI="false">
+                  name="Standard directories in Ada projects"
+                  visibleInUI="true">
             </commonFilter>
             <commonFilter
                   activeByDefault="true"
                   class="org.padacore.ui.navigator.filters.ObjectDirectoryFilter"
                   description="Hides object directory of Ada project"
                   id="org.padacore.ui.navigator.filters.objectDirectory"
-                  name="Object directory"
+                  name="Ada object directory"
                   visibleInUI="true">
             </commonFilter>
             <commonFilter
@@ -263,32 +226,91 @@
                   class="org.padacore.ui.navigator.filters.ExecutableDirectoryFilter"
                   description="Hides executable directory of Ada project"
                   id="org.padacore.ui.navigator.filters.executableDirectory"
-                  name="Executable directory"
+                  name="Ada executable directory"
                   visibleInUI="true">
             </commonFilter>
+           
             <commonWizard
-                  menuGroupId="org.padacore.ui"
-                  type="new"
-                  wizardId="org.padacore.wizards.NewGnatProjectWizard">
-               <enablement></enablement>
-            </commonWizard>
-            <commonWizard
-                  menuGroupId="org.padacore.ui"
-                  type="import"
-                  wizardId="org.padacore.ui.wizards.AdaProjectFromGprWizard">
-               <enablement></enablement>
-            </commonWizard>
-            <commonWizard
-                  menuGroupId="org.padacore.ui"
-                  type="new"
-                  wizardId="org.padacore.wizards.NewAdaSpecificationWizard">
-               <enablement></enablement>
-            </commonWizard>
-            <commonWizard
-                  menuGroupId="org.padacore.ui"
+                  menuGroupId="group.org.padacore.ui.resource"
                   type="new"
                   wizardId="org.padacore.wizards.NewAdaImplementationWizard">
-               <enablement></enablement>
+               <enablement>
+                  <with
+                        variable="selection">
+                     <iterate ifEmpty="false"  operator="and">
+                        <or>
+                           <and>
+                              <instanceof
+                                    value="org.eclipse.core.resources.IProject">
+                              </instanceof>
+                              <test
+                                    property="org.eclipse.core.resources.projectNature"
+                                    value="org.padacore.core.adaProjectNature">
+                              </test>
+                           </and>
+                           <and>
+                              <instanceof
+                                    value="org.eclipse.core.resources.IFile">
+                              </instanceof>
+                              <test
+                                    forcePluginActivation="true"
+                                    property="org.padacore.isInAdaProject">
+                              </test>
+                           </and>
+                           <and>
+                              <instanceof
+                                    value="org.eclipse.core.resources.IFolder">
+                              </instanceof>
+                              <test
+                                    forcePluginActivation="true"
+                                    property="org.padacore.isInAdaProject">
+                              </test>
+                           </and>
+                        </or>
+                     </iterate>
+                  </with>
+               </enablement>
+            </commonWizard>
+            <commonWizard
+                  menuGroupId="group.org.padacore.ui.resource"
+                  type="new"
+                  wizardId="org.padacore.wizards.NewAdaSpecificationWizard">
+               <enablement>
+                  <with
+                        variable="selection">
+                     <iterate ifEmpty="false"  operator="and">
+                        <or>
+                           <and>
+                              <instanceof
+                                    value="org.eclipse.core.resources.IProject">
+                              </instanceof>
+                              <test
+                                    property="org.eclipse.core.resources.projectNature"
+                                    value="org.padacore.core.adaProjectNature">
+                              </test>
+                           </and>
+                           <and>
+                              <instanceof
+                                    value="org.eclipse.core.resources.IFile">
+                              </instanceof>
+                              <test
+                                    forcePluginActivation="true"
+                                    property="org.padacore.isInAdaProject">
+                              </test>
+                           </and>
+                           <and>
+                              <instanceof
+                                    value="org.eclipse.core.resources.IFolder">
+                              </instanceof>
+                              <test
+                                    forcePluginActivation="true"
+                                    property="org.padacore.isInAdaProject">
+                              </test>
+                           </and>
+                        </or>
+                     </iterate>
+                  </with>
+               </enablement>
             </commonWizard>
    </extension>
    <extension
@@ -296,6 +318,17 @@
       <initializer
             class="org.padacore.ui.preferences.PreferenceInitializer">
       </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.navigator.viewer">
+      <viewerContentBinding
+            viewerId="org.eclipse.ui.navigator.ProjectExplorer">
+         <includes>
+            <contentExtension
+                  pattern="org.padacore.ui.navigator.filters.*">
+            </contentExtension>
+         </includes>
+      </viewerContentBinding>
    </extension>
 
 </plugin>

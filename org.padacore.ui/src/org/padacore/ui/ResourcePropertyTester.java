@@ -1,8 +1,9 @@
-package org.padacore.ui.launch;
+package org.padacore.ui;
 
 import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ui.IEditorInput;
@@ -13,11 +14,12 @@ import org.padacore.core.project.AdaProjectNature;
 import org.padacore.core.project.IAdaProject;
 import org.padacore.core.project.PropertiesManager;
 
-public class AdaLaunchConfigurationShortcutTester extends PropertyTester {
+public class ResourcePropertyTester extends PropertyTester {
 
-	private final static String BELONGS_TO_ADA_PROJECT = "belongsToAdaProject";
+	private final static String IS_EXECUTABLE_IN_ADA_PROJECT = "isExecutableInAdaProject";
 	private final static String IS_EXECUTABLE_ADA_PROJECT = "isExecutableAdaProject";
 	private final static String IS_ADA_EDITOR = "isAdaExecutableEditor";
+	private final static String IS_IN_ADA_PROJECT = "isInAdaProject";
 
 	@Override
 	public boolean test(Object receiver, String property, Object[] args,
@@ -25,7 +27,7 @@ public class AdaLaunchConfigurationShortcutTester extends PropertyTester {
 
 		boolean testPassed = false;
 
-		if (property.equals(BELONGS_TO_ADA_PROJECT)) {
+		if (property.equals(IS_EXECUTABLE_IN_ADA_PROJECT)) {
 			Assert.isLegal(receiver instanceof IFile);
 			testPassed = this.isFileAnExecutableInAdaProject((IFile) receiver);
 		} else if (property.equals(IS_EXECUTABLE_ADA_PROJECT)) {
@@ -36,9 +38,37 @@ public class AdaLaunchConfigurationShortcutTester extends PropertyTester {
 			Assert.isLegal(receiver instanceof IEditorPart);
 			testPassed = this
 					.doesEditorPointsToAnExecutableInAdaProject((IEditorPart) receiver);
+		} else if (property.equals(IS_IN_ADA_PROJECT)) {
+			Assert.isLegal(receiver instanceof IResource);
+			testPassed = this.isResourceInAdaProject((IResource) receiver);
 		}
 
 		return testPassed;
+
+	}
+
+	/**
+	 * Checks if the given resource belongs to a project with Ada nature.
+	 * 
+	 * @param resource
+	 *            the selected resource to check.
+	 * @return True if resource belongs to a project with Ada nature, False
+	 *         otherwise.
+	 */
+	private boolean isResourceInAdaProject(IResource resource) {
+		IProject enclosingProject = resource.getProject();
+		boolean isInAdaProject = false;
+
+		if (enclosingProject.isOpen()) {
+			try {
+				isInAdaProject = enclosingProject
+						.hasNature(AdaProjectNature.NATURE_ID);
+			} catch (CoreException e) {
+				isInAdaProject = false;
+			}
+		}
+
+		return isInAdaProject;
 
 	}
 
@@ -74,27 +104,25 @@ public class AdaLaunchConfigurationShortcutTester extends PropertyTester {
 	 *         executable, False otherwise.
 	 */
 	private boolean isProjectAnExecutableAdaProject(IProject selectedProject) {
-		boolean hasAdaNatureAndIsOpen = false;
-		boolean isAnExecutableProject = false;
+		boolean isAnExecutableOpenAdaProject = false;
 
 		IAdaProject associatedAdaProject;
 
-		try {
-			if (selectedProject.isOpen()) {
-				hasAdaNatureAndIsOpen = selectedProject
-						.hasNature(AdaProjectNature.NATURE_ID);
-			}
+		if (selectedProject.isOpen()) {
+			try {
+				if (selectedProject.hasNature(AdaProjectNature.NATURE_ID)) {
 
-			if (hasAdaNatureAndIsOpen) {
-				associatedAdaProject = AbstractAdaProjectAssociationManager
-						.GetAssociatedAdaProject(selectedProject);
-				isAnExecutableProject = associatedAdaProject.isExecutable();
+					associatedAdaProject = AbstractAdaProjectAssociationManager
+							.GetAssociatedAdaProject(selectedProject);
+					isAnExecutableOpenAdaProject = associatedAdaProject
+							.isExecutable();
+				}
+			} catch (CoreException e) {
+				isAnExecutableOpenAdaProject = false;
 			}
-		} catch (CoreException e) {
-			hasAdaNatureAndIsOpen = false;
 		}
 
-		return hasAdaNatureAndIsOpen && isAnExecutableProject;
+		return isAnExecutableOpenAdaProject;
 	}
 
 	/**

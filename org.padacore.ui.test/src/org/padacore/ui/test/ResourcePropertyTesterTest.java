@@ -1,4 +1,4 @@
-package org.padacore.ui.launch.test;
+package org.padacore.ui.test;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -6,15 +6,16 @@ import static org.mockito.Mockito.when;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
 import org.junit.Before;
 import org.junit.Test;
 import org.padacore.core.test.utils.CommonTestUtils;
-import org.padacore.ui.launch.AdaLaunchConfigurationShortcutTester;
+import org.padacore.ui.ResourcePropertyTester;
 
-public class AdaLaunchConfigurationShortcutTesterTest {
+public class ResourcePropertyTesterTest {
 
 	private final static String EXECUTABLE_SOURCE_FILENAME = "main.adb";
 	private final static String EXECUTABLE_BINARY_FILENAME = CommonTestUtils
@@ -22,7 +23,8 @@ public class AdaLaunchConfigurationShortcutTesterTest {
 
 	private IProject executableAdaProject;
 	private IProject nonExecutableAdaProject;
-	private AdaLaunchConfigurationShortcutTester sut;
+	private IProject nonAdaProject;
+	private ResourcePropertyTester sut;
 	private IFile editedFile;
 	private IEditorPart editor;
 
@@ -31,12 +33,13 @@ public class AdaLaunchConfigurationShortcutTesterTest {
 		this.executableAdaProject = CommonTestUtils.CreateAdaProject(true,
 				true, new String[] { EXECUTABLE_SOURCE_FILENAME });
 		this.nonExecutableAdaProject = CommonTestUtils.CreateAdaProject(true);
+		this.nonAdaProject = CommonTestUtils.CreateNonAdaProject(true);
 		this.editor = mock(IEditorPart.class);
 		IFileEditorInput fileEditorInput = mock(IFileEditorInput.class);
 		this.editedFile = mock(IFile.class);
 		when(this.editor.getEditorInput()).thenReturn(fileEditorInput);
 		when(fileEditorInput.getFile()).thenReturn(this.editedFile);
-		this.sut = new AdaLaunchConfigurationShortcutTester();
+		this.sut = new ResourcePropertyTester();
 	}
 
 	private IFile createFileInProject(IProject project, String fileName) {
@@ -47,26 +50,47 @@ public class AdaLaunchConfigurationShortcutTesterTest {
 		return file;
 	}
 
-	private void checkProjectPropertyTestIsPassed(boolean isPassed,
-			IProject project, String comment) {
-		assertTrue(comment,
+	private void checkExecutableAdaProjectPropertyTestIsPassed(
+			boolean isPassed, IProject project, String comment) {
+		assertTrue(
+				comment,
 				this.sut.test(project, "isExecutableAdaProject", null, null) == isPassed);
+	}
+
+	private void checkInAdaProjectPropertyTestIsPassed(boolean isPassed,
+			IResource resource, String comment) {
+		assertTrue(
+				comment,
+				this.sut.test(resource, "isInAdaProject", null, null) == isPassed);
 	}
 
 	private void checkFilePropertyTestIsPassed(boolean isPassed, IFile file,
 			String comment) {
 		assertTrue(
 				comment,
-				this.sut.test(file, "belongsToAdaProject", null, null) == isPassed);
+				this.sut.test(file, "isExecutableInAdaProject", null, null) == isPassed);
 
 	}
 
 	@Test
 	public void testIsAdaExecutableProject() {
-		this.checkProjectPropertyTestIsPassed(true, this.executableAdaProject,
-				"Executable Ada project");
-		this.checkProjectPropertyTestIsPassed(false,
+		this.checkExecutableAdaProjectPropertyTestIsPassed(true,
+				this.executableAdaProject, "Executable Ada project");
+		this.checkExecutableAdaProjectPropertyTestIsPassed(false,
 				this.nonExecutableAdaProject, "Non-executable Ada project");
+	}
+
+	@Test
+	public void testIsInAdaProject() {
+		this.checkInAdaProjectPropertyTestIsPassed(true,
+				this.executableAdaProject.getFile("test"),
+				"In executable Ada project");
+		this.checkInAdaProjectPropertyTestIsPassed(true,
+				this.nonExecutableAdaProject.getFolder("test"),
+				"In non-executable Ada project");
+		this.checkInAdaProjectPropertyTestIsPassed(false,
+				this.nonAdaProject.getFile("test"), "Non-Ada project");
+
 	}
 
 	private void runTestCaseForFile(IProject project, String fileNameToCreate,
