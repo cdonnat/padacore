@@ -37,7 +37,7 @@ public class View extends ViewPart implements Observer {
 		TableColumnLayout layout = new TableColumnLayout();
 		composite.setLayout(layout);
 
-		this.viewer = new TableViewer(composite, SWT.H_SCROLL | SWT.V_SCROLL);
+		this.viewer = new TableViewer(composite, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
 		this.viewer.getTable().setLinesVisible(true);
 		this.viewer.getTable().setHeaderVisible(true);
 
