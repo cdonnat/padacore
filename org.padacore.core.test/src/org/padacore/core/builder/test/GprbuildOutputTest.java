@@ -36,12 +36,12 @@ public class GprbuildOutputTest {
 	private void performErrorTestCase(String input, String file, int line, int column,
 			int severity, String message) {
 		sut.evaluate(input);
-		assertEquals("Error indicator", sut.lastEntryIndicatesError(), true);
-		assertEquals("File containing error", sut.error().file(), file);
-		assertEquals("Line containing error", sut.error().line(), line);
-		assertEquals("Column containing error", sut.error().column(), column);
-		assertEquals("Message error", sut.error().message(), message);
-		assertEquals("Severity", sut.error().severity(), severity);
+		assertEquals("Error indicator", true, sut.lastEntryIndicatesError());
+		assertEquals("File containing error", file, sut.error().file());
+		assertEquals("Line containing error", line, sut.error().line());
+		assertEquals("Column containing error", column, sut.error().column());
+		assertEquals("Message error", message, sut.error().message());
+		assertEquals("Severity", severity, sut.error().severity(), severity);
 	}
 
 	@Test
@@ -52,5 +52,8 @@ public class GprbuildOutputTest {
 				"toto_test.ads", 5, 35, Error.SEVERITY_WARNING, "variable toto is not referenced");
 		performErrorTestCase("toto_test.ads:5:35:error: variable toto is not referenced",
 				"toto_test.ads", 5, 35, Error.SEVERITY_ERROR, "variable toto is not referenced");
+		performErrorTestCase("/home/rs/DL/Adacore/gtkada-2.24.2-src/src/gtkextra/gtkplotcanvasline.c:24:21: fatal error: gtk/gtk.h: No such file or directory",
+				"/home/rs/DL/Adacore/gtkada-2.24.2-src/src/gtkextra/gtkplotcanvasline.c", 24, 21, Error.SEVERITY_ERROR, "gtk/gtk.h: No such file or directory");
+		
 	}
 }

@@ -64,6 +64,27 @@ public class GprbuildOutput {
 	}
 
 	/**
+	 * Returns the error header from a message which contains the error type and
+	 * may contain an error header.
+	 * 
+	 * @param errorTypeWithErrorHeader
+	 *            a message which contains the error type and may contain an
+	 *            error header.
+	 * @return error header if there is such one or null otherwise.
+	 */
+	private String getErrorHeader(String errorTypeWithErrorHeader) {
+		String[] splitErrorTypeWithErrorHeader = errorTypeWithErrorHeader
+				.split(":");
+		String errorHeader = null;
+
+		if (splitErrorTypeWithErrorHeader.length == 2) {
+			errorHeader = splitErrorTypeWithErrorHeader[1];
+		}
+
+		return errorHeader;
+	}
+
+	/**
 	 * Precondition : lastEntryIndicatesError() Postcondition: returned error is
 	 * not null
 	 * 
@@ -71,13 +92,25 @@ public class GprbuildOutput {
 	 */
 	public Error error() {
 		int severity = Error.SEVERITY_ERROR;
+		StringBuilder message = new StringBuilder();
+		String errorTypeWithErrorHeader = errorMatcher.group(4);
+		String errorHeader;
 
-		if (errorMatcher.group(4) != null) {
-			severity = errorMatcher.group(4).contains("warning") ? Error.SEVERITY_WARNING
+		if (errorTypeWithErrorHeader != null) {
+			severity = errorTypeWithErrorHeader.contains("warning") ? Error.SEVERITY_WARNING
 					: Error.SEVERITY_ERROR;
+
+			errorHeader = this.getErrorHeader(errorTypeWithErrorHeader);
+			if (errorHeader != null) {
+				message.append(errorHeader.trim());
+				message.append(": ");
+			}
 		}
 
-		return new Error(errorMatcher.group(1), Integer.parseInt(errorMatcher.group(2)),
-				Integer.parseInt(errorMatcher.group(3)), severity, errorMatcher.group(5));
+		message.append(errorMatcher.group(5));
+
+		return new Error(errorMatcher.group(1), Integer.parseInt(errorMatcher
+				.group(2)), Integer.parseInt(errorMatcher.group(3)), severity,
+				message.toString());
 	}
 }
