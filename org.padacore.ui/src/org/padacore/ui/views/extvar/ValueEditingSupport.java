@@ -17,23 +17,20 @@ import org.padacore.core.gnat.ScenarioItem;
 
 public class ValueEditingSupport extends EditingSupport {
 
-	private final TableViewer viewer;
 	private final Scenario scenario;
 
 	public ValueEditingSupport(TableViewer viewer, Scenario scenario) {
 		super(viewer);
-		this.viewer = viewer;
 		this.scenario = scenario;
 	}
 
 	@Override
 	protected CellEditor getCellEditor(Object element) {
-		Composite parent = (Composite) this.viewer.getTable();
+		Composite parent = (Composite) this.getViewer().getControl();
 		ScenarioItem var = (ScenarioItem) element;
 		CellEditor res;
 		if (var.isTyped()) {
-			res = new ComboBoxCellEditor(parent, this.getValuesAsArray(var), SWT.READ_ONLY
-					| SWT.BORDER);
+			res = new ComboBoxCellEditor(parent, this.getValuesAsArray(var), SWT.READ_ONLY);
 		} else {
 			res = new TextCellEditor(parent);
 		}
@@ -68,11 +65,11 @@ public class ValueEditingSupport extends EditingSupport {
 			valueToSet = (String) value;
 		}
 		this.scenario.setExternalVariableValueFor(this.getProject(), var.getName(), valueToSet);
-		this.viewer.refresh();
+		this.getViewer().refresh();
 	}
 
 	private GnatAdaProject getProject() {
-		return (GnatAdaProject) this.viewer.getInput();
+		return (GnatAdaProject) this.getViewer().getInput();
 	}
 
 	private List<String> getValues(ScenarioItem var) {
