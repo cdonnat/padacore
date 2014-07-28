@@ -16,10 +16,11 @@ public class GprbuildOutputTest {
 		sut = new GprbuildOutput();
 	}
 
-	private void performProgressionTestCase(String input, boolean lastEntryIndicatesProgress,
-			int remaining) {
+	private void performProgressionTestCase(String input,
+			boolean lastEntryIndicatesProgress, int remaining) {
 		sut.evaluate(input);
-		assertEquals(sut.lastEntryIndicatesProgress(), lastEntryIndicatesProgress);
+		assertEquals(sut.lastEntryIndicatesProgress(),
+				lastEntryIndicatesProgress);
 		if (lastEntryIndicatesProgress) {
 			assertEquals(sut.nbRemainingFilesToProcess(), remaining);
 		}
@@ -33,8 +34,8 @@ public class GprbuildOutputTest {
 		performProgressionTestCase("completed 12 out of 20 (100%)...", true, 8);
 	}
 
-	private void performErrorTestCase(String input, String file, int line, int column,
-			int severity, String message) {
+	private void performErrorTestCase(String input, String file, int line,
+			int column, int severity, String message) {
 		sut.evaluate(input);
 		assertEquals("Error indicator", true, sut.lastEntryIndicatesError());
 		assertEquals("File containing error", file, sut.error().file());
@@ -48,12 +49,22 @@ public class GprbuildOutputTest {
 	public void testError() {
 		performErrorTestCase("main.adb:5:35: missing \";\"", "main.adb", 5, 35,
 				Error.SEVERITY_ERROR, "missing \";\"");
-		performErrorTestCase("toto_test.ads:5:35:warning: variable toto is not referenced",
-				"toto_test.ads", 5, 35, Error.SEVERITY_WARNING, "variable toto is not referenced");
-		performErrorTestCase("toto_test.ads:5:35:error: variable toto is not referenced",
-				"toto_test.ads", 5, 35, Error.SEVERITY_ERROR, "variable toto is not referenced");
-		performErrorTestCase("/home/rs/DL/Adacore/gtkada-2.24.2-src/src/gtkextra/gtkplotcanvasline.c:24:21: fatal error: gtk/gtk.h: No such file or directory",
-				"/home/rs/DL/Adacore/gtkada-2.24.2-src/src/gtkextra/gtkplotcanvasline.c", 24, 21, Error.SEVERITY_ERROR, "gtk/gtk.h: No such file or directory");
-		
+		performErrorTestCase(
+				"toto_test.ads:5:35:warning: variable toto is not referenced",
+				"toto_test.ads", 5, 35, Error.SEVERITY_WARNING,
+				"variable toto is not referenced");
+		performErrorTestCase(
+				"toto_test.ads:5:35:error: variable toto is not referenced",
+				"toto_test.ads", 5, 35, Error.SEVERITY_ERROR,
+				"variable toto is not referenced");
+		performErrorTestCase(
+				"/home/rs/DL/Adacore/gtkada-2.24.2-src/src/gtkextra/gtkplotcanvasline.c:24:21: fatal error: gtk/gtk.h: No such file or directory",
+				"/home/rs/DL/Adacore/gtkada-2.24.2-src/src/gtkextra/gtkplotcanvasline.c",
+				24, 21, Error.SEVERITY_ERROR,
+				"gtk/gtk.h: No such file or directory");
+		performErrorTestCase(
+				"gate.adb:26:22: non-visible declaration at glib.ads:43",
+				"gate.adb", 26, 22, Error.SEVERITY_ERROR, "non-visible declaration at glib.ads:43");
+
 	}
 }

@@ -6,7 +6,9 @@ import java.util.regex.Pattern;
 public class GprbuildOutput {
 
 	private static final String PROGRESS_PATTERN_STRING = "completed (\\d+) out of (\\d+)";
-	private static final String ERROR_PATTERN_STRING = "^(.+):(\\d+):(\\d+):(.*:)?\\s+(.*)$";
+	// <filename>:<line>:<column>:<errorType>:<errorDescription>
+	private static final String ERROR_PATTERN_STRING = "^(.+):(\\d+):(\\d+):([^:]*:)?\\s+(.*)$";
+	//private static final String ERROR_PATTERN_STRING = "^(.+):(\\d+):(\\d+):(.*:)?\\s+(.*)$";
 
 	private Pattern progressPattern;
 	private Pattern errorPattern;
@@ -64,27 +66,6 @@ public class GprbuildOutput {
 	}
 
 	/**
-	 * Returns the error header from a message which contains the error type and
-	 * may contain an error header.
-	 * 
-	 * @param errorTypeWithErrorHeader
-	 *            a message which contains the error type and may contain an
-	 *            error header.
-	 * @return error header if there is such one or null otherwise.
-	 */
-	private String getErrorHeader(String errorTypeWithErrorHeader) {
-		String[] splitErrorTypeWithErrorHeader = errorTypeWithErrorHeader
-				.split(":");
-		String errorHeader = null;
-
-		if (splitErrorTypeWithErrorHeader.length == 2) {
-			errorHeader = splitErrorTypeWithErrorHeader[1];
-		}
-
-		return errorHeader;
-	}
-
-	/**
 	 * Precondition : lastEntryIndicatesError() Postcondition: returned error is
 	 * not null
 	 * 
@@ -92,25 +73,15 @@ public class GprbuildOutput {
 	 */
 	public Error error() {
 		int severity = Error.SEVERITY_ERROR;
-		StringBuilder message = new StringBuilder();
-		String errorTypeWithErrorHeader = errorMatcher.group(4);
-		String errorHeader;
+		String errorType = errorMatcher.group(4);
 
-		if (errorTypeWithErrorHeader != null) {
-			severity = errorTypeWithErrorHeader.contains("warning") ? Error.SEVERITY_WARNING
+		if (errorType != null) {
+			severity = errorType.contains("warning") ? Error.SEVERITY_WARNING
 					: Error.SEVERITY_ERROR;
-
-			errorHeader = this.getErrorHeader(errorTypeWithErrorHeader);
-			if (errorHeader != null) {
-				message.append(errorHeader.trim());
-				message.append(": ");
-			}
 		}
-
-		message.append(errorMatcher.group(5));
 
 		return new Error(errorMatcher.group(1), Integer.parseInt(errorMatcher
 				.group(2)), Integer.parseInt(errorMatcher.group(3)), severity,
-				message.toString());
+				errorMatcher.group(5));
 	}
 }
