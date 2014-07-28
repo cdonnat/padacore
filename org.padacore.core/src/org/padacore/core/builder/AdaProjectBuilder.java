@@ -3,6 +3,7 @@ package org.padacore.core.builder;
 import java.util.Map;
 import java.util.Observer;
 
+import org.eclipse.core.resources.IBuildConfiguration;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
@@ -22,7 +23,7 @@ import org.padacore.core.utils.ExternalProcessOutput;
 import org.padacore.core.utils.ProgramNotFoundException;
 
 /**
- * This class implements an Ada incremental project build using gprbuild.
+ * This class implements an Ada incremental project builder using gprbuild.
  * 
  * @author RS
  * 
@@ -58,6 +59,40 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 				(GnatAdaProject) new PropertiesManager(this.getProject())
 						.getAdaProject());
 		return cmd.clean();
+	}
+
+	/**
+	 * Checks if the build request comes from a top-level workspace build (e.g.
+	 * automatic build or "Build All").
+	 * 
+	 * @return true if and only if build request comes from a top-level
+	 *         workspace build
+	 */
+	private boolean isWorkspaceBuildRequested() {
+		return this.getContext().getRequestedConfigs().length == 0;
+	}
+
+	/**
+	 * Checks if the build for this project has been explicity requested by user
+	 * using "Build Project" option.
+	 * 
+	 * @return true if and only if the current project build has been explicitly
+	 *         requested by user.
+	 */
+	private boolean isBuildExplicitlyRequestedForCurrentProject() {
+		boolean buildExplicitlyRequestedForCurrentProject = false;
+		int build = 0;
+		IBuildConfiguration[] requestedBuilds = this.getContext()
+				.getRequestedConfigs();
+
+		while (build < requestedBuilds.length
+				&& !buildExplicitlyRequestedForCurrentProject) {
+			buildExplicitlyRequestedForCurrentProject = requestedBuilds[build]
+					.getProject() == this.getProject();
+			build++;
+		}
+
+		return buildExplicitlyRequestedForCurrentProject;
 	}
 
 	/**
@@ -115,8 +150,10 @@ public class AdaProjectBuilder extends IncrementalProjectBuilder {
 	@Override
 	protected IProject[] build(int kind, Map<String, String> args,
 			IProgressMonitor monitor) throws CoreException {
-
-		this.build(kind, monitor);
+		if (this.isWorkspaceBuildRequested()
+				|| this.isBuildExplicitlyRequestedForCurrentProject()) {
+			this.build(kind, monitor);
+		}
 
 		return this.getProject().getReferencedProjects();
 	}
