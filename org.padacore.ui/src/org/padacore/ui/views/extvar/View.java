@@ -37,29 +37,33 @@ public class View extends ViewPart implements Observer {
 		TableColumnLayout layout = new TableColumnLayout();
 		composite.setLayout(layout);
 
-		this.viewer = new TableViewer(composite, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
+		this.viewer = new TableViewer(composite, SWT.H_SCROLL | SWT.V_SCROLL
+				| SWT.FULL_SELECTION);
 		this.viewer.getTable().setLinesVisible(true);
 		this.viewer.getTable().setHeaderVisible(true);
 
 		this.viewer.setContentProvider(new ContentProvider(
 				org.padacore.core.Activator.getDefault().getScenario()));
 
-		final TableViewerColumn nameViewerColumn = new TableViewerColumn(this.viewer, SWT.LEFT);
+		final TableViewerColumn nameViewerColumn = new TableViewerColumn(
+				this.viewer, SWT.LEFT);
 		final TableColumn nameColumn = nameViewerColumn.getColumn();
 		nameColumn.setText("Name");
 		nameColumn.setWidth(200);
 		nameColumn.setResizable(true);
 		nameViewerColumn.setLabelProvider(new NameLabelProvider());
-		layout.setColumnData(nameColumn, new ColumnWeightData(2, ColumnWeightData.MINIMUM_WIDTH,
-				true));
+		layout.setColumnData(nameColumn, new ColumnWeightData(2,
+				ColumnWeightData.MINIMUM_WIDTH, true));
 
-		final TableViewerColumn valueViewerColumn = new TableViewerColumn(this.viewer, SWT.LEFT);
+		final TableViewerColumn valueViewerColumn = new TableViewerColumn(
+				this.viewer, SWT.LEFT);
 		final TableColumn valueColumn = valueViewerColumn.getColumn();
 		valueColumn.setText("Value");
 		valueColumn.setWidth(200);
 		valueColumn.setResizable(true);
-		valueViewerColumn.setEditingSupport(new ValueEditingSupport(this.viewer,
-				org.padacore.core.Activator.getDefault().getScenario()));
+		valueViewerColumn.setEditingSupport(new ValueEditingSupport(
+				this.viewer, org.padacore.core.Activator.getDefault()
+						.getScenario()));
 		valueViewerColumn.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
@@ -68,8 +72,13 @@ public class View extends ViewPart implements Observer {
 			}
 		});
 
-		layout.setColumnData(valueColumn, new ColumnWeightData(2, ColumnWeightData.MINIMUM_WIDTH,
-				true));
+		layout.setColumnData(valueColumn, new ColumnWeightData(2,
+				ColumnWeightData.MINIMUM_WIDTH, true));
+	}
+
+	@Override
+	public void dispose() {
+		this.viewer = null;
 	}
 
 	@Override
@@ -80,9 +89,13 @@ public class View extends ViewPart implements Observer {
 	public void update(Observable o, Object arg) {
 		Assert.isLegal(arg instanceof IProject);
 
-		PropertiesManager propertyManager = new PropertiesManager((IProject) arg);
-		GnatAdaProject selectedProject = (GnatAdaProject) propertyManager.getAdaProject();
+		PropertiesManager propertyManager = new PropertiesManager(
+				(IProject) arg);
+		GnatAdaProject selectedProject = (GnatAdaProject) propertyManager
+				.getAdaProject();
 
-		this.viewer.setInput(selectedProject);
+		if (this.viewer != null) {
+			this.viewer.setInput(selectedProject);
+		}
 	}
 }
