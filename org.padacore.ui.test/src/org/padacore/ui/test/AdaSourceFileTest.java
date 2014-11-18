@@ -70,6 +70,27 @@ public class AdaSourceFileTest {
 	}
 
 	@Test
+	public void checkFileNameWithLeadingDigitIsInvalid() {
+		String leadingDigit = this.addExtension("2file");
+		assertFalse("File name with leading digit is invalid",
+				this.sut.isFileNameValid(leadingDigit));
+	}
+
+	@Test
+	public void checkFileNameWithEndingUnderscoreIsInvalid() {
+		String endingUnderscore = this.addExtension("file_");
+		assertFalse("File name with ending underscore is invalid",
+				this.sut.isFileNameValid(endingUnderscore));
+	}
+
+	@Test
+	public void checkFileNameWithConsecutiveUnderscores() {
+		String consecutiveUnderscores = this.addExtension("fil__e");
+		assertFalse("File name with consecutive underscores is invalid",
+				this.sut.isFileNameValid(consecutiveUnderscores));
+	}
+
+	@Test
 	public void checkValidFileName() {
 		String alphaNumWithDashAndUnderscore = this
 				.addExtension("package-file_impl");

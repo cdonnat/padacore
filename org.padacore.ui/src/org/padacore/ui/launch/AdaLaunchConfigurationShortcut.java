@@ -3,6 +3,7 @@ package org.padacore.ui.launch;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.ui.ILaunchShortcut;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -73,17 +74,23 @@ public class AdaLaunchConfigurationShortcut implements ILaunchShortcut {
 
 				} else if (selectedElt instanceof IProject) {
 					final IProject selectedProject = (IProject) selectedElt;
-
-					ExecutableSelector execSelector = new ExecutableSelector(
-							selectedProject, new ExecutableSelectionDialogFactory());
-
-					if (execSelector.isExecutableSelected()) {
-						adaAppLauncher = this
-								.getApplicationLauncherFor(selectedProject);
-
-						adaAppLauncher.performLaunchFromFile(execSelector
-								.getSelectedExecutable());
+					
+					try {
+						selectedProject.getFile(selectedProject.getName() + ".gpr").touch(null);
+					} catch (CoreException e) {
+						e.printStackTrace();
 					}
+
+//					ExecutableSelector execSelector = new ExecutableSelector(
+//							selectedProject, new ExecutableSelectionDialogFactory());
+//
+//					if (execSelector.isExecutableSelected()) {
+//						adaAppLauncher = this
+//								.getApplicationLauncherFor(selectedProject);
+//
+//						adaAppLauncher.performLaunchFromFile(execSelector
+//								.getSelectedExecutable());
+//					}
 				}
 			}
 		}
