@@ -13,9 +13,13 @@ public class AdaSourceFileCreationPage extends WizardNewFileCreationPage {
 
 	/**
 	 * Creates a new wizard page for Ada source file creation.
-	 * @param pageName the name of the page
-	 * @param selection the current selection
-	 * @param sourceFileType the type of Ada source file to create
+	 * 
+	 * @param pageName
+	 *            the name of the page
+	 * @param selection
+	 *            the current selection
+	 * @param sourceFileType
+	 *            the type of Ada source file to create
 	 */
 	public AdaSourceFileCreationPage(String pageName,
 			IStructuredSelection selection, AdaSourceFile sourceFileType) {
@@ -35,34 +39,36 @@ public class AdaSourceFileCreationPage extends WizardNewFileCreationPage {
 	protected InputStream getInitialContents() {
 		return this.sourceFileType.getTemplate();
 	}
-	
+
 	@Override
 	public void setFileName(String value) {
 		super.setFileName(value);
 	}
-	
+
 	/**
-	 * Displays an error message if the input file name is considered as incorrect.
+	 * Displays an error message if the input file name is considered as
+	 * incorrect.
 	 */
 	private void displayErrorMsgForIncorrectFileName() {
-		String errorMsgIfInvalidFileName = "Filename is invalid (it shall contain only letters, digits, underscores and dashes and shall shart with a letter or digit.";
+		String errorMsgIfInvalidFileName = "Filename is not a valid Ada identifier";
 
 		this.setErrorMessage(errorMsgIfInvalidFileName);
 	}
-	
+
 	@Override
 	protected boolean validatePage() {
 		boolean pageIsValid = super.validatePage();
 		boolean fileNameIsValid = false;
-		
+
 		if (pageIsValid) {
-			fileNameIsValid = this.sourceFileType.isFileNameValid(this.getFileName()); 
-			
-			if (!fileNameIsValid){
+			fileNameIsValid = this.sourceFileType.isFileNameValid(this
+					.getFileName());
+
+			if (!fileNameIsValid) {
 				displayErrorMsgForIncorrectFileName();
 			}
 		}
-		
+
 		pageIsValid = pageIsValid && fileNameIsValid;
 
 		return pageIsValid;
