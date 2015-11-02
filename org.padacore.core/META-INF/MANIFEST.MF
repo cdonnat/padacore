@@ -8,9 +8,10 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.debug.core;bundle-version="3.7.1",
  org.eclipse.ui.console;bundle-version="3.5.100",
  org.eclipse.jface;bundle-version="3.8.102",
- org.padacore.gpr4j;bundle-version="1.0.0"
+ org.padacore.gpr4j;bundle-version="1.0.0",
+ org.padacore.antlr;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ClassPath: bin
 Import-Package: org.eclipse.ui.statushandlers
 Export-Package: org.padacore.core,

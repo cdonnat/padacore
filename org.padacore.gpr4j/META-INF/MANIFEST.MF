@@ -4,8 +4,7 @@ Bundle-Name: org.padacore.gpr4j
 Bundle-SymbolicName: org.padacore.gpr4j
 Bundle-Version: 1.0.0.qualifier
 Bundle-ClassPath: lib/gpr4j-1.0.jar,
- lib/guava-14.0.1.jar,
- lib/antlr-4.0-complete.jar
-Export-Package: com.google.common.base,
- org.antlr.runtime,org.gpr4j.api
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+ lib/guava-14.0.1.jar
+Export-Package: com.google.common.base,org.gpr4j.api
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Require-Bundle: org.padacore.antlr;bundle-version="1.0.0"
