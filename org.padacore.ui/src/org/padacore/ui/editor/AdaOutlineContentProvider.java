@@ -1,6 +1,5 @@
 package org.padacore.ui.editor;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,13 +9,22 @@ import org.ada4j.api.model.IPackage;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentListener;
+import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
 
-public class AdaOutlineContentProvider implements ITreeContentProvider {
+/**
+ * This class provides contents for the standard "Outline" view used with Ada
+ * editor (packages, procedures...).
+ * 
+ * @author RS
+ *
+ */
+public class AdaOutlineContentProvider
+		implements ITreeContentProvider, IDocumentListener {
 
 	private TreeViewer viewer;
 	private IDocument document;
@@ -28,34 +36,29 @@ public class AdaOutlineContentProvider implements ITreeContentProvider {
 		}
 	}
 
-	private IDocumentListener documentListener = new IDocumentListener() {
-		@Override
-		public void documentChanged(DocumentEvent event) {
-			if (!AdaOutlineContentProvider.this.viewer.getControl().isDisposed()) {
-				AdaOutlineContentProvider.this.viewer.refresh();
-			}
-		}
-
-		@Override
-		public void documentAboutToBeChanged(DocumentEvent event) {
-		}
-	};
-
 	@Override
 	public void dispose() {
+		if (this.viewer != null && !this.viewer.getControl().isDisposed()) {
+			this.viewer.getControl().dispose();
+		}
 	}
 
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		this.viewer = (TreeViewer) viewer;
+		this.viewer.setAutoExpandLevel(AbstractTreeViewer.ALL_LEVELS);
 
 		if (oldInput instanceof IDocument) {
-			this.document.removeDocumentListener(this.documentListener);
+			this.document.removeDocumentListener(this);
 		}
 
 		if (newInput instanceof IDocument) {
 			this.document = (IDocument) newInput;
-			this.document.addDocumentListener(this.documentListener);
+			this.document.addDocumentListener(this);
+		}
+
+		if (!this.viewer.getControl().isDisposed()) {
+			this.viewer.refresh();
 		}
 	}
 
@@ -75,10 +78,11 @@ public class AdaOutlineContentProvider implements ITreeContentProvider {
 		IDocument document = this.getDocument(inputElement);
 
 		if (document != null && this.editorInput != null) {
-			Path editedFilePath = this.editorInput.getFile().getRawLocation()
-					.toFile().toPath();
+			String editedFileName = this.editorInput.getFile().getRawLocation()
+					.toFile().getName();
 			elements = new ICompilationUnit[1];
-			elements[0] = Factory.Create_Compilation_Unit(editedFilePath);
+			elements[0] = Factory.Create_Compilation_Unit(document.get(),
+					editedFileName);
 		}
 
 		return elements;
@@ -118,6 +122,15 @@ public class AdaOutlineContentProvider implements ITreeContentProvider {
 	@Override
 	public boolean hasChildren(Object element) {
 		return this.getChildren(element).length > 0;
+	}
+
+	@Override
+	public void documentAboutToBeChanged(DocumentEvent event) {
+	}
+
+	@Override
+	public void documentChanged(DocumentEvent event) {
+
 	}
 
 }

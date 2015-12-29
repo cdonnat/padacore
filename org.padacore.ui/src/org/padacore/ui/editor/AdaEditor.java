@@ -1,5 +1,6 @@
 package org.padacore.ui.editor;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
@@ -17,7 +18,7 @@ public class AdaEditor extends TextEditor {
 	@Override
 	public Object getAdapter(Class required) {
 
-		Object adapter;
+		Object adapter = super.getAdapter(required);
 
 		if (IContentOutlinePage.class.equals(required)) {
 			if (this.outlinePage == null) {
@@ -25,10 +26,17 @@ public class AdaEditor extends TextEditor {
 						this);
 			}
 			adapter = this.outlinePage;
-		} else {
-			adapter = super.getAdapter(required);
 		}
 
 		return adapter;
+	}
+
+	@Override
+	public void doSave(IProgressMonitor progressMonitor) {
+		// Refreshes "Outline" view upon file save
+		if (this.outlinePage != null) {
+			this.outlinePage.refresh();
+		}
+		super.doSave(progressMonitor);
 	}
 }
