@@ -1,9 +1,12 @@
 package org.padacore.ui.editor;
 
+import java.util.stream.Collectors;
+
 import org.ada4j.api.model.ICompilationUnit;
 import org.ada4j.api.model.INamedUnit;
 import org.ada4j.api.model.IPackage;
 import org.ada4j.api.model.ISubprogram;
+import org.ada4j.api.model.IType;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.swt.graphics.Image;
@@ -78,8 +81,31 @@ public class AdaOutlineLabelProvider implements ILabelProvider {
 	public String getText(Object element) {
 		Preconditions.checkArgument(
 				INamedUnit.class.isAssignableFrom(element.getClass()));
+		String eltText = ((INamedUnit) element).getName();
 
-		return ((INamedUnit) element).getName();
+		if (ISubprogram.class.isAssignableFrom(element.getClass())) {
+			ISubprogram subprogram = (ISubprogram) element;
+
+			StringBuilder eltTextBuilder = new StringBuilder();
+			eltTextBuilder.append(subprogram.getName());
+
+			if (subprogram.getArguments().size() != 0) {
+				eltTextBuilder.append("(");
+
+				eltTextBuilder.append(subprogram.getArguments().stream()
+						.map(IType::getName).collect(Collectors.joining(", ")));
+
+				eltTextBuilder.append(")");
+			}
+
+			if (subprogram.getType() == ISubprogram.FUNCTION) {
+				eltTextBuilder.append(" : ");
+				eltTextBuilder.append(subprogram.getReturnType().getName());
+			}
+			eltText = eltTextBuilder.toString();
+		}
+
+		return eltText;
 	}
 
 }

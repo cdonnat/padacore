@@ -83,7 +83,7 @@ public class AdaOutlineContentProvider
 					.toFile().getName();
 
 			ICompilationUnit compilationUnit = Factory
-					.Create_Compilation_Unit(document.get(), editedFileName);
+					.CreateCompilationUnit(document.get(), editedFileName);
 			if (compilationUnit.getMainSubprogram() != null) {
 				elements = new ISubprogram[1];
 				elements[0] = compilationUnit.getMainSubprogram();
@@ -129,7 +129,7 @@ public class AdaOutlineContentProvider
 		}
 
 		return parent;
-	}
+	} 
 
 	@Override
 	public boolean hasChildren(Object element) {
