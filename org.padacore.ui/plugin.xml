@@ -6,7 +6,7 @@
       <editor
             class="org.padacore.ui.editor.AdaEditor"
             default="true"
-            extensions="ads,adb,gpr"
+            extensions="ads,adb"
             icon="icons/adafile_obj.gif"
             id="org.padacore.ui.editor.AdaEditor"
             name="Ada Editor">

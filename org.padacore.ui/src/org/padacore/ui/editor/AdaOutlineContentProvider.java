@@ -6,6 +6,7 @@ import java.util.List;
 import org.ada4j.api.Factory;
 import org.ada4j.api.model.ICompilationUnit;
 import org.ada4j.api.model.IPackage;
+import org.ada4j.api.model.ISubprogram;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentListener;
@@ -80,9 +81,17 @@ public class AdaOutlineContentProvider
 		if (document != null && this.editorInput != null) {
 			String editedFileName = this.editorInput.getFile().getRawLocation()
 					.toFile().getName();
-			elements = new ICompilationUnit[1];
-			elements[0] = Factory.Create_Compilation_Unit(document.get(),
-					editedFileName);
+
+			ICompilationUnit compilationUnit = Factory
+					.Create_Compilation_Unit(document.get(), editedFileName);
+			if (compilationUnit.getMainSubprogram() != null) {
+				elements = new ISubprogram[1];
+				elements[0] = compilationUnit.getMainSubprogram();
+			} else {
+				// it's a package
+				elements = new IPackage[1];
+				elements[0] = compilationUnit.getRootPackage();
+			}
 		}
 
 		return elements;
@@ -100,8 +109,11 @@ public class AdaOutlineContentProvider
 		} else if (ICompilationUnit.class
 				.isAssignableFrom(parentElement.getClass())) {
 			ICompilationUnit parentUnit = (ICompilationUnit) parentElement;
-			children.addAll(parentUnit.getPackages());
-			children.addAll(parentUnit.getSubprograms());
+			if (parentUnit.getMainSubprogram() != null) {
+				children.add(parentUnit.getMainSubprogram());
+			} else {
+				children.add(parentUnit.getRootPackage());
+			}
 		}
 
 		return children.toArray();
